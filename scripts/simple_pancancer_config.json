@@ -1,0 +1,14 @@
+{
+  "max_fleet_size":1,
+  "fleet_name":"myFleet",
+  "path_to_key":"/home/ubuntu/.ssh/MyKey.pem",
+  "key_name":"MyKey",
+  "aws_region":"us_east_1",
+  "aws_zones":"us-east-1a,us-east-1b,us-east-1c,us-east-1d,us-east-1e",
+  "image_id":"ami-12345",
+  "instance_type":"m1.xlarge",
+  "security_group":"default",
+  "aws_key":"AWS_KEY",
+  "aws_secret_key":"AWS_SECRET_KEY",
+  "lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"
+}

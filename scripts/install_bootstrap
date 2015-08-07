@@ -17,6 +17,8 @@ DO YOU WISH TO CONTINUE [Y/N]:
 MSG
 #TODO detect docker installation
 
+
+
 read install_pancancer_launcher
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
@@ -62,8 +64,11 @@ if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
 
 	# now wget the start_launcher_container script and call it with the values from above:
 	# bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -f $user_fleet_name -e $user_cloud_env
-
+else
+	echo "You can run this script at another time to run the pancancer launcher"
+	exit 0
 fi
+
 
 echo "Exiting now."
 set +e

@@ -9,7 +9,6 @@ def processYouxiaSettings(d):
     outstr+='[youxia]\n'
     awsStr=''
     openstackStr=''
-
     for k,v in d.items():
         if not (isinstance(v,dict)):
             outstr+=makeConfigString(k,v)
@@ -43,6 +42,11 @@ def processConsonanceSettings(d):
             outstr+=makeConfigString(k1,str(v1))
     return outstr
 
+
+#######################
+# Main body of script #
+#######################
+
 with open('simple_pancancer_config.json') as simple_config_file:
     simple_config=json.load(simple_config_file)
 
@@ -52,7 +56,7 @@ with open('pancancer_config.mustache') as mustache_template_file:
 renderer=pystache.Renderer()
 parsed=pystache.parse(mustache_template)
 rendered_str=renderer.render(parsed,(simple_config))
-print(rendered_str)
+#print(rendered_str)
 data=json.loads(rendered_str)
 
 with open('youxia_config','w') as youxia_file:

@@ -4,6 +4,42 @@ from cliff.app import App
 from cliff.commandmanager import CommandManager
 from cliff.command import Command
 
+class WorkflowLister:
+    # Eventually, this list will come from some sort of online registry
+    _workflows= {   'Sanger':
+                    {
+                        'http_workflow':
+                        {
+                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1.zip',
+                            'full_name':'Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0',
+                            'version':'1.0.8'
+                        }
+                    },
+                    'BWA':
+                    {
+                        'http_workflow':
+                        {
+                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0.zip',
+                            'full_name':'Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1',
+                            'version':'2.6.5'
+                        }
+                    },
+                    'DKFZ/EMBL':
+                    {
+                        'http_workflow':
+                        {
+                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1.zip',
+                            'full_name':'Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1',
+                            'version':'1.0.5'
+                        }
+                    }
+                }
+    def get_workflow_names(self):
+        keys = ''
+        for k in self._workflows:
+            keys += k+'\n'
+        return keys
+
 class Workflows(Command):
     "This command  can help you configure and select workflows."
     log = logging.getLogger(__name__)
@@ -19,8 +55,11 @@ class Workflows(Command):
         subparser_name=vars(parsed_args)['subparser_name']
         self.log.info('subparser: %s',subparser_name)
         if subparser_name=='list':
-            # Eventually, this list will come from some sort of online registry
-            print('Sanger\nBWA\nDFKZ/EMBL')
+            lister = WorkflowLister()
+            workflow_list = lister.get_workflow_names()
+            print ('Available workflows are:')
+            print(workflow_list)
+
         elif subparser_name=='config':
             # TODO: Actually generate the correct INI file!
             print('generating default INI for workflow '+vars(parsed_args)['workflow_name'])

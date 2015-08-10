@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 import sys
 import logging
 from cliff.app import App
@@ -5,6 +7,7 @@ from cliff.commandmanager import CommandManager
 from cliff.command import Command
 
 class WorkflowLister:
+    "Get a listing of workflows from a source of workflow metadata."
     # Eventually, this list will come from some sort of online registry
     _workflows= {   'Sanger':
                     {
@@ -13,7 +16,15 @@ class WorkflowLister:
                             'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1.zip',
                             'full_name':'Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0',
                             'version':'1.0.8'
-                        }
+                        },
+                        "containers":
+                        {
+                            "seqware_whitestar_pancancer": {
+                                "name":"seqware_whitestar_pancancer",
+                                "image_name": "pancancer/seqware_whitestar_pancancer:1.1.1"
+                            }
+                        },
+                        "ami_id":"ami-12345"
                     },
                     'BWA':
                     {
@@ -22,7 +33,15 @@ class WorkflowLister:
                             'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0.zip',
                             'full_name':'Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1',
                             'version':'2.6.5'
-                        }
+                        },
+                        "containers":
+                        {
+                            "seqware_whitestar_pancancer": {
+                                "name":"seqware_whitestar_pancancer",
+                                "image_name": "pancancer/seqware_whitestar_pancancer:1.1.1"
+                            }
+                        },
+                        "ami_id":"ami-12345"
                     },
                     'DKFZ/EMBL':
                     {
@@ -31,12 +50,33 @@ class WorkflowLister:
                             'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1.zip',
                             'full_name':'Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1',
                             'version':'1.0.5'
-                        }
+                        },
+                        "containers":
+                        {
+                            "pcawg-delly-workflow": {
+                                "name":"pcawg-delly-workflow",
+                                "image_name": "pancancer/pcawg-delly-workflow:1.0"
+                            },
+                            "seqware_whitestar_pancancer": {
+                                "name":"seqware_whitestar_pancancer",
+                                "image_name": "pancancer/seqware_whitestar_pancancer:1.1.1"
+                            }
+                        },
+                        "s3_containers":
+                        {
+                            "dkfz_dockered_workflows":
+                            {
+                                "name":"dkfz_dockered_workflows",
+                                "url":"https://s3.amazonaws.com/oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar"
+                            }
+                        },
+                        "ami_id":"ami-12345"
                     }
                 }
-    def get_workflow_names(self):
+    @staticmethod
+    def get_workflow_names():
         keys = ''
-        for k in self._workflows:
+        for k in WorkflowLister._workflows:
             keys += k+'\n'
         return keys
 
@@ -55,8 +95,7 @@ class Workflows(Command):
         subparser_name=vars(parsed_args)['subparser_name']
         self.log.info('subparser: %s',subparser_name)
         if subparser_name=='list':
-            lister = WorkflowLister()
-            workflow_list = lister.get_workflow_names()
+            workflow_list = WorkflowLister.get_workflow_names()
             print ('Available workflows are:')
             print(workflow_list)
 
@@ -66,6 +105,7 @@ class Workflows(Command):
 
 
 class DaemonCommand(Command):
+    "Parent class for commands that start/stop daemons"
     service_name=''
     log = logging.getLogger(__name__)
 
@@ -105,6 +145,18 @@ class Provisioner(DaemonCommand):
 class Generator(Command):
     "This Generator will generate new job orders."
     log = logging.getLogger(__name__)
+    def get_parser(self,prog_name):
+       parser = super(Generator,self).get_parser(prog_name)
+       parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.')
+       return parser
+
+    def take_action(self, parsed_args):
+        workflow_name=vars(parsed_args)['workflow_name']
+        self.log.info('workflow_name: %s',workflow_name)
+
+        if not (workflow_name in WorkflowLister.get_workflow_names()):
+            print('sorry, but '+workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
+
 
 class Reports(Command):
     "The will generate reports on the command line."

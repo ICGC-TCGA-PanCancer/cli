@@ -8,13 +8,13 @@ from cliff.command import Command
 
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
-    # Eventually, this list will come from some sort of online registry
+    # Eventually, this data structure should come from some sort of online registry. For now, just define it in code.
     _workflows= {   'Sanger':
                     {
+                        'full_name':'Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0',
                         'http_workflow':
                         {
                             'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1.zip',
-                            'full_name':'Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0',
                             'version':'1.0.8'
                         },
                         "containers":
@@ -28,10 +28,10 @@ class WorkflowLister:
                     },
                     'BWA':
                     {
+                        'full_name':'Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1',
                         'http_workflow':
                         {
                             'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0.zip',
-                            'full_name':'Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1',
                             'version':'2.6.5'
                         },
                         "containers":
@@ -45,10 +45,11 @@ class WorkflowLister:
                     },
                     'DKFZ/EMBL':
                     {
+                        'full_name':'Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1',
                         'http_workflow':
                         {
                             'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1.zip',
-                            'full_name':'Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1',
+
                             'version':'1.0.5'
                         },
                         "containers":
@@ -73,12 +74,18 @@ class WorkflowLister:
                         "ami_id":"ami-12345"
                     }
                 }
+
     @staticmethod
     def get_workflow_names():
         keys = ''
         for k in WorkflowLister._workflows:
             keys += k+'\n'
         return keys
+
+    @staticmethod
+    def get_workflow_details(workflow_name):
+        return WorkflowLister._workflows[workflow_name]
+
 
 class Workflows(Command):
     "This command  can help you configure and select workflows."
@@ -136,11 +143,13 @@ class Coordinator(DaemonCommand):
     def __init__(self,Coordinator,args):
         self.service_name='Coordinator'
 
+
 class Provisioner(DaemonCommand):
     "The Provisioner will launcher worker VMs as needed based on the workflow orders sent to the system."
     log = logging.getLogger(__name__)
     def __init__(self,Provisioner,args):
         self.service_name='Provisioner'
+
 
 class Generator(Command):
     "This Generator will generate new job orders."
@@ -155,12 +164,18 @@ class Generator(Command):
         self.log.info('workflow_name: %s',workflow_name)
 
         if not (workflow_name in WorkflowLister.get_workflow_names()):
-            print('sorry, but '+workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
+            print('Oh, I\'m SO sorry, but '+workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
+        else:
+            workflow_details = WorkflowLister.get_workflow_details(workflow_name)
+            generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_details['http_workflow']['version']+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir'
+            print(generator_cmd)
+            #TODO execute generator_cmd
 
 
 class Reports(Command):
     "The will generate reports on the command line."
     log = logging.getLogger(__name__)
+
 
 class PancancerApp(App):
     log = logging.getLogger(__name__)

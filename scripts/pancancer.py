@@ -9,12 +9,29 @@ from cliff.command import Command
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
     # Eventually, this data structure should come from some sort of online registry. For now, just define it in code.
-    _workflows= {   'Sanger':
+    _workflows= {   'HelloWorld':
+                    {
+                        'full_name':' 	Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.1',
+                        'http_workflow':
+                        {
+                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.1.zip',
+                            'version':'1.0-SNAPSHOT'
+                        },
+                        "containers":
+                        {
+                            "seqware_whitestar_pancancer": {
+                                "name":"seqware_whitestar_pancancer",
+                                "image_name": "pancancer/seqware_whitestar_pancancer:1.1.1"
+                            }
+                        },
+                        "ami_id":"ami-12345"
+                    },
+                    'Sanger':
                     {
                         'full_name':'Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0',
                         'http_workflow':
                         {
-                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1.zip',
+                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0.zip',
                             'version':'1.0.8'
                         },
                         "containers":
@@ -31,7 +48,7 @@ class WorkflowLister:
                         'full_name':'Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1',
                         'http_workflow':
                         {
-                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0.zip',
+                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1.zip',
                             'version':'2.6.5'
                         },
                         "containers":
@@ -93,6 +110,7 @@ class Workflows(Command):
 
     def get_parser(self,prog_name):
         parser = super(Workflows,self).get_parser(prog_name)
+        #parser.add_mutually_exclusive_group()
         workflows_subparser = parser.add_subparsers(title='subcommands',help='workflows subcommands: list and config',dest='subparser_name')
         workflows_subparser.add_parser('list',help='Get a list of workflows')
         workflows_subparser.add_parser('config',help='Generate a default config file for a specific workflow').add_argument('workflow_name',help='Name of workflow to configure')
@@ -100,15 +118,19 @@ class Workflows(Command):
 
     def take_action(self, parsed_args):
         subparser_name=vars(parsed_args)['subparser_name']
-        self.log.info('subparser: %s',subparser_name)
+        self.log.debug('subparser: %s',subparser_name)
         if subparser_name=='list':
             workflow_list = WorkflowLister.get_workflow_names()
             print ('Available workflows are:')
             print(workflow_list)
 
         elif subparser_name=='config':
-            # TODO: Actually generate the correct INI file!
-            print('generating default INI for workflow '+vars(parsed_args)['workflow_name'])
+            workflow_name=vars(parsed_args)['workflow_name']
+            if workflow_name in WorkflowLister.get_workflow_names():
+                # TODO: Actually generate the correct INI file!
+                print('generating default INI in /home/ubuntu/ini-dir/'+workflow_name+'.ini for workflow '+workflow_name)
+            else:
+                print ('Sorry, but '+workflow_name+' is not a valid workflow name. Please use the command \'workflows list\' to see a list of available workflows.')
 
 
 class DaemonCommand(Command):
@@ -126,7 +148,7 @@ class DaemonCommand(Command):
 
     def take_action(self, parsed_args):
         subparser_name=vars(parsed_args)['subparser_name']
-        self.log.info('subparser: %s',subparser_name)
+        self.log.debug('subparser: %s',subparser_name)
 
         #if subparser_name=='start':
             #TODO: Figure out how to properly start/stop services from within python
@@ -161,7 +183,7 @@ class Generator(Command):
 
     def take_action(self, parsed_args):
         workflow_name=vars(parsed_args)['workflow_name']
-        self.log.info('workflow_name: %s',workflow_name)
+        self.log.debug('workflow_name: %s',workflow_name)
         if not (workflow_name in WorkflowLister.get_workflow_names()):
             print('Oh, I\'m SO sorry, but '+workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
         else:

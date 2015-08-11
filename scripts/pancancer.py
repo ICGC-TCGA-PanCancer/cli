@@ -104,6 +104,7 @@ class WorkflowLister:
     def get_workflow_details(workflow_name):
         return WorkflowLister._workflows[workflow_name]
 
+###
 
 class Workflows(Command):
     "This command  can help you configure and select workflows."
@@ -132,7 +133,10 @@ class Workflows(Command):
                 print('generating default INI in /home/ubuntu/ini-dir/'+workflow_name+'.ini for workflow '+workflow_name)
             else:
                 print ('Sorry, but '+workflow_name+' is not a valid workflow name. Please use the command \'workflows list\' to see a list of available workflows.')
+        else:
+            print ('The available subcommands are \'list\' and \'config\'.')
 
+###
 
 class DaemonCommand(Command):
     "Parent class for commands that start/stop daemons"
@@ -164,12 +168,15 @@ class DaemonCommand(Command):
             subprocess.check_call(stop_cmd.split(' '))
             subprocess.Popen(start_cmd.split(' '))
 
+###
+
 class Coordinator(DaemonCommand):
     "The Coordinator will process existing job orders into requests for VMs and jobs that will be picked up by running VMs."
     log = logging.getLogger(__name__)
     def __init__(self,Coordinator,args):
         self.service_name='Coordinator'
 
+###
 
 class Provisioner(DaemonCommand):
     "The Provisioner will launcher worker VMs as needed based on the workflow orders sent to the system."
@@ -177,6 +184,7 @@ class Provisioner(DaemonCommand):
     def __init__(self,Provisioner,args):
         self.service_name='Provisioner'
 
+###
 
 class Generator(Command):
     "This Generator will generate new job orders."
@@ -197,11 +205,35 @@ class Generator(Command):
             print(generator_cmd)
             subprocess.check_call(generator_cmd.split(' '))
 
+###
 
 class Reports(Command):
-    "The will generate reports on the command line."
+    "This will generate reports on the command line."
     log = logging.getLogger(__name__)
+    def get_parser(self,prog_name):
+        parser = super(Reports,self).get_parser(prog_name)
+        subparser = parser.add_subparsers(title='subcommands',help='reporting subcommands: gather, info, jobs, provisioned, status, help',dest='report_subcmd')
+        subparser.required=True
+        subparser.add_parser('gather',help='gathers the last message sent by each worker and displays the last line of it')
+        subparser.add_parser('info',help='retrieves detailed information on provisioned instances')
+        subparser.add_parser('jobs',help='retrieves detailed information on jobs')
+        subparser.add_parser('provisioned',help='retrieves detailed information on provisioned instances')
+        subparser.add_parser('status',help='retrieves configuration and version information on arch3')
+        subparser.add_parser('youxia',help='ask youxia for all information on instances known to the cloud APIs that are configured')
+        subparser.add_parser('help',help='Prints a help message for the reporting system.')
+        return parser
 
+    def take_action(self, parsed_args):
+        subcmd = vars(parsed_args)['report_subcmd']
+        cmd_str=''
+        if subcmd!='help':
+            # TODO: The path to the config file should probably be configurable, or at least in a more standard location than /home/ubuntu/...
+            cmd_str='java -cp reporting.jar info.pancancer.arch3.reportcli.ReportCLI --config /home/ubuntu/arch3/config/masterConfig.ini '+subcmd
+        elif subcmd=='help':
+            cmd_str='java -cp reporting.jar info.pancancer.arch3.reportcli.ReportCLI --config /home/ubuntu/arch3/config/masterConfig.ini'
+        subprocess.call(cmd_str.split(' '))
+
+###
 
 class PancancerApp(App):
     log = logging.getLogger(__name__)

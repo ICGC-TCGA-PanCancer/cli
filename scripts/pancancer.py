@@ -156,20 +156,19 @@ class Generator(Command):
     log = logging.getLogger(__name__)
     def get_parser(self,prog_name):
        parser = super(Generator,self).get_parser(prog_name)
-       parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.')
+       parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.',required=True)
        return parser
 
     def take_action(self, parsed_args):
         workflow_name=vars(parsed_args)['workflow_name']
         self.log.info('workflow_name: %s',workflow_name)
-
         if not (workflow_name in WorkflowLister.get_workflow_names()):
             print('Oh, I\'m SO sorry, but '+workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
         else:
             workflow_details = WorkflowLister.get_workflow_details(workflow_name)
             generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_details['http_workflow']['version']+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir'
             print(generator_cmd)
-            #TODO execute generator_cmd
+            #TODO execute generator_cmd in the background using the subprocess module
 
 
 class Reports(Command):

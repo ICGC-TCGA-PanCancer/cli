@@ -1,4 +1,6 @@
 #! /usr/bin/python3
+import json
+import configparser
 import time
 import sys
 import subprocess
@@ -234,7 +236,37 @@ class Generator(Command):
         else:
             workflow_details = WorkflowLister.get_workflow_details(workflow_name)
             generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_details['http_workflow']['version']+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
-            print(generator_cmd)
+            self.log.debug(generator_cmd)
+            # Before generating the job, we have to update params.json with the workflow/container info about the requested workflow.
+            paramsData=''
+            with open('/home/ubuntu/params.json','r') as params_file:
+                paramsData = json.load(params_file)
+                if 'http_workflow' in workflow_details:
+                    paramsData['http_workflows'] = workflow_details['http_workflow']
+                if 's3_workflows' in workflow_details:
+                    paramsData['s3_workflows'] = workflow_details['s3_workflows']
+                if 'containers' in workflow_details:
+                    paramsData['containers'] = workflow_details['containers']
+                if 's3_containers' in workflow_details:
+                    paramsData['s3_containers'] = workflow_details['s3_containers']
+                if 'http_containers' in workflow_details:
+                    paramsData['http_containers'] = workflow_details['http_containers']
+
+                paramsData['lvm_device_whitelist'] = workflow_details['lvm_devices']
+                paramsData['workflow_name'] = workflow_name
+
+            # Now write the params.json file.
+            with open('/home/ubuntu/params.json','w+') as params_file:
+                params_file.write(str(json.dumps(paramsData,sort_keys=True, indent=4) ))
+
+            # Update the youxia config file with the correct AMI and instance-type
+            config = configparser.ConfigParser()
+            config.read('/home/ubuntu/.youxia/config')
+            config['deployer']['instance_type']=workflow_details['instance-type']
+            config['deployer']['ami_image']=workflow_details['ami_id']
+            with open('/home/ubuntu/.youxia/config','r+') as youxia_configfile:
+                config.write(youxia_configfile,space_around_delimiters=True)
+
             subprocess.check_call(generator_cmd.split(' '))
 
 ###

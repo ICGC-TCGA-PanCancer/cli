@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-
+import time
 import sys
 import subprocess
 import logging
@@ -25,7 +25,10 @@ class WorkflowLister:
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
                             }
                         },
-                        'ami_id':'ami-12345'
+                        'ami_id':'ami-12345',
+                        'default-ini':'http://something.ini',
+                        'instance-type':'m3.medium',
+                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     },
                     'Sanger':
                     {
@@ -42,7 +45,10 @@ class WorkflowLister:
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
                             }
                         },
-                        'ami_id':'ami-12345'
+                        'ami_id':'ami-12345',
+                        'default-ini':'http://something.ini',
+                        'instance-type':'m3.medium',
+                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     },
                     'BWA':
                     {
@@ -59,9 +65,12 @@ class WorkflowLister:
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
                             }
                         },
-                        'ami_id':'ami-12345'
+                        'ami_id':'ami-12345',
+                        'default-ini':'http://something.ini',
+                        'instance-type':'m3.medium',
+                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     },
-                    'DKFZ/EMBL':
+                    'DKFZ_EMBL':
                     {
                         'full_name':'Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1',
                         'http_workflow':
@@ -89,7 +98,10 @@ class WorkflowLister:
                                 'url':'https://s3.amazonaws.com/oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar'
                             }
                         },
-                        'ami_id':'ami-12345'
+                        'ami_id':'ami-12345',
+                        'default-ini':'http://something.ini',
+                        'instance-type':'m3.medium',
+                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     }
                 }
 
@@ -143,6 +155,28 @@ class DaemonCommand(Command):
     service_name=''
     log = logging.getLogger(__name__)
 
+    def _do_start(self,start_cmd):
+        self.log.debug (start_cmd)
+        p = subprocess.Popen(start_cmd.split(' '))
+        # Wait a moment... if we get ANY response, it means that the process did not start, probably because it's already been started.
+        time.sleep(2)
+        p.poll()
+        if p.returncode==1:
+            print('The '+self.service_name+' process might already be running.')
+        else:
+            print('The service has been started, check the log files for more detail.')
+
+    def _do_stop(self,stop_cmd):
+        self.log.debug (stop_cmd)
+        p = subprocess.Popen(stop_cmd.split(' '))
+        # wait a moment to get the result of the kill command.
+        time.sleep(2)
+        p.poll()
+        if p.returncode==0:
+            print('The '+self.service_name+' process has been stopped.')
+        elif p.returncode==1:
+            print('The '+self.service_name+' process does not appear to have been running, nothing has been stopped.')
+
     def get_parser(self,prog_name):
         parser = super(DaemonCommand,self).get_parser(prog_name)
         subparser = parser.add_subparsers(title='subcommands',help='coordinator subcommands: start, stop, restart',dest='service_state')
@@ -154,19 +188,17 @@ class DaemonCommand(Command):
 
     def take_action(self, parsed_args):
         subparser_name=vars(parsed_args)['service_state']
-        print ('working on service: '+self.service_name)
-        self.log.info('subparser: %s',subparser_name)
+        self.log.debug('working on service: '+self.service_name)
+        self.log.debug('subparser: %s',subparser_name)
         start_cmd='flock -n /tmp/arch3_'+self.service_name+'.pid ' +self.service_name+' --config /home/ubuntu/arch3/config/masterConfig.ini --endless'
         stop_cmd='pkill -f '+self.service_name
         if subparser_name=='start':
-            print (start_cmd)
-            subprocess.Popen(start_cmd.split(' '))
+            self._do_start(start_cmd)
         elif subparser_name=='stop':
-            print (stop_cmd)
-            subprocess.call(stop_cmd.split(' '))
+            self._do_stop(stop_cmd)
         elif subparser_name=='restart':
-            subprocess.check_call(stop_cmd.split(' '))
-            subprocess.Popen(start_cmd.split(' '))
+            self._do_stop(start_cmd)
+            self._do_start(stop_cmd)
 
 ###
 

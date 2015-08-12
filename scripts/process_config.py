@@ -56,19 +56,25 @@ with open('pancancer_config.mustache') as mustache_template_file:
 renderer=pystache.Renderer()
 parsed=pystache.parse(mustache_template)
 rendered_str=renderer.render(parsed,(simple_config))
-#print(rendered_str)
 data=json.loads(rendered_str)
 
+# The master config file should be written to ~/.pancancer/pancancer_config.json
+with open('pancancer_config.json','w') as master_config_file:
+    master_config_file.write(str(json.dumps(data,sort_keys=True, indent=4) ))
+
+# Youxia config should go to ~/.youxia/config
 with open('youxia_config','w') as youxia_file:
     youxia_settings=data['youxia']
     youxia_str=processYouxiaSettings(youxia_settings)
     youxia_file.write(youxia_str)
 
+# params.json should go to ~/params.json
 with open('params.json','w') as params_json_file:
     params_settings=data['params']
     params_str=processParams(params_settings)
     params_json_file.write(params_str)
 
+# masterConfig should go to ~/arch3/config/masterConfig.ini
 with open('masterConfig.ini','w') as consonance_file:
     consonance_settings=data['consonance']
     consonance_str=processConsonanceSettings(consonance_settings)

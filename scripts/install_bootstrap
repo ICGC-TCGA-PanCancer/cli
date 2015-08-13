@@ -24,11 +24,12 @@ read install_pancancer_launcher
 if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
 	sudo apt-get install wget
 	echo "Installing docker..."
+	sleep 2
 	wget -qO- https://get.docker.com/ | sh
-	echo "Done!"
+	echo "Done installing docker!"
 	echo "Pulling latest pancancer_launcher image..."
 	docker pull pancancer/pancancer_launcher:latest
-	echo "Done!"
+	echo "Done pulling pancancer_launcher!"
 else
 	echo "You are exiting the installer now, but you can always run it again when you are ready."
 	exit 0
@@ -45,19 +46,26 @@ read run_pancancer_launcher
 # If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
 if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
 	# TODO: Detect existing config.
-	echo "What cloud environment would you like to use (default will be \"AWS\")? [AWS/OPENSTACK]"
-	read user_cloud_env
 
-	if [ -z $user_cloud_env ] ; then
+	# This question isn't needed for the Aug31 demo
+	# echo "What cloud environment would you like to use (default will be \"AWS\")? [AWS/OPENSTACK]"
+	# read user_cloud_env
+
+	# if [ -z $user_cloud_env ] ; then
 		user_cloud_env=AWS
-	fi
+	# fi
 
-	echo "What is the path to the pem key you will use to authenticate against this environment?"
+	echo "What is the path to the pem key file you will use to authenticate in this environment?"
 	read user_pem_path
 	#TODO: validate pem path
 
-	echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
-	read user_pancancer_version
+	echo "What is the name of this key?"
+	read user_pem_name
+
+	# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
+	# read user_pancancer_version
+	# They already pulled "latest", earlier in this script, so just stick with that.
+	user_pancaner_verion=latest
 
 	echo "What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you."
 	read user_fleet_name

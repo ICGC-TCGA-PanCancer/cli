@@ -1,0 +1,137 @@
+{
+  "youxia":
+  {
+    "sensu_username":"admin",
+    "sensu_password":"seqware",
+    "sensu_ip_address":"localhost",
+    "sensu_port":"4567",
+    "managed_tag":"{{fleet_name}}",
+    "aws":
+    {
+      "aws_ssh_key":"{{path_to_key}}",
+      "aws_key_name":"{{name_of_key}}",
+      "region":"{{aws_region}}",
+      "zone": "{{aws_zones}}",
+      "ami_image":"{{image_id}}",
+      "instance_type":"{{instance_type}}",
+      "security_group":"{{security_group}}",
+      "product":"Linux/UNIX",
+      "disable_sensu_server":true
+    },
+    "openstack":
+    {
+      "openstack_username":"{{os_username}}",
+      "openstack_password":"{{os_password}}",
+      "openstack_endpoint":"{{os_endpoint}}",
+      "openstack_key_name":"{{name_of_key}}",
+      "openstack_ssh_key":"{{path_to_key}}",
+      "openstack_region":"{{os_region}}",
+      "flavor":"{{instance_type}}",
+      "min_cores":4,
+      "min_ram":16384,
+      "image_id":"{{image_id}}",
+      "security_group":"{{security_group}}",
+      "network_id":"{{os_network_id}}",
+      "arbitrary_wait":200000
+    }
+  },
+  "params":
+  {
+    "SENSU_SERVER_IP_ADDRESS": "10.0.26.25",
+    "aws_key": "{{aws_key}}",
+    "aws_secret_key": "{{aws_secret_key}}",
+    "seqware_version": "1.1.1",
+    "workflow_name": "HelloWorld",
+    {{! Will have to inject workflows in some other way.
+    "http_workflows": {
+      "DEWrapper": {
+        "name": "Workflow_Bundle_DEWrapperWorkflow_1.0.2_SeqWare_1.1.0",
+        "url": "http://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_DEWrapperWorkflow_1.0.2_SeqWare_1.1.0.zip"
+      },
+      "HelloWorld": {
+        "name": "Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.0",
+        "url":"http://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.0.zip"
+      }
+    },
+    "s3_workflows": {
+      "S3Workflow": {
+        "name":"Workflow_Bundle_OnlyAvailableFromS3_1.0_SeqWare_1.1.0",
+        "url":"s3://some.private.bucket/Workflow_Bundle_OnlyAvailableFromS3_1.0_SeqWare_1.1.0.zip"
+      }
+    },
+    "containers": {
+      "seqware_whitestar": {
+        "name": "seqware_whitestar",
+        "image_name": "seqware/seqware_whitestar:{ seqware_version }"
+      },
+      "pcawg-delly-workflow": {
+        "name":"pcawg-delly-workflow",
+        "image_name": "pancancer/pcawg-delly-workflow:1.0"
+      },
+      "pancancer_upload_download": {
+        "name": "pancancer_upload_download",
+        "image_name": "pancancer/pancancer_upload_download:1.1"
+      }
+    },
+    "s3_containers": {
+      "some_s3_container": {
+        "name": "some_s3_container_1.2.3",
+        "url": "s3://private.container.bucket/some_s3_container_1.2.3.tar"
+      }
+    },
+    "http_containers": {
+      "some_other_container": {
+        "name":"some_other_container",
+        "url":"http://www.some-other-organization.com/some_other_container.tar"
+      }
+    },
+    }}
+    "install_workflow": "true",
+    "test_workflow": false,
+    "queueHost": "10.0.26.25",
+    "queueName": "pancancer_arch_3",
+    "lvm_device_whitelist": "{{lvm_devices}}",
+    "single_node_lvm": true,
+    "pancancer_arch3_version": "1.1-alpha.5",
+    "seqware_engine":"whitestar-parallel",
+    "seqware_use_custom_settings":false,
+    "azure": false
+  },
+  "consonance":
+  {
+    "rabbit":
+    {
+      "rabbitMQHost":"localhost",
+      "rabbitMQUser":"queue_user",
+      "rabbitMQPass":"queue",
+      "rabbitMQQueueName":"pancancer_arch_3"
+    },
+    "database":
+    {
+      "postgresHost":"127.0.0.1",
+      "postgresUser":"queue_user",
+      "postgresPass":"queue",
+      "postgresDBName":"queue_status"
+    },
+    "generator":
+    {
+      "results":"results.txt",
+      "check_previous_job_hash":false
+    },
+    "report":
+    {
+      "namespace":"pipboy",
+      "slack_token":""
+    },
+    "coordinator":
+    {
+      "max_seconds_before_lost":3600
+    },
+    "provision":
+    {
+      "max_running_containers":{{max_fleet_size}},
+      "youxia_deployer_parameters":"--max-spot-price 0.001 --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file server-tags.json",
+      "youxia_reaper_params":"--test"
+    }
+  }
+}

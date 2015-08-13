@@ -1,13 +1,15 @@
 #! /usr/bin/python3
+import psutil
 import json
 import configparser
 import time
 import sys
+import os
 import subprocess
 import logging
-from cliff.app import App
-from cliff.commandmanager import CommandManager
-from cliff.command import Command
+import cliff.app
+import cliff.commandmanager
+import cliff.command
 
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
@@ -90,6 +92,10 @@ class WorkflowLister:
                             'seqware_whitestar_pancancer': {
                                 'name':'seqware_whitestar_pancancer',
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
+                            },
+                            'pancancer_upload_download': {
+                                'name':'pancancer_upload_download',
+                                'image_name':'pancancer/pancancer_upload_download:1.2'
                             }
                         },
                         's3_containers':
@@ -97,7 +103,7 @@ class WorkflowLister:
                             'dkfz_dockered_workflows':
                             {
                                 'name':'dkfz_dockered_workflows',
-                                'url':'https://s3.amazonaws.com/oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar'
+                                'url':'s3://oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar'
                             }
                         },
                         'ami_id':'ami-12345',
@@ -120,7 +126,7 @@ class WorkflowLister:
 
 ###
 
-class Workflows(Command):
+class Workflows(cliff.command.Command):
     "This command  can help you configure and select workflows."
     log = logging.getLogger(__name__)
 
@@ -129,7 +135,7 @@ class Workflows(Command):
         #parser.add_mutually_exclusive_group()
         workflows_subparser = parser.add_subparsers(title='subcommands',help='workflows subcommands: list and config',dest='subparser_name')
         workflows_subparser.add_parser('list',help='Get a list of workflows')
-        workflows_subparser.add_parser('config',help='Generate a default config file for a specific workflow').add_argument('workflow_name',help='Name of workflow to configure')
+        workflows_subparser.add_parser('config',help='Generate a default config file for a specific workflow').add_argument('--workflow', dest='workflow_name',help='Name of workflow to configure')
         return parser
 
     def take_action(self, parsed_args):
@@ -152,32 +158,57 @@ class Workflows(Command):
 
 ###
 
-class DaemonCommand(Command):
+class DaemonCommand(cliff.command.Command):
     "Parent class for commands that start/stop daemons"
     service_name=''
     log = logging.getLogger(__name__)
 
+    def _do_get_status(self,status_cmd):
+        "Get the status of a process."
+
     def _do_start(self,start_cmd):
         self.log.debug (start_cmd)
-        p = subprocess.Popen(start_cmd.split(' '))
+        pid_file_path='/tmp/arch3_'+self.service_name+'.pid'
+        # set start_new_session=True so that we can kill flock and all it's child processes by killing the process group whose pgid is the same as the flock pid.
+        # We don't want to use subprocess.call() or check_call() here because those will wait for the command to complete. Since the child process will run in "endless" mode,
+        # we really don't want *this* script to run endlessly - we want to start the child and let it keep running in the background.
+        p = subprocess.Popen(start_cmd.split(' '),start_new_session=True)
         # Wait a moment... if we get ANY response, it means that the process did not start, probably because it's already been started.
         time.sleep(2)
         p.poll()
+
         if p.returncode==1:
             print('The '+self.service_name+' process might already be running.')
         else:
+            self.log.debug('pid: '+str(p.pid))
             print('The service has been started, check the log files for more detail.')
+            # ONLY if the service was started new (and not already running) write a pid file so we will know which processes to kill later.
+            with open(pid_file_path,'w') as pidfile:
+                pidfile.write(str(p.pid))
+
 
     def _do_stop(self,stop_cmd):
-        self.log.debug (stop_cmd)
-        p = subprocess.Popen(stop_cmd.split(' '))
-        # wait a moment to get the result of the kill command.
-        time.sleep(2)
-        p.poll()
-        if p.returncode==0:
-            print('The '+self.service_name+' process has been stopped.')
-        elif p.returncode==1:
-            print('The '+self.service_name+' process does not appear to have been running, nothing has been stopped.')
+        pid = ''
+        # Read the pid from the file.
+        pid_file_path='/tmp/arch3_'+self.service_name+'.pid'
+        if os.path.isfile(pid_file_path):
+            with open(pid_file_path,'r') as pidfile:
+                pid = pidfile.readline()
+
+            stop_cmd += pid
+            self.log.debug (stop_cmd)
+
+            self.log.debug('pid: '+pid)
+
+            if psutil.pid_exists(int(pid)):
+                returncode = subprocess.call(stop_cmd.split(' '))
+                if returncode == 0:
+                    print ('The '+self.service_name+' process has been stopped.')
+                    os.remove(pid_file_path)
+            else:
+                print('The '+self.service_name+' process with PID '+pid+' does not appear to be running.')
+        else:
+            print('The '+self.service_name+' process does not appear to be running.')
 
     def get_parser(self,prog_name):
         parser = super(DaemonCommand,self).get_parser(prog_name)
@@ -192,8 +223,10 @@ class DaemonCommand(Command):
         subparser_name=vars(parsed_args)['service_state']
         self.log.debug('working on service: '+self.service_name)
         self.log.debug('subparser: %s',subparser_name)
-        start_cmd='flock -n /tmp/arch3_'+self.service_name+'.pid ' +self.service_name+' --config /home/ubuntu/arch3/config/masterConfig.ini --endless'
-        stop_cmd='pkill -f '+self.service_name
+        # Use flock to ensure that multiple instances of the "service" cannot run at the same time.
+        start_cmd='flock -n /tmp/arch3_'+self.service_name+'.lock ' +self.service_name+' --config /home/ubuntu/arch3/config/masterConfig.ini --endless'
+        # Negate the PID of the process to kill the process group.
+        stop_cmd='kill -KILL -'
         if subparser_name=='start':
             self._do_start(start_cmd)
         elif subparser_name=='stop':
@@ -220,7 +253,7 @@ class Provisioner(DaemonCommand):
 
 ###
 
-class Generator(Command):
+class Generator(cliff.command.Command):
     "This Generator will generate new job orders."
     log = logging.getLogger(__name__)
     def get_parser(self,prog_name):
@@ -267,11 +300,11 @@ class Generator(Command):
             with open('/home/ubuntu/.youxia/config','r+') as youxia_configfile:
                 config.write(youxia_configfile,space_around_delimiters=True)
 
-            subprocess.check_call(generator_cmd.split(' '))
+            subprocess.call(generator_cmd.split(' '))
 
 ###
 
-class Reports(Command):
+class Reports(cliff.command.Command):
     "This will generate reports on the command line."
     log = logging.getLogger(__name__)
     def get_parser(self,prog_name):
@@ -289,21 +322,20 @@ class Reports(Command):
 
     def take_action(self, parsed_args):
         subcmd = vars(parsed_args)['report_subcmd']
-        cmd_str=''
+        cmd_str='java -cp reporting.jar info.pancancer.arch3.reportcli.ReportCLI --config /home/ubuntu/arch3/config/masterConfig.ini'
         if subcmd!='help':
-            # TODO: The path to the config file should probably be configurable, or at least in a more standard location than /home/ubuntu/...
+            # If you don't pass a reporting subcommand to ReportCLI, it will print the help text by default.
             cmd_str='java -cp reporting.jar info.pancancer.arch3.reportcli.ReportCLI --config /home/ubuntu/arch3/config/masterConfig.ini '+subcmd
-        elif subcmd=='help':
-            cmd_str='java -cp reporting.jar info.pancancer.arch3.reportcli.ReportCLI --config /home/ubuntu/arch3/config/masterConfig.ini'
+
         subprocess.call(cmd_str.split(' '))
 
 ###
 
-class PancancerApp(App):
+class PancancerApp(cliff.app.App):
     log = logging.getLogger(__name__)
 
     def __init__(self):
-        commandMgr = CommandManager('pancancer.app')
+        commandMgr = cliff.commandmanager.CommandManager('pancancer.app')
         super(PancancerApp, self).__init__(
             description='Pancancer CLI',
             version='1.0',

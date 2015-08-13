@@ -275,8 +275,10 @@ class Generator(cliff.command.Command):
                 paramsData = json.load(params_file)
                 if 'http_workflow' in workflow_details:
                     paramsData['http_workflows'] = workflow_details['http_workflow']
+                    paramsData['http_workflows']['name'] = workflow_details['full_name']
                 if 's3_workflows' in workflow_details:
                     paramsData['s3_workflows'] = workflow_details['s3_workflows']
+                    paramsData['s3_workflows']['name'] = workflow_details['full_name']
                 if 'containers' in workflow_details:
                     paramsData['containers'] = workflow_details['containers']
                 if 's3_containers' in workflow_details:
@@ -296,7 +298,7 @@ class Generator(cliff.command.Command):
             config.read('/home/ubuntu/.youxia/config')
             config['deployer']['instance_type']=workflow_details['instance-type']
             config['deployer']['ami_image']=workflow_details['ami_id']
-            with open('/home/ubuntu/.youxia/config','r+') as youxia_configfile:
+            with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
                 config.write(youxia_configfile,space_around_delimiters=True)
 
             subprocess.call(generator_cmd.split(' '))

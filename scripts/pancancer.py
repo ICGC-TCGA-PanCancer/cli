@@ -10,6 +10,7 @@ import logging
 import cliff.app
 import cliff.commandmanager
 import cliff.command
+import process_config
 
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
@@ -156,6 +157,15 @@ class Workflows(cliff.command.Command):
         else:
             print ('The available subcommands are \'list\' and \'config\'.')
 
+###
+
+class SysConfig(cliff.command.Command):
+    "This command will setup the pancancer system configuration."
+    log = logging.getLogger(__name__)
+
+    def take_action(self, parsed_args):
+        process_config.main()
+        
 ###
 
 class DaemonCommand(cliff.command.Command):
@@ -411,7 +421,8 @@ class PancancerApp(cliff.app.App):
             'reports': Reports,
             'provisioner': Provisioner,
             'coordinator': Coordinator,
-            'status': Status
+            'status': Status,
+            'sysconfig': SysConfig
         }
         for k, v in commands.items():
             commandMgr.add_command(k, v)

@@ -11,6 +11,7 @@ import cliff.app
 import cliff.commandmanager
 import cliff.command
 import process_config
+import shutil
 
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
@@ -164,8 +165,13 @@ class SysConfig(cliff.command.Command):
     log = logging.getLogger(__name__)
 
     def take_action(self, parsed_args):
+        #TODO: Prompt user interactively for cofig values
+        print('Setting up pancancer config files.')
         process_config.main()
-        
+        shutil.copy2('./youxia_config','/home/ubuntu/.youxia/config')
+        shutil.copy2('./masterConfig.ini','/home/ubuntu/arch3/config/masterConfig.ini')
+        shutil.copy2('./params.json','/home/ubuntu/params.json')
+
 ###
 
 class DaemonCommand(cliff.command.Command):

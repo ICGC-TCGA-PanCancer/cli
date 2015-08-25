@@ -7,28 +7,37 @@ def makeConfigString(k,v):
 def processYouxiaSettings(d):
     outstr=''
     outstr+='[youxia]\n'
-    awsStr=''
-    openstackStr=''
+    aws_str=''
+    openstack_str=''
+    aws_deployer_str=''
     for k,v in d.items():
         if not (isinstance(v,dict)):
             outstr+=makeConfigString(k,v)
         else:
             if k=='aws':
                 # Process AWS-specific variables in the AWS heading
-                awsStr+='\n[aws]\n'
+                # awsStr+='\n[aws]\n'
                 aws_settings=d['aws']
                 for k1,v1 in aws_settings.items():
-                    awsStr+=makeConfigString(k1,str(v1))
+                    aws_str+=makeConfigString(k1,str(v1))
             elif k=='openstack':
                 # Process AWS-specific variables in the AWS heading
-                openstackStr+='\n[openstack]\n'
+                openstack_str+='\n[openstack]\n'
                 openstack_settings=d['openstack']
                 for k1,v1 in openstack_settings.items():
                     #print(k1+'='+str(v1))
                     openstackStr+=makeConfigString(k1,str(v1))
+            elif k=='deployer':
+                # Process AWS-specific variables in the AWS heading
+                aws_deployer_str+='\n[deployer]\n'
+                aws_deployer_settings=d['deployer']
+                for k1,v1 in openstack_settings.items():
+                    #print(k1+'='+str(v1))
+                    aws_deployer_str+=makeConfigString(k1,str(v1))
 
-    outstr+=awsStr
-    outstr+=openstackStr
+    outstr+=aws_str
+    outstr+=aws_deployer_str
+    outstr+=openstack_str
     return outstr
 
 def processParams(d):

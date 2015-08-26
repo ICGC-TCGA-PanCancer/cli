@@ -165,7 +165,7 @@ class SysConfig(cliff.command.Command):
     log = logging.getLogger(__name__)
 
     def take_action(self, parsed_args):
-        #TODO: Prompt user interactively for cofig values
+        #TODO: Prompt user interactively for config values
         print('Setting up pancancer config files.')
         process_config.main()
         shutil.copy2('./youxia_config','/home/ubuntu/.youxia/config')
@@ -290,11 +290,11 @@ class Generator(cliff.command.Command):
             with open('/home/ubuntu/params.json','r') as params_file:
                 paramsData = json.load(params_file)
                 if 'http_workflow' in workflow_details:
-                    paramsData['http_workflows'] = workflow_details['http_workflow']
-                    paramsData['http_workflows']['name'] = workflow_details['full_name']
+                    paramsData['http_workflows'][workflow_name] = workflow_details['http_workflow']
+                    paramsData['http_workflows'][workflow_name]['name'] = workflow_details['full_name']
                 if 's3_workflows' in workflow_details:
-                    paramsData['s3_workflows'] = workflow_details['s3_workflows']
-                    paramsData['s3_workflows']['name'] = workflow_details['full_name']
+                    paramsData['s3_workflows'][workflow_name] = workflow_details['s3_workflows']
+                    paramsData['s3_workflows'][workflow_name]['name'] = workflow_details['full_name']
                 if 'containers' in workflow_details:
                     paramsData['containers'] = workflow_details['containers']
                 if 's3_containers' in workflow_details:

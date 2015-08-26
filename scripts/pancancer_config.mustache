@@ -9,7 +9,10 @@
     "aws":
     {
       "aws_ssh_key":"{{path_to_key}}",
-      "aws_key_name":"{{name_of_key}}",
+      "aws_key_name":"{{name_of_key}}"
+    },
+    "deployer":
+    {
       "region":"{{aws_region}}",
       "zone": "{{aws_zones}}",
       "ami_image":"{{image_id}}",
@@ -37,7 +40,8 @@
   },
   "params":
   {
-    "SENSU_SERVER_IP_ADDRESS": "10.0.26.25",
+    "SENSU_SERVER_IP_ADDRESS": "{{sensu_server_ip_address}}",
+    "FLEET_NAME": "{{fleet_name}}",
     "aws_key": "{{aws_key}}",
     "aws_secret_key": "{{aws_secret_key}}",
     "seqware_version": "1.1.1",
@@ -88,7 +92,7 @@
     }}
     "install_workflow": "true",
     "test_workflow": false,
-    "queueHost": "10.0.26.25",
+    "queueHost": "{{queue_host}}",
     "queueName": "pancancer_arch_3",
     "lvm_device_whitelist": "{{lvm_devices}}",
     "single_node_lvm": true,

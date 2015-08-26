@@ -1,5 +1,6 @@
 import json
 import pystache
+import os
 
 def makeConfigString(k,v):
     return k+'='+v+'\n'
@@ -26,12 +27,12 @@ def processYouxiaSettings(d):
                 openstack_settings=d['openstack']
                 for k1,v1 in openstack_settings.items():
                     #print(k1+'='+str(v1))
-                    openstackStr+=makeConfigString(k1,str(v1))
+                    openstack_str+=makeConfigString(k1,str(v1))
             elif k=='deployer':
                 # Process AWS-specific variables in the AWS heading
                 aws_deployer_str+='\n[deployer]\n'
                 aws_deployer_settings=d['deployer']
-                for k1,v1 in openstack_settings.items():
+                for k1,v1 in aws_deployer_settings.items():
                     #print(k1+'='+str(v1))
                     aws_deployer_str+=makeConfigString(k1,str(v1))
 
@@ -57,8 +58,13 @@ def processConsonanceSettings(d):
 #######################
 
 def main():
+    #TODO: This should take a path to any config file.
     with open('simple_pancancer_config.json') as simple_config_file:
         simple_config=json.load(simple_config_file)
+        # These are not something the user will put into their simple config,
+        # so we need to get it from the environment (it will have been set by the start_services_in_container.sh script)
+        simple_config['sensu_server_ip_address'] = os.environ['SENSU_SERVER_IP_ADDRESS']
+        simple_config['queue_host'] = os.environ['SENSU_SERVER_IP_ADDRESS']
 
     with open('pancancer_config.mustache') as mustache_template_file:
         mustache_template=mustache_template_file.read()

@@ -250,8 +250,8 @@ class DaemonCommand(cliff.command.Command):
         elif subparser_name=='stop':
             self._do_stop(stop_cmd)
         elif subparser_name=='restart':
-            self._do_stop(start_cmd)
-            self._do_start(stop_cmd)
+            self._do_stop(stop_cmd)
+            self._do_start(start_cmd)
 
 ###
 
@@ -293,9 +293,11 @@ class Generator(cliff.command.Command):
             with open('/home/ubuntu/params.json','r') as params_file:
                 paramsData = json.load(params_file)
                 if 'http_workflow' in workflow_details:
+                    paramsData['http_workflows'] = {}
                     paramsData['http_workflows'][workflow_name] = workflow_details['http_workflow']
                     paramsData['http_workflows'][workflow_name]['name'] = workflow_details['full_name']
                 if 's3_workflows' in workflow_details:
+                    paramsData['s3_workflows'] = {}
                     paramsData['s3_workflows'][workflow_name] = workflow_details['s3_workflows']
                     paramsData['s3_workflows'][workflow_name]['name'] = workflow_details['full_name']
                 if 'containers' in workflow_details:

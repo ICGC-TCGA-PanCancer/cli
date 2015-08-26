@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/bash
 set -e
 cat <<MSG
 PANCANCER COMMAND LINE INTERFACE - INSTALLATION
@@ -15,21 +15,33 @@ This system requires the following:
 
 DO YOU WISH TO CONTINUE [Y/N]:
 MSG
-#TODO detect docker installation
-
-
 
 read install_pancancer_launcher
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
-	sudo apt-get install wget
-	echo "Installing docker..."
-	sleep 2
-	wget -qO- https://get.docker.com/ | sh
-	echo "Done installing docker!"
-	echo "Pulling latest pancancer_launcher image..."
-	docker pull pancancer/pancancer_launcher:latest
-	echo "Done pulling pancancer_launcher!"
+	user_install_docker=''
+	DOCKER_PATH=$(which docker)
+	if [ -z $DOCKER_PATH ] ; then
+		INSTALL_DOCKER='Y'
+	else
+		while [ "${user_install_docker^^}"!='Y' || "${user_install_docker^^}"!='N']
+		do
+			echo "It looks like docker may already be installed. Would you like to run this step anyway, which may attempt to upgrade docker? [Y/N]"
+			read user_install_docker
+		done
+	fi
+	if [ "$user_install_docker" = 'Y' ] ; then
+		sudo apt-get install wget
+		echo "Installing docker..."
+		sleep 2
+		wget -qO- https://get.docker.com/ | sh
+		echo "Done installing docker!"
+		echo "Pulling latest pancancer_launcher image..."
+		sudo docker pull pancancer/pancancer_launcher:latest
+		echo "Done pulling pancancer_launcher!"
+	else
+		echo "Skipping docker installation..."
+	fi
 else
 	echo "You are exiting the installer now, but you can always run it again when you are ready."
 	exit 0
@@ -57,7 +69,10 @@ if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
 
 	echo "What is the path to the pem key file you will use to authenticate in this environment?"
 	read user_pem_path
-	#TODO: validate pem path
+	if [ ! -f $user_pem_path ] ; then
+    echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
+    exit 1
+  fi
 
 	echo "What is the name of this key?"
 	read user_pem_name
@@ -70,13 +85,21 @@ if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
 	echo "What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you."
 	read user_fleet_name
 
+	FLEET_NAME_STR=
+
+	if [ ! -z $user_fleet_name ] ; then
+		FLEET_NAME_STR=' -f $user_fleet_name '
+	fi
+
 	# now wget the start_launcher_container script and call it with the values from above:
-	# bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -f $user_fleet_name -e $user_cloud_env
+
+	CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e $user_cloud_env $FLEET_NAME_STR"
+	echo $CMD_STR
+	#$(CMD_STR)
 else
 	echo "You can run this script at another time to run the pancancer launcher"
 	exit 0
 fi
-
 
 echo "Exiting now."
 set +e

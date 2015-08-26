@@ -11,7 +11,6 @@ import cliff.app
 import cliff.commandmanager
 import cliff.command
 import process_config
-import shutil
 
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
@@ -151,7 +150,7 @@ class Workflows(cliff.command.Command):
         elif subparser_name=='config':
             workflow_name=vars(parsed_args)['workflow_name']
             if workflow_name in WorkflowLister.get_workflow_names():
-                # TODO: Actually generate the correct INI file!
+                # TODO: Actually generate the correct INI file! This will come from some URL...
                 print('generating default INI in /home/ubuntu/ini-dir/'+workflow_name+'.ini for workflow '+workflow_name)
             else:
                 print ('Sorry, but '+workflow_name+' is not a valid workflow name. Please use the command \'workflows list\' to see a list of available workflows.')
@@ -164,13 +163,17 @@ class SysConfig(cliff.command.Command):
     "This command will setup the pancancer system configuration."
     log = logging.getLogger(__name__)
 
+    def get_parser(self,prog_name):
+        parser = super(SysConfig,self).get_parser(prog_name)
+        sysconf_subparser = parser.add_argument('--config',dest='config_path',help='The path to your pancancer config file.',required=True)
+        return parser
+
     def take_action(self, parsed_args):
         #TODO: Prompt user interactively for config values
         print('Setting up pancancer config files.')
-        process_config.main()
-        shutil.copy2('./youxia_config','/home/ubuntu/.youxia/config')
-        shutil.copy2('./masterConfig.ini','/home/ubuntu/arch3/config/masterConfig.ini')
-        shutil.copy2('./params.json','/home/ubuntu/params.json')
+        config_path=vars(parsed_args)['config_path']
+        self.log.debug('path to config file: '+config_path)
+        process_config.main(config_path)
 
 ###
 

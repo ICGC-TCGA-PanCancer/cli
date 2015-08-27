@@ -10,7 +10,7 @@ This quick-start guide will help you get started using the Pancancer CLI tool.
 ```
 $ bash install_bootstrap
 ```
-4. This script will install docker, the pancancer_launcher image, and collect some basic configuration info to get the launcher started.
+This script will install docker, the pancancer_launcher image, and collect some basic configuration info to get the launcher started.
 
 ##Inside the Pancancer Launcher.
 

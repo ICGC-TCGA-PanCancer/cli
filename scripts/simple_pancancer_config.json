@@ -2,7 +2,7 @@
   "max_fleet_size":1,
   "fleet_name":"myFleet",
   "path_to_key":"/home/ubuntu/.ssh/MyKey.pem",
-  "key_name":"MyKey",
+  "name_of_key":"MyKey",
   "security_group":"default",
   "aws_key":"AWS_KEY",
   "aws_secret_key":"AWS_SECRET_KEY"

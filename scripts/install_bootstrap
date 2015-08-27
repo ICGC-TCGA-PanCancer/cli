@@ -1,5 +1,6 @@
-#!/bin/sh
+#! /bin/bash
 set -e
+PANCANCER_LAUNCHER_VERSION=3.1.2
 cat <<MSG
 PANCANCER COMMAND LINE INTERFACE - INSTALLATION
 -----------------------------------------------
@@ -8,75 +9,135 @@ the PanCancer donors.  This launcher host can then launch one or more worker VMs
 workflows installed on them for processing one or more genomes specified by the user.
 
 This system requires the following:
-* Docker support in your Linux distribution (or boot2docker on a Mac)
-* AWS credentials and/or OpenStack credentials
-* A GNOS key (or keys) which are used to both download Docker images for our workflows, dependencies, as well as data from from GNOS servers used in the project
+* Docker support in your Linux distribution (Ubuntu 14.04 is officially supported by the Pancancer Launcher)
+* AWS credentials
+* A GNOS key (or keys) which are used to both download Docker images for our workflows, dependencies, as well as data from from GNOS servers used in the project.
+  Please ensure that these files are in ~/.gnos
 * Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
 
-DO YOU WISH TO CONTINUE [Y/N]:
 MSG
-#TODO detect docker installation
 
-
-
-read install_pancancer_launcher
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
-if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
-	sudo apt-get install wget
-	echo "Installing docker..."
-	sleep 2
-	wget -qO- https://get.docker.com/ | sh
-	echo "Done installing docker!"
-	echo "Pulling latest pancancer_launcher image..."
-	docker pull pancancer/pancancer_launcher:latest
-	echo "Done pulling pancancer_launcher!"
-else
-	echo "You are exiting the installer now, but you can always run it again when you are ready."
-	exit 0
-fi
-
-#TODO: download start_launcher_container.sh script...
+install_pancancer_launcher=''
+while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launcher^^}" != 'N' ]] ; do
+	echo "DO YOU WISH TO CONTINUE [Y/N]:"
+	read install_pancancer_launcher
+	if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
+		user_install_docker=''
+		DOCKER_PATH=$(which docker)
+		if [ -z $DOCKER_PATH ] ; then
+			INSTALL_DOCKER='Y'
+		else
+			while [[ "${user_install_docker^^}" != 'Y' &&  "${user_install_docker^^}" != 'N' ]] ; do
+				echo "It looks like docker may already be installed. Would you like to run this step anyway, which may attempt to upgrade docker? [Y/N]"
+				read user_install_docker
+			done
+		fi
+		if [ "$user_install_docker" = 'Y' ] ; then
+			sudo apt-get install wget
+			echo "Installing docker..."
+			sleep 2
+			wget -qO- https://get.docker.com/ | sh
+			echo "Done installing docker!"
+			echo "Pulling latest pancancer_launcher image..."
+			sudo docker pull pancancer/pancancer_launcher:latest
+			echo "Done pulling pancancer_launcher!"
+		else
+			echo "Skipping docker installation..."
+		fi
+	elif [ "${install_pancancer_launcher^^}" = 'N' ] ; then
+		echo "You are exiting the installer now, but you can always run it again when you are ready."
+		exit 0
+	fi
+done
 
 #TODO: let user do their config stuff. Once configuration is finished, give them the option of starting up pancancer_launcher right away (they shouldn't have to call start_launcher_container.sh manually.)
 # pre-pancancer_launcher config: pem key path, fleet name, environment (AWS, OpenStack, Azure), Image version (default to specific tag or "latest"?)
 # post-pancancer_launcher config (once inside the container): AWS keys (if AWS), AMI/ImageID, VM flavour, # nodes, batch size, Slack webhook, AWS region/zones, OpenStack region, path to key, workflows, endless worker, Azure-specific stuff...?
+run_pancancer_launcher=''
+while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" != 'N' ]] ; do
+	echo "Would you like to run the pancancer_launcher now? [Y/N]"
+	read run_pancancer_launcher
+	# If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
+	if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
 
-echo "Would you like to run the pancancer_launcher now? [Y/N]"
-read run_pancancer_launcher
-# If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
-if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
-	# TODO: Detect existing config.
+		# This question isn't needed for the Aug31 demo
+		# echo "What cloud environment would you like to use (default will be \"AWS\")? [AWS/OPENSTACK]"
+		# read user_cloud_env
 
-	# This question isn't needed for the Aug31 demo
-	# echo "What cloud environment would you like to use (default will be \"AWS\")? [AWS/OPENSTACK]"
-	# read user_cloud_env
+		# if [ -z $user_cloud_env ] ; then
+			user_cloud_env=AWS
+		# fi
 
-	# if [ -z $user_cloud_env ] ; then
-		user_cloud_env=AWS
-	# fi
+		#Read the config file if it exists and then show previous values...
+		if [ -f ~/.pancancer/pancancer.config ] ; then
+			source ~/.pancancer/pancancer.config
+		fi
 
-	echo "What is the path to the pem key file you will use to authenticate in this environment?"
-	read user_pem_path
-	#TODO: validate pem path
+		user_pem_path=''
+		while [[ ! -f $user_pem_path || -z "${user_pem_path// /}" ]] ; do
+			if [ ! -z $PEM_PATH ] ; then
+				read -ep $'What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
+			else
+				read -ep "What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment?" user_pem_path
+			fi
+			if [[ ! -f $user_pem_path ]] ; then
+				echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
+			fi
+	  done
 
-	echo "What is the name of this key?"
-	read user_pem_name
+		user_key_name=''
+		while [[ -z "${user_key_name// /}" ]] ; do
+			if [ ! -z $KEY_NAME ] ; then
+				read -ep $'What is the name of this key? Previous value: \n' -i $KEY_NAME user_key_name
+			else
+				read -ep $'What is the name of this key?\n' user_key_name
+			fi
+			if [[ -z "${user_key_name// /}" ]] ; then
+				echo 'Key name cannot be blank.'
+			fi
+		done
 
-	# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
-	# read user_pancancer_version
-	# They already pulled "latest", earlier in this script, so just stick with that.
-	user_pancaner_verion=latest
+		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
+		# read user_pancancer_version
+		# They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
+		user_pancancer_version="latest"
 
-	echo "What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you."
-	read user_fleet_name
+		user_fleet_name=''
+		if [ ! -z $FLEET_NAME ] ; then
+			read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you. Previous value: \n' -i $FLEET_NAME user_fleet_name
+		else
+			read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you.\n' user_fleet_name
+		fi
 
-	# now wget the start_launcher_container script and call it with the values from above:
-	# bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -f $user_fleet_name -e $user_cloud_env
-else
-	echo "You can run this script at another time to run the pancancer launcher"
-	exit 0
-fi
+		FLEET_NAME_STR=''
 
+		if [ ! -z $user_fleet_name ] ; then
+			FLEET_NAME_STR=" -f $user_fleet_name "
+		fi
 
+		# now wget the start_launcher_container script and call it with the values from above:
+		$(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
+    chmod u+x start_launcher_container.sh
+		CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e $user_cloud_env $FLEET_NAME_STR"
+
+		#Now write a config for this file.
+		[[ -d ~/.pancancer ]] || mkdir ~/.pancancer
+
+		cat >~/.pancancer/pancancer.config <<CONFIG
+PEM_PATH=${user_pem_path}
+KEY_NAME=${user_key_name}
+FLEET_NAME=${user_fleet_name}
+CONFIG
+    [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
+    cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config
+
+		echo $CMD_STR
+		$($CMD_STR)
+	elif [ "${run_pancancer_launcher^^}" = 'N' ] ; then
+		echo "You can run this script at another time to run the pancancer launcher"
+		exit 0
+	fi
+done
 echo "Exiting now."
 set +e

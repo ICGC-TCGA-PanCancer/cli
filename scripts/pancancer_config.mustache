@@ -6,12 +6,13 @@
     "sensu_ip_address":"localhost",
     "sensu_port":"4567",
     "managed_tag":"{{fleet_name}}",
-    "aws":
+    {{! Yes, I know, these are AWS-specific settings but that's how it is in the original youxia config. }}
+    "aws_ssh_key":"{{path_to_key}}",
+    "aws_key_name":"{{name_of_key}}",
+    "region":"{{aws_region}}{{^aws_region}}us-east-1{{/aws_region}}",
+    "zone":"{{aws_zones}}{{^aws_zones}}us-east-1a,us-east-1b,us-east-1c,us-east-1d,us-east-1e{{/aws_zones}}",
+    "deployer":
     {
-      "aws_ssh_key":"{{path_to_key}}",
-      "aws_key_name":"{{name_of_key}}",
-      "region":"{{aws_region}}",
-      "zone": "{{aws_zones}}",
       "ami_image":"{{image_id}}",
       "instance_type":"{{instance_type}}",
       "security_group":"{{security_group}}",
@@ -34,15 +35,17 @@
       "network_id":"{{os_network_id}}",
       "arbitrary_wait":200000
     }
+    {{! TODO: Add an openstack-deployer section }}
   },
   "params":
   {
-    "SENSU_SERVER_IP_ADDRESS": "10.0.26.25",
+    "SENSU_SERVER_IP_ADDRESS": "{{sensu_server_ip_address}}",
+    "FLEET_NAME": "{{fleet_name}}",
     "aws_key": "{{aws_key}}",
     "aws_secret_key": "{{aws_secret_key}}",
     "seqware_version": "1.1.1",
     "workflow_name": "HelloWorld",
-    {{! Will have to inject workflows in some other way.
+    {{! Workflows will be injected into params.json by the "pancancer generator" command, because that's the first point where we know what the user wants.
     "http_workflows": {
       "DEWrapper": {
         "name": "Workflow_Bundle_DEWrapperWorkflow_1.0.2_SeqWare_1.1.0",
@@ -88,11 +91,11 @@
     }}
     "install_workflow": "true",
     "test_workflow": false,
-    "queueHost": "10.0.26.25",
+    "queueHost": "{{queue_host}}",
     "queueName": "pancancer_arch_3",
     "lvm_device_whitelist": "{{lvm_devices}}",
     "single_node_lvm": true,
-    "pancancer_arch3_version": "1.1-alpha.5",
+    "pancancer_arch3_version": "1.1-beta.4",
     "seqware_engine":"whitestar-parallel",
     "seqware_use_custom_settings":false,
     "azure": false

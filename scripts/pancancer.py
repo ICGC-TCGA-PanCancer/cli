@@ -173,16 +173,16 @@ class SysConfig(cliff.command.Command):
         self.log.info('Setting up pancancer config files.')
         config_path=vars(parsed_args)['config_path']
 
-        if config_path != '':
-            self.log.debug('path to config file: '+config_path)
+        if config_path != None:
+            self.log.debug('path to config file: ' + config_path)
             process_config.main(config_path)
         else:
             # if the user did not specify a config, ask them questions and then WRITE a config!
             pancancer_config={}
             fleet_size='x'
-            while ! fleet_size.isdigit()
+            while fleet_size.isdigit()==False:
                 fleet_size = input('How many VMs do you want in your fleet?')
-                if ! fleet_size.isdigit()
+                if fleet_size.isdigit()==False:
                     self.log.info('A positive integer must be specified here.')
 
 
@@ -215,12 +215,12 @@ class SysConfig(cliff.command.Command):
                 pem_key_path = H['PEM_PATH']
                 key_name = H['KEY_NAME']
             else:
-                while pem_key_path != '' and !os.path.isfile(pem_key_path):
+                while pem_key_path != '' and os.path.isfile(pem_key_path)==False:
                     pem_key_path = input('What is the path to the AWS pem key file that your new VMs to use?')
                     if pem_key_path.strip() == '':
                         self.log.info('This value cannot be blank.')
 
-                while key_name != ''
+                while key_name != '':
                     key_name = input('What is the Name of this key in AWS?')
                     if key_name.strip() == '':
                         self.log.info('This value cannot be blank.')
@@ -239,9 +239,9 @@ class SysConfig(cliff.command.Command):
             pancancer_config['security_group'] = security_group
             pancancer_config['aws_key'] = aws_key
             pancancer_config['aws_secret_key'] = aws_secret_key
-            if not os.path.exists('~/.pancancer'):
-                os.makedirs('~/.pancancer')
-            config_path='~/.pancancer/simple_pancancer_config.json'
+            if not os.path.exists(os.path.expanduser('~/.pancancer')):
+                os.makedirs(os.path.expanduser('~/.pancancer'))
+            config_path=os.path.expanduser('~/.pancancer/simple_pancancer_config.json')
             with open(config_path,'w') as simple_pancancer_config:
                 simple_pancancer_config.write(str(json.dumps(pancancer_config,sort_keys=True, indent=4) ))
                 self.log.info('Your new pancancer system config file has been written to '+config_path)

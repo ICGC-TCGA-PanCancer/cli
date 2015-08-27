@@ -66,6 +66,7 @@ def main(config_path):
         # so we need to get it from the environment (it will have been set by the start_services_in_container.sh script)
         simple_config['sensu_server_ip_address'] = os.environ['SENSU_SERVER_IP_ADDRESS']
         simple_config['queue_host'] = os.environ['SENSU_SERVER_IP_ADDRESS']
+        simple_config['fleet_name'] = os.environ['FLEET_NAME']
 
     config_path = os.path.dirname(__file__)
     with open(config_path +'/pancancer_config.mustache') as mustache_template_file:

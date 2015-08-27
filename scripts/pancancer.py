@@ -169,7 +169,6 @@ class SysConfig(cliff.command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        #TODO: Prompt user interactively for config values if no file is given.
         self.log.info('Setting up pancancer config files.')
         config_path=vars(parsed_args)['config_path']
 

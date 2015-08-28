@@ -11,6 +11,8 @@ import cliff.app
 import cliff.commandmanager
 import cliff.command
 import process_config
+import urllib.request
+import shutil
 
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
@@ -30,9 +32,9 @@ class WorkflowLister:
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
                             }
                         },
-                        'ami_id':'ami-12345',
+                        'ami_id':'ami-270cc34c',
                         'default-ini':'http://something.ini',
-                        'instance-type':'m3.medium',
+                        'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     },
                     'Sanger':
@@ -50,9 +52,9 @@ class WorkflowLister:
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
                             }
                         },
-                        'ami_id':'ami-12345',
-                        'default-ini':'http://something.ini',
-                        'instance-type':'m3.medium',
+                        'ami_id':'ami-270cc34c',
+                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore/1.0.8/workflow/config/CgpCnIndelSnvStrWorkflow.ini',
+                        'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     },
                     'BWA':
@@ -70,9 +72,9 @@ class WorkflowLister:
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
                             }
                         },
-                        'ami_id':'ami-12345',
-                        'default-ini':'http://something.ini',
-                        'instance-type':'m3.medium',
+                        'ami_id':'ami-270cc34c',
+                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.5/workflow/config/workflow.ini',
+                        'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     },
                     'DKFZ_EMBL':
@@ -107,9 +109,9 @@ class WorkflowLister:
                                 'url':'s3://oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar'
                             }
                         },
-                        'ami_id':'ami-12345',
-                        'default-ini':'http://something.ini',
-                        'instance-type':'m3.medium',
+                        'ami_id':'ami-270cc34c',
+                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/1.0.6/workflow/config/DEWrapperWorkflow.ini',
+                        'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     }
                 }
@@ -150,7 +152,17 @@ class Workflows(cliff.command.Command):
         elif subparser_name=='config':
             workflow_name=vars(parsed_args)['workflow_name']
             if workflow_name in WorkflowLister.get_workflow_names():
-                # TODO: Actually generate the correct INI file! This will come from some URL...
+                ini_file_path = os.path.expanduser('~/ini-dir/'+workflow_name+'.ini')
+                if workflow_name != 'HelloWorld':
+                    workflow_details = WorkflowLister.get_workflow_details(workflow_name)
+                    url = workflow_details['default-ini']
+
+                    with urllib.request.urlopen(url) as response, open(ini_file_path,'wb') as ini_file:
+                        shutil.copyfileobj(response,ini_file)
+                else:
+                    with open(ini_file_path,'w') as ini_file:
+                        ini_file.write('greeting=Greetings_from_Panancer_CLI')
+
                 self.log.info('generating default INI in /home/ubuntu/ini-dir/'+workflow_name+'.ini for workflow '+workflow_name)
             else:
                 self.log.info ('Sorry, but '+workflow_name+' is not a valid workflow name. Please use the command \'workflows list\' to see a list of available workflows.')

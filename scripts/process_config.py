@@ -99,6 +99,13 @@ def main(config_path):
         consonance_str=processConsonanceSettings(consonance_settings)
         consonance_file.write(consonance_str)
 
+    #create the server tags, if necessary. The user can change this file later, and we won't touch it (since it already exists).
+    server_tags_path = os.path.expanduser('~/arch3/server-tags.json')
+    if not os.path.exists(server_tags_path):
+        with open(server_tags_path,'w') as server_tags_file:
+            server_tags={'KEEP':os.environ['FLEET_NAME']}
+            server_tags_file.write(str(json.dumps(server_tags,sort_keys=True, indent=4) ))
+
     shutil.copy2(config_path + '/youxia_config','/home/ubuntu/.youxia/config')
     shutil.copy2(config_path + '/masterConfig.ini','/home/ubuntu/arch3/config/masterConfig.ini')
     shutil.copy2(config_path + '/params.json','/home/ubuntu/params.json')

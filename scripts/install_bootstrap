@@ -133,7 +133,7 @@ CONFIG
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config
 
 		echo $CMD_STR
-		$($CMD_STR)
+		$(echo -e $CMD_STR)
 	elif [ "${run_pancancer_launcher^^}" = 'N' ] ; then
 		echo "You can run this script at another time to run the pancancer launcher"
 		exit 0

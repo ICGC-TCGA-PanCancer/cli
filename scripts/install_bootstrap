@@ -36,7 +36,7 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			done
 		fi
 		if [ "$user_install_docker" = 'Y' ] ; then
-			sudo apt-get install wget
+			sudo apt-get install wget curl
 			echo "Installing docker..."
 			sleep 2
 			curl -sSL https://get.docker.com/ | sh
@@ -44,6 +44,17 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			echo "Pulling latest pancancer_launcher image..."
 			sudo docker pull pancancer/pancancer_launcher:latest
 			echo "Done pulling pancancer_launcher!"
+                        set +e
+                        ubuntu_is_docker_user="$(groups ubuntu | grep docker)"
+                        set -e
+                        # If the user is not in the docker group, they need to be added and they need to log out and then log in again.
+                        # Otherwise, it will make running the start_launcher_container script difficult (since it tries to write into $HOME,
+                        # which should exapand to "ubuntu").
+			if [ -z "$ubuntu_is_docker_user" ] ; then
+                                echo "Updating user permissions (You will have to log out and log in to this system again for this to take effect)."
+                                sudo usermod -aG docker ubuntu
+                                exit 0
+                        fi
 		else
 			echo "Skipping docker installation..."
 		fi

@@ -4,11 +4,10 @@ This quick-start guide will help you get started using the Pancancer CLI tool.
 
 ##Getting started
 
-1. Launch a new VM in Amazon EC2 (This guide will assume you are using us-east-1 AKA North Virginia). TODO: link to guide on how to do this in AWS
-2. Download the [bootstrap script](scripts/install_bootstrap)
-3. Execute the bootstrap script:
+1. Launch a new VM in Amazon EC2 (This guide will assume you are using us-east-1 AKA North Virginia). If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html)
+2. Download & execute the [bootstrap script](scripts/install_bootstrap)
 ```
-$ bash install_bootstrap
+$ wget -qO install_bootstrap https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/develop/scripts/install_bootstrap && bash install_bootstrap
 ```
 This script will install docker, the pancancer_launcher image, and collect some basic configuration info to get the launcher started.
 

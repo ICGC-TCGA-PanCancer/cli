@@ -37,7 +37,7 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			sudo apt-get install wget
 			echo "Installing docker..."
 			sleep 2
-			wget -qO- https://get.docker.com/ | sh
+			curl -sSL https://get.docker.com/ | sh
 			echo "Done installing docker!"
 			echo "Pulling latest pancancer_launcher image..."
 			sudo docker pull pancancer/pancancer_launcher:latest

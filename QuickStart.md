@@ -2,6 +2,11 @@
 
 This quick-start guide will help you get started using the Pancancer CLI tool.
 
+##What You Need
+
+Give a list of items the user needs to have ready:
+* 
+
 ##Getting started
 
 1. Launch a new VM in Amazon EC2 (This guide will assume you are using us-east-1 AKA North Virginia). If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html)

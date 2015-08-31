@@ -4,7 +4,7 @@ This quick-start guide will help you get started using the Pancancer CLI tool.
 
 ##Getting started
 
-1. Launch a new VM in Amazon EC2 (This guide will assume you are using us-east-1 AKA North Virginia).
+1. Launch a new VM in Amazon EC2 (This guide will assume you are using us-east-1 AKA North Virginia). <link to guide on how to do this in AWS>
 2. Download the [bootstrap script](scripts/install_bootstrap)
 3. Execute the bootstrap script:
 ```

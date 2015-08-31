@@ -17,7 +17,7 @@ Before you get started, there are a few items you will need to have available:
 Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html).
 Once the VM is running, log in to your new VM.
 ### Set up files
-You will now need to set up a few files.
+You will now need to set up a few files on your VM.
   - You will need to set up your AWS credentials on your new VM so that they can be used by the PancancerCLI. Create a directory named `~/.aws` and create a file named `config` in `~/.aws`. Format it as is shown [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files). Example:
 ```
 $ cat ~/.aws/config
@@ -38,6 +38,17 @@ Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 $ wget -qO install_bootstrap https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/develop/scripts/install_bootstrap && bash install_bootstrap
 ```
 This script will install docker, the pancancer_launcher image, and collect some basic configuration info to get the launcher started.
+
+**NOTE:**
+Please be aware that if docker has not been installed on your VM before, you *will* need to log out and log in again for user permission changes to take effect (the script will exit automatically at this point to let you do this). This will *only* happen the first time that docker is installed.
+
+After logging out and logging back in, you can resume the setup process by simply typing:
+
+```
+bash install_bootstrap
+```
+
+When you are asked if you wish to install Docker, you can answer "N" for "no", and continue with the rest of the setup process.
 
 ##Inside the Pancancer Launcher.
 
@@ -74,7 +85,7 @@ You can verify that your job request has been enqueued with this command:
 $ pancancer status queues
 ```
 You should see that some queues have a message in them.
-
+<!-- TODO: These services should be started when the container starts. Requires changes to architecture-setup -->
 ####Running the coordinator and provisioner
 Once an INI file has been generated and the job request has been enqueued, you will be ready to start the services which will run the jobs. First, you should start the coordinator service:
 

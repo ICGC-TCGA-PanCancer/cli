@@ -24,9 +24,11 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 	read install_pancancer_launcher
 	if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
 		user_install_docker=''
-		DOCKER_PATH=$(which docker)
-		if [ -z $DOCKER_PATH ] ; then
-			INSTALL_DOCKER='Y'
+		set +e
+		DOCKER_PATH="$(which docker)"
+		set -e
+		if [ -z "$DOCKER_PATH" ] ; then
+			user_install_docker='Y'
 		else
 			while [[ "${user_install_docker^^}" != 'Y' &&  "${user_install_docker^^}" != 'N' ]] ; do
 				echo "It looks like docker may already be installed. Would you like to run this step anyway, which may attempt to upgrade docker? [Y/N]"

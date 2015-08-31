@@ -4,15 +4,32 @@ This quick-start guide will help you get started using the Pancancer CLI tool.
 
 ##What You Need
 
-Give a list of items the user needs to have ready:
-* pem key for ssh to workers in .ssh/
-* gnos key in .gnos/gnos.pem
-* aws credentials in .aws/config
+Before you get started, there are a few items you will need to have available:
+ - A valid account on Amazon AWS EC2
+ - A valid key file that you can use to log in to your EC2 VMs. Click [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) for a document about how to generate these pem keys.
+ - Valid GNOS key files.
+ - Your AWS Key and Secret Key. If you don't know your Key and Secret Key, [this](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) document may be able to help you.
+
 
 ##Getting started
 
-1. Launch a new VM in Amazon EC2 (This guide will assume you are using us-east-1 AKA North Virginia). If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html)
-2. Download & execute the [bootstrap script](scripts/install_bootstrap)
+1. Launch a new VM in Amazon EC2 (This guide will assume you are using us-east-1 AKA North Virginia). If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html).
+2. Log in to your new VM.
+3. You will now need to set up a few files.
+  - You will need to set up your AWS credentials on your new VM so that they can be used by the PancancerCLI. Create a directory named `~/.aws` and create a file named `config` in `~/.aws`. Format it as is shown [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files). Example:
+```
+$ cat ~/.aws/config
+[default]
+aws_access_key_id=<YOUR AWS ACCESS KEY>
+aws_secret_access_key=<YOUR SECRET KEY>
+```
+  - You will need to put your AWS pem key on to this machine in `~/.ssh/MyKey.pem`. Also make sure you set the permissions correctly on this file, you can do that with the command:
+```
+chmod 600 ~/.ssh/MyKey.pem
+```
+You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+  - You will need to put your GNOS keys on this machine in `~/.gnos/`. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+4. Download & execute the [bootstrap script](scripts/install_bootstrap)
 ```
 $ wget -qO install_bootstrap https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/develop/scripts/install_bootstrap && bash install_bootstrap
 ```

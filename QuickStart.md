@@ -5,7 +5,9 @@ This quick-start guide will help you get started using the Pancancer CLI tool.
 ##What You Need
 
 Give a list of items the user needs to have ready:
-* 
+* pem key for ssh to workers in .ssh/
+* gnos key in .gnos/gnos.pem
+* aws credentials in .aws/config
 
 ##Getting started
 

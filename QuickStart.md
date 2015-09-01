@@ -50,6 +50,12 @@ bash install_bootstrap
 
 When you are asked if you wish to install Docker, you can answer "N" for "no", and continue with the rest of the setup process.
 
+This installer script will ask you some questions about how to get started. It will need to know:
+ - The absolute path to your AWS pem key (this should be copied into `~/.ssh` before begining the installer, as per instructions above)
+ - The *name* of your AWS key. This is *usually* the same as the name of the key file you download from AWS. For example, an AWS key with the name "MyKey" is normally downloaded and saved as the file "MyKey.pem".
+ - Your AWS Key and AWS Secret Key. If you do not know these, [this document](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) might be able to help you.
+ - The name that you would like to give to your fleet. This will make it easier to find your VMs in the AWS EC2 Management Console. If you do not specify a fleet name, a randomly generated name will be used.
+
 ##Inside the Pancancer Launcher.
 
 ###Configuration
@@ -58,8 +64,11 @@ Once you are in the Pancancer Launcher docker container, you will want to do som
 ```
 $ pancancer sysconfig
 ```
-You should do this before you run any workflows.
+You should do this before you run any workflows. This configuration tool will ask you questions about:
+ - How many VMs you want in your fleet.
+ - The name of the AWS Security Group you would like your VMs to be a part of.
 
+If the tool detects missing values for AWS Key, AWS Secret Key, the path to the pem key, or the key name, it may ask you to fill in these values.
 
 ###Running workflows
 

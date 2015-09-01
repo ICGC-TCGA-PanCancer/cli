@@ -85,7 +85,19 @@ You can verify that your job request has been enqueued with this command:
 $ pancancer status queues
 ```
 You should see that some queues have a message in them.
-<!-- TODO: These services should be started when the container starts. Requires changes to architecture-setup -->
+
+```
+queues: 
++-------+-------------------------+---------------------+----------+
+| vhost |          name           |        node         | messages |
++-------+-------------------------+---------------------+----------+
+| /     | aliveness-test          | rabbit@23aba91e1eaf | 0        |
+| /     | pancancer_arch_3_orders | rabbit@23aba91e1eaf | 1        |
++-------+-------------------------+---------------------+----------+
+```
+
+As you can see there is one message in the message queue named "pancancer_arch_3_orders". This indicates that the system successfully generated a job order from your INI file in `~/ini-dir`.
+
 ####Running the coordinator and provisioner
 Once an INI file has been generated and the job request has been enqueued, you will be ready to start the services which will run the jobs. First, you should start the coordinator service:
 

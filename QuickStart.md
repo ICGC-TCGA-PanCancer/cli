@@ -99,21 +99,22 @@ queues:
 As you can see there is one message in the message queue named "pancancer_arch_3_orders". This indicates that the system successfully generated a job order from your INI file in `~/ini-dir`.
 
 ####Running the coordinator and provisioner
-Once an INI file has been generated and the job request has been enqueued, you will be ready to start the services which will run the jobs. First, you should start the coordinator service:
+Once the system has been configured and an INI file has been generated and the job request has been enqueued, you will be ready to start the services which will provision new VMs so that the jobs can be run. First, you should start the coordinator service:
 
 ```
 $ pancancer coordinator start
 ```
-This process will write to a file named `coordinator.out`. More detailed output can also be found in `arch3.log`.
+The coordinator will process job requets into jobs and provisioning requests. This process will write to a file named `coordinator.out`. More detailed output can also be found in `arch3.log`.
 
 You will also need to start the provisioner service:
 ```
 $ pancancer provisioner start
 ```
-This process will write to a file named `provisioner.out`. More detailed output can also be found in `arch3.log`. Provisioning may take a while. You can watch the progress using this command:
+The provisioner will provision new VMs. It is these VMs that will execute your jobs. This process will write to a file named `provisioner.out`. More detailed output can also be found in `arch3.log`. Provisioning may take a while. You can watch the progress using this command:
 ```
 $ watch tail -n 30 provisioner.out
 ```
+Type <kbd>Ctrl</kbd>-<kbd>C</kbd> to terminate `watch`.
 
 ####Interactive shell
 You can also work with the pancancer tool's interactive shell simply by executing the command `pancancer`:

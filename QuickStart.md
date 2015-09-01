@@ -77,15 +77,15 @@ The Pancancer Launcher can generate a template INI file for workflows (you can s
 ####Generating an INI file
 To generate an INI file:
 ```
-$ pancancer workflows config --workflow BWA
+$ pancancer workflows config --workflow HelloWorld
 ```
 
-A new BWA-specific INI file should be generated in `~/ini-dir`. You will want to edit this file before generating job requests.
+A new HelloWorld-specific INI file should be generated in `~/ini-dir`. You will want to edit this file before generating job requests.
 
 ####Generating a job request
 To generate job requests for a workflow:
 ```
-$ pancancer generator --workflow BWA
+$ pancancer generator --workflow HelloWorld
 ```
 The generated jobs will use the INI files in `~/ini-dir` so it is important to make any necessary edits before this step!
 

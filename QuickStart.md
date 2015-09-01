@@ -66,7 +66,7 @@ $ pancancer sysconfig
 ```
 You should do this before you run any workflows. This configuration tool will ask you questions about:
  - How many VMs you want in your fleet.
- - The name of the AWS Security Group you would like your VMs to be a part of.
+ - The name of the AWS Security Group you would like your VMs to be a part of. If you do not specify a security group, the security group name "default" will be used. You may have to configure your Security Group to allow inbound SSH connections from the public IP address of the machine on which the pancancer launcher is running. If you are not familiar with working with AWS EC2 Security Groups, you may want to read [this document](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html).
 
 If the tool detects missing values for AWS Key, AWS Secret Key, the path to the pem key, or the key name, it may ask you to fill in these values.
 

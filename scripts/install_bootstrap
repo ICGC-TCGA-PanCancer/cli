@@ -111,6 +111,44 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 			fi
 		done
 
+    # load AWS config
+    if [ -f ~/.aws/config ] ; then
+      AWS_KEY=$(grep aws_access_key_id ~/.aws/config | sed 's/\(.*=\)//g')
+      AWS_SECRET_KEY=$(grep aws_secret_access_key ~/.aws/config | sed 's/\(.*=\)//g')
+    fi
+
+    user_aws_key=''
+		while [[ -z "${user_aws_key// /}" ]] ; do
+			if [ ! -z $AWS_KEY ] ; then
+				read -ep $'What is your AWS Key? Previous value: \n' -i $AWS_KEY user_aws_key
+			else
+				read -ep $'What is your AWS Key?\n' user_aws_key
+			fi
+			if [[ -z "${user_aws_key// /}" ]] ; then
+				echo 'AWS Key name cannot be blank.'
+			fi
+		done
+
+    user_aws_secret_key=''
+    while [[ -z "${user_aws_secret_key// /}" ]] ; do
+      if [ ! -z $AWS_SECRET_KEY ] ; then
+        read -ep $'What is your AWS Secret Key? Previous value: \n' -i $AWS_SECRET_KEY user_aws_secret_key
+      else
+        read -ep $'What is your AWS Secret Key?\n' user_aws_secret_key
+      fi
+      if [[ -z "${user_aws_secret_key// /}" ]] ; then
+        echo 'AWS Secret Key name cannot be blank.'
+      fi
+    done
+
+    # Write the AWS config file, so that it will be available when the start_launcher_container script runs.
+    [[ -d ~/.aws ]] || mkdir ~/.aws
+    cat >~/.aws/config <<AWS_CONFIG
+[default]
+aws_access_key_id=${user_aws_key}
+aws_secret_access_key=${user_aws_secret_key}
+AWS_CONFIG
+
 		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
 		# read user_pancancer_version
 		# They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...

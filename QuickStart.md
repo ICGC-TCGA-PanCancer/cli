@@ -41,7 +41,7 @@ This script will install docker, the pancancer_launcher image, and collect some 
 **NOTE:**
 Please be aware that if docker has not been installed on your VM before, you *will* need to log out and log in again for user permission changes to take effect (the script will exit automatically at this point to let you do this). This will *only* happen the first time that docker is installed.
 
-After logging out and logging back in, you can resume the setup process by simply typing:
+**After logging out and logging back in to your VM**, you can resume the setup process by simply typing:
 
 ```
 bash install_bootstrap

@@ -4,6 +4,8 @@ This quick-start guide will help you get started using the Pancancer CLI tool.
 
 Context... what is this?
 
+Diagram showing S3->workflow(s)->S3 out.  People need to realize if they can do this for one they can do it for 500.  We need S3 support in our workflows (inputs and outputs).
+
 ##What You Need
 
 Before you get started, there are a few items you will need to have available:

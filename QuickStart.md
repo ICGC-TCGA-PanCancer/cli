@@ -18,13 +18,7 @@ Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA 
 Once the VM is running, log in to your new VM.
 ### Set up files
 You will now need to set up a few files on your VM.
-  - You will need to set up your AWS credentials on your new VM so that they can be used by the PancancerCLI. Create a directory named `~/.aws` and create a file named `config` in `~/.aws`. Format it as is shown [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files). Example:
-```
-$ cat ~/.aws/config
-[default]
-aws_access_key_id=<YOUR AWS ACCESS KEY>
-aws_secret_access_key=<YOUR SECRET KEY>
-```
+
   - You will need to put your AWS pem key on to this machine in `~/.ssh/MyKey.pem`. Also make sure you set the permissions correctly on this file, you can do that with the command:
 ```
 chmod 600 ~/.ssh/MyKey.pem

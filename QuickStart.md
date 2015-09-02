@@ -153,6 +153,8 @@ In this example, the user has started the interactive shell, as can be seen by t
 
 To get a list of all pancancer commands, you can type `pancancer -h` and the help text will be displayed.
 
+TODO: what happened?  What did I just do?  Why is it significant?  What do I do now?
+
 ###Troubleshooting
 
 #### The provisioner keeps getting SSH errors!

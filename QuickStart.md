@@ -137,7 +137,7 @@ To get a list of all pancancer commands, you can type `pancancer -h` and the hel
 
 ###Troubleshooting
 
-> The provisioner keeps getting SSH errors!
+#### The provisioner keeps getting SSH errors!
 
 There are a few things that could cause this to happen, the most common being:
  - An invalid PEM key file
@@ -147,7 +147,7 @@ Ensure that your PEM key file is valid and that the path is configured correctly
 
 Ensure that the security group allows inbound connections on all TCP ports from the *public* IP address of the machine which is acting as the launcher host.
 
-> I changed my configuration but it doesn't seem to be having any effect.
+#### I changed my configuration but it doesn't seem to be having any effect.
 
 If the configuration is changed while the provisioner and coordinator are running, they may need to be restarted to use the new configuration. It is best to avoid doing this while a VM is being provisioned. Try stopping these services, updating your configuration, and then starting them again:
 ```

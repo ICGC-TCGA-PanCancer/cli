@@ -2,7 +2,7 @@
 
 This quick-start guide will help you get started using the Pancancer CLI tool.
 
-Context... what is this?
+The Pancancer CLI tool is a command-line interface tool that will allow you to interact with the pancancer components. The Pancancer CLI tool can be used to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMLB) on a fleet of VMs in a cloud-computing environment.
 
 Diagram showing S3->workflow(s)->S3 out.  People need to realize if they can do this for one they can do it for 500.  We need S3 support in our workflows (inputs and outputs).
 
@@ -18,10 +18,11 @@ Before you get started, there are a few items you will need to have available:
 ##Getting started
 
 ### Launch a VM
-Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html).
-Once the VM is running, log in to your new VM over ssh.
+Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html). When setting up your instance, be sure to include enough storage space to install docker and download docker images. 40 GB should be enough. The instance type normally used for this is m3.large.
 
-TODO: instance types, screenshot of storage, note about security group
+
+Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
+
 
 ### Set up files
 You will now need to set up a few files on your VM.
@@ -43,7 +44,7 @@ This script will install docker, the pancancer_launcher image, and collect some 
 **NOTE:**
 Please be aware that if docker has not been installed on your VM before, you *will* need to log out and log in again for user permission changes to take effect (the script will exit automatically at this point to let you do this). This will *only* happen the first time that docker is installed.
 
-TODO: make the printed message all caps in the bootstrap!
+<!-- TODO: make the printed message all caps in the bootstrap! -->
 
 **After logging out and logging back in to your VM**, you can resume the setup process by simply typing:
 
@@ -61,9 +62,11 @@ This installer script will ask you some questions about how to get started. It w
 
 ##Inside the Pancancer Launcher.
 
-If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools.  The prompt will look like:
+<!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console. -->
 
-    [LAUNCHER 3.1.3] ubuntu@f27e86874dfb:~/arch3$ 
+If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, will be different):
+
+    [LAUNCHER 3.1.3] ubuntu@f27e86874dfb:~/arch3$
 
 ###Configuration
 
@@ -71,6 +74,7 @@ Once you are in the Pancancer Launcher docker container, you will want to do som
 ```
 $ pancancer sysconfig
 ```
+<!-- TODO: Ask these questions in the bootstrap script so there is less to do when they get in -->
 You should do this before you run any workflows. This configuration tool will ask you questions about:
  - How many VMs you want in your fleet.
  - The name of the AWS Security Group you would like your VMs to be a part of. If you do not specify a security group, the security group name "default" will be used. You may have to configure your Security Group to allow inbound TCP connections from the *public* IP address of the machine on which the pancancer launcher is running. This is **necessary** for provisoning to work. If you are not familiar with working with AWS EC2 Security Groups, you may want to read [this document](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html).
@@ -79,7 +83,7 @@ If the tool detects missing values for AWS Key, AWS Secret Key, the path to the 
 
 ###Running workflows
 
-The Pancancer Launcher can generate a template INI file for workflows (you can see which workflows are available with the command `pancancer workflows list`, but you may want to edit these before executing the workflow.
+The Pancancer Launcher can generate a template INI file for workflows. To see which workflows are available, you can use the command `pancancer workflows list`:
 
 ```
 $ pancancer workflows list
@@ -96,27 +100,32 @@ To generate an INI file:
 $ pancancer workflows config --workflow HelloWorld
 ```
 
-A new HelloWorld-specific INI file should be generated in `~/ini-dir`. You will want to edit this file before generating job requests.
+A new HelloWorld-specific INI file should be generated in `~/ini-dir`.
+
+The generated file has *default* values only. Sometimes, you may need to edit these INI files with your own specific values. For example, for the Sanger workflow, you may need to change the IP address of the tabix server. Other workflows will have other edits that may be necessary. <!-- TODO: Add links to workflows with details about the INI files -->
+
+**You will want to edit this file before generating job requests. Please do this now, before continuing.**
 
 ####Generating a job request
 To generate job requests for a workflow:
 ```
 $ pancancer generator --workflow HelloWorld
 ```
-The generated jobs will use the INI files in `~/ini-dir` so it is important to make any necessary edits before this step!
+<!-- TODO: auto-backup old INI files? -->
+The job generator will attempt to generate one job for *each and every* INI file in `~/ini-dir`. It is important to ensure that this directory *only* contains INI files for jobs you wish to run, *and* that you have made any necessary edits to them.
 
-TODO: need to have some output even if it's OK!
+<!-- TODO: need to have some output even if it's OK! -->
 
-TODO: need better notes on contents of ini-dir, need to move ini out of here once submitted.
+<!-- TODO: need better notes on contents of ini-dir, need to move ini out of here once submitted. or not? hash check should prevent duplicates... -->
 
 You can verify that your job request has been enqueued with this command:
 ```
 $ pancancer status queues
 ```
 You should see that some queues have a message in them.
-
+<!-- TODO: Simpler output for 'pancancer status queues' -->
 ```
-queues: 
+queues:
 +-------+-------------------------+---------------------+----------+
 | vhost |          name           |        node         | messages |
 +-------+-------------------------+---------------------+----------+
@@ -139,11 +148,46 @@ You will also need to start the provisioner service:
 ```
 $ pancancer provisioner start
 ```
-The provisioner will provision new VMs. It is these VMs that will execute your jobs. This process will write to a file named `provisioner.out`. More detailed output can also be found in `arch3.log`. Provisioning may take a while. You can watch the progress using this command:
+The provisioner will provision new VMs. It is these VMs that will execute your jobs. This process will write to a file named `provisioner.out`. More detailed output can also be found in `arch3.log`.
+
+Provisioning may take several minutes. There are a few ways that you can monitor progress. You can watch the progress using this command:
 ```
 $ watch tail -n 30 provisioner.out
 ```
 Type <kbd>Ctrl</kbd>-<kbd>C</kbd> to terminate `watch`.
+
+You can also monitor progress from the AWS EC2 console. Look for the new instance that is starting up, named `instance_managed_by_<YOUR_FLEET_NAME>`:
+
+
+Once provisioning is complete, you should see output that looks similar to this (the exact numbers for "ok" and "changed" may vary, but everything is OK as long as "unreachable" and "failed" are 0) in the `provision.out` file:
+
+<pre>
+PLAY RECAP ********************************************************************
+i-fb797f50                 : ok=125  changed=86   unreachable=0    failed=0
+
+[2015/09/02 18:06:16] | Finishing configuring i-fb797f50
+</pre>
+
+At this point, the job should begin executing on the new VM. You can check the status of *all* jobs using the command `pancancer status jobs`
+
+```
+$ pancancer status jobs
+ status  | job_id |               job_uuid               |  workflow  |      create_timestamp      |      update_timestamp
+---------+--------+--------------------------------------+------------+----------------------------+----------------------------
+ PENDING |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | HelloWorld | 2015-09-02 19:45:26.023313 | 2015-09-02 19:45:26.023313
+```
+
+When the job has completed successfully, you should see a result that looks like this:
+
+```
+$ pancancer status jobs
+ status  | job_id |               job_uuid               |  workflow  |      create_timestamp      |      update_timestamp
+---------+--------+--------------------------------------+------------+----------------------------+----------------------------
+ SUCCESS |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | HelloWorld | 2015-09-02 19:45:26.023313 | 2015-09-02 20:04:27.033118
+```
+
+
+
 
 ####Interactive shell
 You can also work with the pancancer tool's interactive shell simply by executing the command `pancancer`:
@@ -155,11 +199,11 @@ In this example, the user has started the interactive shell, as can be seen by t
 
 To get a list of all pancancer commands, you can type `pancancer -h` and the help text will be displayed.
 
-TODO: what happened?  What did I just do?  Why is it significant?  What do I do now?
+<!-- TODO: what happened?  What did I just do?  Why is it significant?  What do I do now?
 
 * reporting
 * how do you get the output of the workflows? e.g. helloworld?
-* what do you do next?
+* what do you do next? -->
 
 ###Troubleshooting
 

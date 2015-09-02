@@ -2,6 +2,8 @@
 
 This quick-start guide will help you get started using the Pancancer CLI tool.
 
+Context... what is this?
+
 ##What You Need
 
 Before you get started, there are a few items you will need to have available:

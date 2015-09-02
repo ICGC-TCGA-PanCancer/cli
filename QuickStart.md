@@ -17,7 +17,7 @@ Before you get started, there are a few items you will need to have available:
 
 ### Launch a VM
 Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html).
-Once the VM is running, log in to your new VM.
+Once the VM is running, log in to your new VM over ssh.
 
 TODO: instance types, screenshot of storage, note about security group
 

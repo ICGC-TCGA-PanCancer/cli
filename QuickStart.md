@@ -155,6 +155,10 @@ To get a list of all pancancer commands, you can type `pancancer -h` and the hel
 
 TODO: what happened?  What did I just do?  Why is it significant?  What do I do now?
 
+* reporting
+* how do you get the output of the workflows? e.g. helloworld?
+* what do you do next?
+
 ###Troubleshooting
 
 #### The provisioner keeps getting SSH errors!

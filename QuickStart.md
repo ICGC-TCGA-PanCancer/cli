@@ -59,6 +59,10 @@ This installer script will ask you some questions about how to get started. It w
 
 ##Inside the Pancancer Launcher.
 
+If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools.  The prompt will look like:
+
+    [LAUNCHER 3.1.3] ubuntu@f27e86874dfb:~/arch3$ 
+
 ###Configuration
 
 Once you are in the Pancancer Launcher docker container, you will want to do some basic pancancer system configuration. You can do this using the command:

@@ -103,6 +103,10 @@ $ pancancer generator --workflow HelloWorld
 ```
 The generated jobs will use the INI files in `~/ini-dir` so it is important to make any necessary edits before this step!
 
+TODO: need to have some output even if it's OK!
+
+TODO: need better notes on contents of ini-dir, need to move ini out of here once submitted.
+
 You can verify that your job request has been enqueued with this command:
 ```
 $ pancancer status queues

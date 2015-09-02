@@ -24,9 +24,9 @@ TODO: instance types, screenshot of storage, note about security group
 ### Set up files
 You will now need to set up a few files on your VM.
 
-  - You will need to put your AWS pem key on to this machine in `~/.ssh/MyKey.pem`. Also make sure you set the permissions correctly on this file, you can do that with the command:
+  - You will need to put your AWS pem key on to this machine in `~/.ssh/FillInYourKeyName.pem`. Also make sure you set the permissions correctly on this file, you can do that with the command:
 ```
-chmod 600 ~/.ssh/MyKey.pem
+chmod 600 ~/.ssh/FillInYourKeyName.pem
 ```
    You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
   - You will need to put your GNOS keys on this machine in `~/.gnos/`. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.

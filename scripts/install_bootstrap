@@ -51,8 +51,21 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
                         # Otherwise, it will make running the start_launcher_container script difficult (since it tries to write into $HOME,
                         # which should exapand to "ubuntu").
 			if [ -z "$ubuntu_is_docker_user" ] ; then
-                                echo "Updating user permissions (You will have to log out and log in to this system again for this to take effect)."
+                                echo "Updating user permissions..."
                                 sudo usermod -aG docker ubuntu
+                                sleep 1
+                                cat <<LOGOUT_MESSAGE
+*************************
+ATTENTION!!
+
+USER GROUP SETTINGS HAVE
+CHANGED. PLEASE LOG OUT
+OF THIS SYSTEM AND THEN
+LOG BACK IN IMMEDIATELY
+OR THESE CHANGES TO TAKE
+EFFECT!
+*************************
+LOGOUT_MESSAGE
                                 exit 0
                         fi
 		else

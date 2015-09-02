@@ -77,7 +77,16 @@ If the tool detects missing values for AWS Key, AWS Secret Key, the path to the 
 
 ###Running workflows
 
-The Pancancer Launcher can generate a template INI file for workflows (you can see which workflows are available with the command `pancancer workflows list`), but you may want to edit these before executing the workflow.
+The Pancancer Launcher can generate a template INI file for workflows (you can see which workflows are available with the command `pancancer workflows list`, but you may want to edit these before executing the workflow.
+
+```
+$ pancancer workflows list
+Available workflows are:
+Sanger
+HelloWorld
+BWA
+DKFZ_EMBL
+```
 
 ####Generating an INI file
 To generate an INI file:

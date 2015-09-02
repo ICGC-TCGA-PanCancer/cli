@@ -452,6 +452,8 @@ class Generator(cliff.command.Command):
                 config.write(youxia_configfile,space_around_delimiters=True)
 
             subprocess.call(generator_cmd.split(' '))
+            self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
+            #TODO: Show the job requests in the queue??
 
 ###
 

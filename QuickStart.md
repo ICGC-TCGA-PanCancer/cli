@@ -28,8 +28,7 @@ Choosing an AMI (here, AMI ami-d05e75b8 was used)
 Choosing an m3.large instance type
 ![choosing an instance type](/images/2_Choose_Instance_Type.png?raw=true "Click for larger view")
 
-Configure your instance. If you want to use termination protection, this is the screen where you can enable it.
-<!-- TODO: screenshot with termination protection turned OFF and link to how to use it -->
+Configure your instance. If you want to use [termination protection](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html#Using_ChangingDisableAPITermination), this is the screen where you can enable it.
 ![Configuring your instance](/images/3_Configure_Instance.png?raw=true "Click for larger view")
 
 Setting up storage. 40 GB should be sufficient.

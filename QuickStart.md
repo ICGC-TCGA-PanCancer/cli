@@ -2,9 +2,13 @@
 
 This quick-start guide will help you get started using the Pancancer CLI tool.
 
-The Pancancer CLI tool is a command-line interface tool that will allow you to interact with the pancancer components. The Pancancer CLI tool can be used to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMLB) on a fleet of VMs in a cloud-computing environment.
+The Pancancer CLI tool is a command-line interface tool that will allow you to interact with the pancancer components. The Pancancer CLI tool can be used to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMBL) on a fleet of virtual machines in a cloud-computing environment.
 
-Diagram showing S3->workflow(s)->S3 out.  People need to realize if they can do this for one they can do it for 500.  We need S3 support in our workflows (inputs and outputs).
+![Pancancer CLI Diagram - Overview](/images/Pancancer_CLI_system_diagram.png)
+
+The diagram above shows some detail about how the Pancancer CLI tool is used to manage a fleet of VMs executing pancancer workflows. The details of how this is done can be found in the document below.
+
+<!-- TODO: Diagram showing S3->workflow(s)->S3 out.  People need to realize if they can do this for one they can do it for 500.  We need S3 support in our workflows (inputs and outputs). -->
 
 ##What You Need
 
@@ -35,7 +39,7 @@ Setting up storage. 40 GB should be sufficient.
 Setting tags on your instance. Here, you can set the instance name that your VM will use.
 ![Tag instance](/images/5_Tag_Instance.png)
 
-Configuring security groups for your instance. You can use an existing group, or let AWS create a new one. *Notice that the rules have been set to allow ssh access from the source "My IP".* It is **very** important to restrict traffic to your VMs to *only* the machines that *need* access. **Avoid** using the "Anywhere" source.
+Configuring security groups for your instance. You can use an existing group, or let AWS create a new one. *Notice that the rules have been set to allow ssh access from the source "My IP".* It is **very** important to restrict traffic to your VMs to *only* the machines that *need* access. **Avoid** using the "Anywhere" source. If you need to allow access from an IP address that is not "My IP", you can use a Custom IP source.
 
 Make a note of the *name* of the security group that is chosen at this step, you will need it later.
 ![Security Groups](/images/6_Security_Group.png)
@@ -62,8 +66,6 @@ This script will install docker, the pancancer_launcher image, and collect some 
 
 **NOTE:**
 Please be aware that if docker has not been installed on your VM before, you *will* need to log out and log in again for user permission changes to take effect (the script will exit automatically at this point to let you do this). This will *only* happen the first time that docker is installed.
-
-<!-- TODO: make the printed message all caps in the bootstrap! -->
 
 **After logging out and logging back in to your VM**, you can resume the setup process by simply typing:
 
@@ -133,16 +135,14 @@ $ pancancer generator --workflow HelloWorld
 <!-- TODO: auto-backup old INI files? -->
 The job generator will attempt to generate one job for *each and every* INI file in `~/ini-dir`. It is important to ensure that this directory *only* contains INI files for jobs you wish to run, *and* that you have made any necessary edits to them.
 
-<!-- TODO: need to have some output even if it's OK! -->
-
 <!-- TODO: need better notes on contents of ini-dir, need to move ini out of here once submitted. or not? hash check should prevent duplicates... -->
 
 You can verify that your job request has been enqueued with this command:
 ```
 $ pancancer status queues
 ```
+
 You should see that some queues have a message in them.
-<!-- TODO: Simpler output for 'pancancer status queues' -->
 ```
 queues:
 +-------+-------------------------+---------------------+----------+
@@ -196,7 +196,7 @@ $ pancancer status jobs
  PENDING |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | HelloWorld | 2015-09-02 19:45:26.023313 | 2015-09-02 19:45:26.023313
 ```
 
-When the job has completed successfully, you should see a result that looks like this:
+When the job has completed successfully, you should see a status result that looks like this:
 
 ```
 $ pancancer status jobs
@@ -205,8 +205,18 @@ $ pancancer status jobs
  SUCCESS |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | HelloWorld | 2015-09-02 19:45:26.023313 | 2015-09-02 20:04:27.033118
 ```
 
+At this point, you have successfully installed the Pancancer Launcher, and used it to schedule and execute a workflow!
 
+<!--
+TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
 
+ Most workflows will write their results to a GNOS respository or an AWS S3 bucket, so you will want to check there for -->
+
+####What's next?
+In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of workflows.
+
+<!-- TODO: Should we eventually have a tool that lets the use create n INI files? Might not be that hard, will need to investigate... -->
+Your next step, now that you have successfully run one workflow on one VM, could be to create several INI files (you can use `pancancer workflows config --workflow <SOME WORKFLOW NAME>` to create a default INI file and then copy it as many times as you need and edit the copies) and then execute them in a larger fleet.
 
 ####Interactive shell
 You can also work with the pancancer tool's interactive shell simply by executing the command `pancancer`:

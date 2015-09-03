@@ -45,7 +45,7 @@ Make a note of the *name* of the security group that is chosen at this step, you
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
-<!-- TODO add screnshot about "connect " -->
+![Connect to Instance](/images/AWS_connect_to_VM2.png?raw=true "Click for larger view")
 
 ### Set up files
 You will now need to set up a few files on your VM.
@@ -117,7 +117,10 @@ DKFZ_EMBL
 
 For more information about these workflows and how to configure their INI files, see the workflows' home pages:
 
-
+ - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore)
+ - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
+ - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow)
+ - HelloWorld - This is a very simple workflow that is good to use when testing basic setup and infrastructure.
 
 ####Generating an INI file
 To generate an INI file:
@@ -129,7 +132,7 @@ A new HelloWorld-specific INI file should be generated in `~/ini-dir`.
 
 The generated file has *default* values only. Sometimes, you may need to edit these INI files with your own specific values. For example, for the Sanger workflow, you may need to change the IP address of the tabix server. Other workflows will have other edits that may be necessary.
 
-<!-- TODO: Add links to workflows with details about the INI files -->
+<!-- TODO: Add links to workflows (done!) with details about the INI files (not yet) -->
 
 **You will want to edit this file before generating job requests. Please do this now, before continuing.**
 
@@ -140,7 +143,8 @@ To generate work order for a workflow:
 ```
 $ pancancer generator --workflow HelloWorld
 ```
-<!-- TODO: auto-backup old INI files? -->
+<!-- TODO: auto-backup old INI files? can wait... -->
+
 The job generator will attempt to generate one job for *each and every* INI file in `~/ini-dir`. It is important to ensure that this directory *only* contains INI files for jobs you wish to run, *and* that you have made any necessary edits to them.
 
 <!-- TODO: need better notes on contents of ini-dir, need to move ini out of here once submitted. or not? hash check should prevent duplicates... -->
@@ -169,7 +173,7 @@ Once the system has been configured and an INI file has been generated and the j
 ```
 $ pancancer coordinator start
 ```
-The coordinator will process job requets into jobs and provisioning requests. This process will write to a file named `coordinator.out`. More detailed output can also be found in `arch3.log`.
+The coordinator will process job requests into jobs and provisioning requests. This process will write to a file named `coordinator.out`. More detailed output can also be found in `arch3.log`.
 
 You will also need to start the provisioner service:
 ```
@@ -215,7 +219,11 @@ $ pancancer status jobs
 
 At this point, you have successfully installed the Pancancer Launcher, and used it to schedule and execute a workflow!
 
-When looking at your AWS EC2 console, you'll notice that when a workflow finishes successfully, the VM it was running on will have been automatically terminated. This is done to save on computing resources. The pancancer workflows write their data to GNOS repositories (AWS S3 support will be coming) before their VM is terminated. The VM that is serving as your launcher will *not* be terminated until you choose to do so.
+When looking at your AWS EC2 console, you will notice that when a workflow finishes successfully, the VM it was running on will have been automatically terminated. This is done to save on computing resources. The pancancer workflows write their data to GNOS repositories (AWS S3 support will be coming) before their VM is terminated. The VM that is serving as your launcher will *not* be terminated until you choose to do so.
+
+<!-- TODO: Add section on failed workflow -->
+
+If a workflow fails, you will see that its status is "FAILED". The VM where the failed workflow ran will *not* be terminated. You will need to log in to this VM using ssh to examine the workflow output to determine why it failed, and troubleshoot the problem.
 
 <!--
 TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
@@ -224,7 +232,7 @@ TODO: Fill in more detail here. currently, the user will have to know to configu
 
 <!-- TODO: Add section on reporting tool -->
 
-<!-- TODO: Add section on failed workflow -->
+
 
 ####What's next?
 In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of workflows.

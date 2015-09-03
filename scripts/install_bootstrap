@@ -180,6 +180,30 @@ AWS_CONFIG
 			FLEET_NAME_STR=" -f $user_fleet_name "
 		fi
 
+    user_fleet_size=''
+		while [[ -z "${user_fleet_size// /}" ]] ; do
+			if [ ! -z $FLEET_SIZE ] ; then
+				read -ep $'What is the size of your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
+			else
+				read -ep $'What is the size of your fleet?\n' user_fleet_size
+			fi
+			if [[ -z "${user_fleet_size// /}" ]] ; then
+				echo 'Key name cannot be blank.'
+			fi
+		done
+
+    user_sec_grp=''
+		while [[ -z "${user_sec_grp// /}" ]] ; do
+			if [ ! -z $SECURITY_GROUP ] ; then
+				read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
+			else
+				read -ep $'What is the size of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
+			fi
+			if [[ -z "${user_sec_grp// /}" ]] ; then
+				echo 'Security Group name cannot be blank.'
+			fi
+		done
+
 		# now wget the start_launcher_container script and call it with the values from above:
 		$(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
     chmod u+x start_launcher_container.sh
@@ -192,6 +216,8 @@ AWS_CONFIG
 PEM_PATH=${user_pem_path}
 KEY_NAME=${user_key_name}
 FLEET_NAME=${user_fleet_name}
+FLEET_SIZE=${user_fleet_size}
+SECURITY_GROUP=${user_sec_grp}
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config

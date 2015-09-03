@@ -211,13 +211,15 @@ class SysConfig(cliff.command.Command):
                     config_data = json.load(pancancer_config_file)
 
             pancancer_config={}
+
+            # TODO: This value could also come from bootstrap config file...
             prev_fleet_size = ''
+            fleet_size=''
             if 'max_fleet_size' in config_data:
                 prev_fleet_size = config_data['max_fleet_size']
-            fleet_size=''
             fleet_size = self._get_config_value(fleet_size, prev_fleet_size, 'How many VMs do you want in your fleet', alt_condition = lambda x: x.strip()=='' or x.isdigit() == False or int(x)<=0 )
 
-
+            # TODO: This value could also come from bootstrap config file...
             prev_security_group = ''
             security_group = ''
             if 'security_group' in config_data:

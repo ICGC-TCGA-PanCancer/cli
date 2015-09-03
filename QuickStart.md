@@ -101,6 +101,10 @@ You should do this before you run any workflows. This configuration tool will as
 
 If the tool detects missing values for AWS Key, AWS Secret Key, the path to the pem key, or the key name, it may ask you to fill in these values.
 
+You will need to update your security group settings at this point. You need to ensure that there is an inbound rule allowing connections from the *public* IP address of your launcher host. In the image below, this is blank. Fill it in with your launcher's public IP address.
+You will also need to ensure that there is a rule allowing inbound traffic from your security group *itself*. This allows your worker VMs to communicate with your launcher. Add a rule and start typing the *name* of your security group as the Custom IP source. The group ID should appear as you type the name. Click on the group ID to select it.
+![Final security group configuration](/images/Final_Security_Group_Config.png?raw=true "Click for larger view")
+
 ###Running workflows
 
 The Pancancer Launcher can generate a template INI file for workflows. To see which workflows are available, you can use the command `pancancer workflows list`:

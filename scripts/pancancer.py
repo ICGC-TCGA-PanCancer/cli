@@ -452,6 +452,8 @@ class Generator(cliff.command.Command):
                 config.write(youxia_configfile,space_around_delimiters=True)
 
             subprocess.call(generator_cmd.split(' '))
+            self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
+            #TODO: Show the job requests in the queue??
 
 ###
 
@@ -530,11 +532,10 @@ class Status(cliff.command.Command):
         cmd=''
         sql=''
         if subcmd == 'queues':
-            #QueueStatus is a simple wrapper script around rabbitmq stats, as a part of architecture-setup
-            cmd = '/bin/bash QueueStats'
+            # QueueStatus has too much output - Pancancer CLI users will ONLY want to see the queues, so just call rabbitmqadmin directly.
+            cmd = 'rabbitmqadmin list queues vhost name node messages'
             subprocess.call(cmd.split(' '))
         elif subcmd == 'job_status':
-            #cmd = ('psql -U queue_user queue_status -c '.split(' ')).append('"select count(*), status from job group by status;"')
             sql='select count(*), status from job group by status;'
             self._do_sql_status(sql)
         elif subcmd == 'jobs':

@@ -8,8 +8,6 @@ The Pancancer CLI tool is a command-line interface tool that will allow you to i
 
 The diagram above shows some detail about how the Pancancer CLI tool is used to manage a fleet of VMs executing pancancer workflows. The details of how this is done can be found in the document below.
 
-<!-- TODO: Diagram showing S3->workflow(s)->S3 out.  People need to realize if they can do this for one they can do it for 500.  We need S3 support in our workflows (inputs and outputs). -->
-
 ##What You Need
 
 Before you get started, there are a few items you will need to have available:
@@ -31,6 +29,7 @@ Choosing an m3.large instance type
 ![choosing an instance type](/images/2_Choose_Instance_Type.png?raw=true "Click for larger view")
 
 Configure your instance. If you want to use termination protection, this is the screen where you can enable it.
+<!-- TODO: screenshot with termination protection turned OFF and link to how to use it -->
 ![Configuring your instance](/images/3_Configure_Instance.png?raw=true "Click for larger view")
 
 Setting up storage. 40 GB should be sufficient.
@@ -42,10 +41,11 @@ Setting tags on your instance. Here, you can set the instance name that your VM 
 Configuring security groups for your instance. You can use an existing group, or let AWS create a new one. *Notice that the rules have been set to allow ssh access from the source "My IP".* It is **very** important to restrict traffic to your VMs to *only* the machines that *need* access. **Avoid** using the "Anywhere" source. If you need to allow access from an IP address that is not "My IP", you can use a Custom IP source.
 
 Make a note of the *name* of the security group that is chosen at this step, you will need it later.
+<!--- TODO: note about not putting spaces in the security group name -->
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
-
+<!-- TODO add screnshot about "connect " -->
 
 ### Set up files
 You will now need to set up a few files on your VM.
@@ -68,7 +68,7 @@ This script will install docker, the pancancer_launcher image, and collect some 
 Please be aware that if docker has not been installed on your VM before, you *will* need to log out and log in again for user permission changes to take effect (the script will exit automatically at this point to let you do this). This will *only* happen the first time that docker is installed.
 
 **After logging out and logging back in to your VM**, you can resume the setup process by simply typing:
-
+<!-- TODO: Update architecture-setup to not require ubuntu in docker group to run (ie let sudo docker work fine) -->
 ```
 bash install_bootstrap
 ```
@@ -83,7 +83,7 @@ This installer script will ask you some questions about how to get started. It w
 
 ##Inside the Pancancer Launcher.
 
-<!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console. -->
+<!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console.  can wait... -->
 
 If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, will be different):
 
@@ -95,7 +95,7 @@ Once you are in the Pancancer Launcher docker container, you will want to do som
 ```
 $ pancancer sysconfig
 ```
-<!-- TODO: Ask these questions in the bootstrap script so there is less to do when they get in -->
+<!-- TODO: Ask these questions in the bootstrap script so there is less to do when they get in. can wait... -->
 You should do this before you run any workflows. This configuration tool will ask you questions about:
  - How many VMs you want in your fleet.
  - The name of the AWS Security Group you would like your VMs to be a part of. If you do not specify a security group, the security group name "default" will be used. You may have to configure your Security Group to allow inbound TCP connections from the *public* IP address of the machine on which the pancancer launcher is running. This is **necessary** for provisoning to work. If you are not familiar with working with AWS EC2 Security Groups, you may want to read [this document](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html).
@@ -115,6 +115,10 @@ BWA
 DKFZ_EMBL
 ```
 
+For more information about these workflows and how to configure their INI files, see the workflows' home pages:
+
+
+
 ####Generating an INI file
 To generate an INI file:
 ```
@@ -123,12 +127,16 @@ $ pancancer workflows config --workflow HelloWorld
 
 A new HelloWorld-specific INI file should be generated in `~/ini-dir`.
 
-The generated file has *default* values only. Sometimes, you may need to edit these INI files with your own specific values. For example, for the Sanger workflow, you may need to change the IP address of the tabix server. Other workflows will have other edits that may be necessary. <!-- TODO: Add links to workflows with details about the INI files -->
+The generated file has *default* values only. Sometimes, you may need to edit these INI files with your own specific values. For example, for the Sanger workflow, you may need to change the IP address of the tabix server. Other workflows will have other edits that may be necessary.
+
+<!-- TODO: Add links to workflows with details about the INI files -->
 
 **You will want to edit this file before generating job requests. Please do this now, before continuing.**
 
-####Generating a job request
-To generate job requests for a workflow:
+####Generating a work order
+A work order is contains information about what work needs to be done, and what kind of VM needs to be provisioned for it.
+
+To generate work order for a workflow:
 ```
 $ pancancer generator --workflow HelloWorld
 ```
@@ -171,9 +179,9 @@ The provisioner will provision new VMs. It is these VMs that will execute your j
 
 Provisioning may take several minutes. There are a few ways that you can monitor progress. You can watch the progress using this command:
 ```
-$ watch tail -n 30 provisioner.out
+$ tail -f provisioner.out
 ```
-Type <kbd>Ctrl</kbd>-<kbd>C</kbd> to terminate `watch`.
+Type <kbd>Ctrl</kbd>-<kbd>C</kbd> to terminate `tail`.
 
 You can also monitor progress from the AWS EC2 console. Look for the new instance that is starting up, named `instance_managed_by_<YOUR_FLEET_NAME>`:
 
@@ -207,10 +215,16 @@ $ pancancer status jobs
 
 At this point, you have successfully installed the Pancancer Launcher, and used it to schedule and execute a workflow!
 
+When looking at your AWS EC2 console, you'll notice that when a workflow finishes successfully, the VM it was running on will have been automatically terminated. This is done to save on computing resources. The pancancer workflows write their data to GNOS repositories (AWS S3 support will be coming) before their VM is terminated. The VM that is serving as your launcher will *not* be terminated until you choose to do so.
+
 <!--
 TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
 
  Most workflows will write their results to a GNOS respository or an AWS S3 bucket, so you will want to check there for -->
+
+<!-- TODO: Add section on reporting tool -->
+
+<!-- TODO: Add section on failed workflow -->
 
 ####What's next?
 In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of workflows.

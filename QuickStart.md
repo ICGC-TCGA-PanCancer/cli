@@ -4,7 +4,7 @@ This quick-start guide will help you get started using the Pancancer CLI tool.
 
 The Pancancer CLI tool is a command-line interface tool that will allow you to interact with the pancancer components. The Pancancer CLI tool can be used to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMBL) on a fleet of virtual machines in a cloud-computing environment.
 
-![Pancancer CLI Diagram - Overview](/images/Pancancer_CLI_system_diagram.png)
+![Pancancer CLI Diagram - Overview](/images/Pancancer_CLI_system_diagram.png?raw=true "Click for larger view")
 
 The diagram above shows some detail about how the Pancancer CLI tool is used to manage a fleet of VMs executing pancancer workflows. The details of how this is done can be found in the document below.
 
@@ -25,24 +25,24 @@ Before you get started, there are a few items you will need to have available:
 Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html). When setting up your instance, be sure to include enough storage space to install docker and download docker images. 40 GB should be enough. The instance type normally used for this is m3.large. The following screen-shots  illustrate how the VM should be configured.
 
 Choosing an AMI (here, AMI ami-d05e75b8 was used)
-![choosing an AMI](/images/1_Choose_AMI.png)
+![choosing an AMI](/images/1_Choose_AMI.png?raw=true "Click for larger view")
 
 Choosing an m3.large instance type
-![choosing an instance type](/images/2_Choose_Instance_Type.png)
+![choosing an instance type](/images/2_Choose_Instance_Type.png?raw=true "Click for larger view")
 
 Configure your instance. If you want to use termination protection, this is the screen where you can enable it.
-![Configuring your instance](/images/3_Configure_Instance.png)
+![Configuring your instance](/images/3_Configure_Instance.png?raw=true "Click for larger view")
 
 Setting up storage. 40 GB should be sufficient.
-![Add Storage](/images/4_Add_Storage.png)
+![Add Storage](/images/4_Add_Storage.png?raw=true "Click for larger view")
 
 Setting tags on your instance. Here, you can set the instance name that your VM will use.
-![Tag instance](/images/5_Tag_Instance.png)
+![Tag instance](/images/5_Tag_Instance.png?raw=true "Click for larger view")
 
 Configuring security groups for your instance. You can use an existing group, or let AWS create a new one. *Notice that the rules have been set to allow ssh access from the source "My IP".* It is **very** important to restrict traffic to your VMs to *only* the machines that *need* access. **Avoid** using the "Anywhere" source. If you need to allow access from an IP address that is not "My IP", you can use a Custom IP source.
 
 Make a note of the *name* of the security group that is chosen at this step, you will need it later.
-![Security Groups](/images/6_Security_Group.png)
+![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
 

@@ -13,121 +13,8 @@ import cliff.command
 import process_config
 import urllib.request
 import shutil
+import workflowlister
 
-class WorkflowLister:
-    "Get a listing of workflows from a source of workflow metadata."
-    # Eventually, this data structure should come from some sort of online registry. For now, just define it in code.
-    _workflows= {   'HelloWorld':
-                    {
-                        'full_name':'Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.1',
-                        'http_workflow':
-                        {
-                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.1.zip',
-                            'version':'1.0-SNAPSHOT'
-                        },
-                        'containers':
-                        {
-                            'seqware_whitestar_pancancer': {
-                                'name':'seqware_whitestar_pancancer',
-                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
-                            }
-                        },
-                        'ami_id':'ami-270cc34c',
-                        'default-ini':'http://something.ini',
-                        'instance-type':'m1.xlarge',
-                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
-                    },
-                    'Sanger':
-                    {
-                        'full_name':'Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0',
-                        'http_workflow':
-                        {
-                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0.zip',
-                            'version':'1.0.8'
-                        },
-                        'containers':
-                        {
-                            'seqware_whitestar_pancancer': {
-                                'name':'seqware_whitestar_pancancer',
-                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
-                            }
-                        },
-                        'ami_id':'ami-270cc34c',
-                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore/1.0.8/workflow/config/CgpCnIndelSnvStrWorkflow.ini',
-                        'instance-type':'m1.xlarge',
-                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
-                    },
-                    'BWA':
-                    {
-                        'full_name':'Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1',
-                        'http_workflow':
-                        {
-                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1.zip',
-                            'version':'2.6.5'
-                        },
-                        'containers':
-                        {
-                            'seqware_whitestar_pancancer': {
-                                'name':'seqware_whitestar_pancancer',
-                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
-                            }
-                        },
-                        'ami_id':'ami-270cc34c',
-                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.5/workflow/config/workflow.ini',
-                        'instance-type':'m1.xlarge',
-                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
-                    },
-                    'DKFZ_EMBL':
-                    {
-                        'full_name':'Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1',
-                        'http_workflow':
-                        {
-                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1.zip',
-
-                            'version':'1.0.5'
-                        },
-                        'containers':
-                        {
-                            'pcawg-delly-workflow': {
-                                'name':'pcawg-delly-workflow',
-                                'image_name': 'pancancer/pcawg-delly-workflow:1.0'
-                            },
-                            'seqware_whitestar_pancancer': {
-                                'name':'seqware_whitestar_pancancer',
-                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
-                            },
-                            'pancancer_upload_download': {
-                                'name':'pancancer_upload_download',
-                                'image_name':'pancancer/pancancer_upload_download:1.2'
-                            }
-                        },
-                        's3_containers':
-                        {
-                            'dkfz_dockered_workflows':
-                            {
-                                'name':'dkfz_dockered_workflows',
-                                'url':'s3://oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar'
-                            }
-                        },
-                        'ami_id':'ami-270cc34c',
-                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/1.0.6/workflow/config/DEWrapperWorkflow.ini',
-                        'instance-type':'m1.xlarge',
-                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
-                    }
-                }
-
-    @staticmethod
-    def get_workflow_names():
-        keys = ''
-        for k in WorkflowLister._workflows:
-            keys += k+'\n'
-        return keys
-
-    @staticmethod
-    def get_workflow_details(workflow_name):
-        return WorkflowLister._workflows[workflow_name]
-
-###
 
 class Workflows(cliff.command.Command):
     "This command  can help you configure and select workflows."
@@ -145,16 +32,16 @@ class Workflows(cliff.command.Command):
         subparser_name=vars(parsed_args)['subparser_name']
         self.log.debug('subparser: %s',subparser_name)
         if subparser_name=='list':
-            workflow_list = WorkflowLister.get_workflow_names()
+            workflow_list = workflowlister.WorkflowLister.get_workflow_names()
             self.log.info ('Available workflows are:')
             self.log.info(workflow_list)
 
         elif subparser_name=='config':
             workflow_name=vars(parsed_args)['workflow_name']
-            if workflow_name in WorkflowLister.get_workflow_names():
+            if workflow_name in workflowlister.WorkflowLister.get_workflow_names():
                 ini_file_path = os.path.expanduser('~/ini-dir/'+workflow_name+'.ini')
                 if workflow_name != 'HelloWorld':
-                    workflow_details = WorkflowLister.get_workflow_details(workflow_name)
+                    workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
                     url = workflow_details['default-ini']
 
                     with urllib.request.urlopen(url) as response, open(ini_file_path,'wb') as ini_file:
@@ -413,10 +300,10 @@ class Generator(cliff.command.Command):
     def take_action(self, parsed_args):
         workflow_name=vars(parsed_args)['workflow_name']
         self.log.debug('workflow_name: %s',workflow_name)
-        if not (workflow_name in WorkflowLister.get_workflow_names()):
+        if not (workflow_name in workflowlister.WorkflowLister.get_workflow_names()):
             self.log.info('Oh, I\'m SO sorry, but '+workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
         else:
-            workflow_details = WorkflowLister.get_workflow_details(workflow_name)
+            workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
             generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_details['http_workflow']['version']+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
             self.log.debug(generator_cmd)
             # Before generating the job, we have to update params.json with the workflow/container info about the requested workflow.

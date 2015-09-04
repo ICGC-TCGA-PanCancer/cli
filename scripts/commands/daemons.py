@@ -1,8 +1,6 @@
 import os
 import subprocess
 import logging
-import cliff.app
-import cliff.commandmanager
 import cliff.command
 import time
 import psutil

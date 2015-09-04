@@ -1,5 +1,3 @@
-import cliff.app
-import cliff.commandmanager
 import cliff.command
 import subprocess
 import logging

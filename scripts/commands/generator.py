@@ -3,6 +3,8 @@ import logging
 import cliff.app
 import cliff.commandmanager
 import cliff.command
+import configparser
+import json
 
 class Generator(cliff.command.Command):
     "This Generator will generate new job orders."

@@ -66,7 +66,7 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 #EFFECT!
 #*************************
 #LOGOUT_MESSAGE
-				$exit 0
+				#exit 0
 			#fi
 		else
 			echo "Skipping docker installation..."
@@ -199,7 +199,7 @@ AWS_CONFIG
 			if [ ! -z $SECURITY_GROUP ] ; then
 				read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
 			else
-				read -ep $'What is the size of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
+				read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
 			fi
 			if [[ -z "${user_sec_grp// /}" ]] ; then
 				echo 'Security Group name cannot be blank.'

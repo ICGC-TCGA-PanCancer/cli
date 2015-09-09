@@ -160,6 +160,8 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 [default]
 aws_access_key_id=${user_aws_key}
 aws_secret_access_key=${user_aws_secret_key}
+region=us-east-1
+output=json
 AWS_CONFIG
 
 		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"

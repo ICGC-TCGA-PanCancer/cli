@@ -4,7 +4,6 @@ import sys
 import logging
 import cliff.app
 import cliff.commandmanager
-import workflowlister
 from commands.workflows import Workflows
 from commands.sysconfig import SysConfig
 from commands.daemons import Coordinator

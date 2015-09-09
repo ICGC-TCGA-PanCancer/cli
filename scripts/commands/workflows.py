@@ -28,7 +28,7 @@ class Workflows(cliff.command.Command):
 
     def _do_config(self, workflow_name, num_INIs=1, backup_old_INIs=True):
         if workflow_name in workflowlister.WorkflowLister.get_workflow_names():
-            backup_dir=os.path.expanduser('~/ini-dir/backup')
+            backup_dir=os.path.expanduser('~/ini-backups')
             ini_dir=os.path.expanduser('~/ini-dir')
             print(backup_old_INIs)
             # TODO: Add cleanup process to move/back-up old INIs before generating new ones, unless user does not want that. Done. now test... 

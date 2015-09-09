@@ -2,7 +2,7 @@ import subprocess
 import logging
 import cliff.command
 import configparser
-
+import workflowlister
 import json
 
 class Generator(cliff.command.Command):

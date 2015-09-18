@@ -6,7 +6,7 @@ import workflowlister
 import json
 
 class Generator(cliff.command.Command):
-    "This Generator will generate new job orders."
+    "This Generator will generate new job orders. Be aware that it will also rewrite your params.json file and your ~.youxia/config file."
     log = logging.getLogger(__name__)
     def get_parser(self,prog_name):
         parser = super(Generator,self).get_parser(prog_name)
@@ -56,6 +56,9 @@ class Generator(cliff.command.Command):
             with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
                 config.write(youxia_configfile,space_around_delimiters=True)
 
+            # After the config has been updated, should the provisioner be restarted and sysconfig re-run? probably...
             subprocess.call(generator_cmd.split(' '))
             self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
             #TODO: Show the job requests in the queue??
+            
+            

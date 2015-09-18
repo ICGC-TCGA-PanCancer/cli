@@ -82,7 +82,7 @@ This installer script will ask you some questions about how to get started. It w
 
 ##Inside the Pancancer Launcher.
 
-<!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console.  can wait... -->
+<!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console.  can wait... done? needs test -->
 
 If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, will be different):
 
@@ -94,10 +94,12 @@ Once you are in the Pancancer Launcher docker container, you will want to do som
 ```
 $ pancancer sysconfig
 ```
-<!-- TODO: Ask these questions in the bootstrap script so there is less to do when they get in. can wait... -->
+<!-- TODO: Ask these questions in the bootstrap script so there is less to do when they get in. can wait... done? needs test -->
 You should do this before you run any workflows. This configuration tool will ask you questions about:
  - How many VMs you want in your fleet.
  - The name of the AWS Security Group you would like your VMs to be a part of. If you do not specify a security group, the security group name "default" will be used. You may have to configure your Security Group to allow inbound TCP connections from the *public* IP address of the machine on which the pancancer launcher is running. This is **necessary** for provisoning to work. If you are not familiar with working with AWS EC2 Security Groups, you may want to read [this document](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html).
+
+<!-- TODO: Write a script that uses AWS CLI and boto to dynamically update security groups --> 
 
 If the tool detects missing values for AWS Key, AWS Secret Key, the path to the pem key, or the key name, it may ask you to fill in these values.
 

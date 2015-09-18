@@ -59,7 +59,7 @@ def processConsonanceSettings(d):
 #######################
 
 def main(config_path):
-    #TODO: This should take a path to any config file.
+
     with open(config_path) as simple_config_file:
         simple_config=json.load(simple_config_file)
         # These are not something the user will put into their simple config,

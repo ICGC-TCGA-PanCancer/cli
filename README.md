@@ -1,9 +1,15 @@
 # Overview
 
-This is a common pancancer command line interface that does two major things:
+The Pancancer CLI is a tool that allows you to provision and manage a fleet of virutal machines in a cloud environment (such as Amazon EC2), and execute Pancancer workflows on them.
 
-* includes an `install_bootstrap` script that installs Docker and the PanCancer launcher
-* within the launcher, a `pancancer` script that simply wraps the tools clouds shepherds use behind a common command line
+<!-- TODO: A little more detail here, and a "how it works" section -->
+<!-- This section needs more work.
+How the Pancancer CLI can help you:
+
+ - Provision VMs - as many or as few as the user needs.
+ - Deploy and execute Pancancer workflows on VMs.
+ - Monitor the health and status of VMs and the workflows running on them.
+-->
 
 # Bootstrap Install
 

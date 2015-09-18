@@ -44,30 +44,30 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			echo "Pulling latest pancancer_launcher image..."
 			sudo docker pull pancancer/pancancer_launcher:latest
 			echo "Done pulling pancancer_launcher!"
-                        set +e
-                        ubuntu_is_docker_user="$(groups ubuntu | grep docker)"
-                        set -e
-                        # If the user is not in the docker group, they need to be added and they need to log out and then log in again.
-                        # Otherwise, it will make running the start_launcher_container script difficult (since it tries to write into $HOME,
-                        # which should exapand to "ubuntu").
-			if [ -z "$ubuntu_is_docker_user" ] ; then
-                                echo "Updating user permissions..."
-                                sudo usermod -aG docker ubuntu
-                                sleep 1
-                                cat <<LOGOUT_MESSAGE
-*************************
-ATTENTION!!
-
-USER GROUP SETTINGS HAVE
-CHANGED. PLEASE LOG OUT
-OF THIS SYSTEM AND THEN
-LOG BACK IN IMMEDIATELY
-OR THESE CHANGES TO TAKE
-EFFECT!
-*************************
-LOGOUT_MESSAGE
-                                exit 0
-                        fi
+			#set +e
+			#ubuntu_is_docker_user="$(groups ubuntu | grep docker)"
+			#set -e
+			# If the user is not in the docker group, they need to be added and they need to log out and then log in again.
+			# Otherwise, it will make running the start_launcher_container script difficult (since it tries to write into $HOME,
+			# which should exapand to "ubuntu").
+			#if [ -z "$ubuntu_is_docker_user" ] ; then
+				#echo "Updating user permissions..."
+				#sudo usermod -aG docker ubuntu
+				#sleep 1
+				#cat <<LOGOUT_MESSAGE
+#*************************
+#ATTENTION!!
+#
+#USER GROUP SETTINGS HAVE
+#CHANGED. PLEASE LOG OUT
+#OF THIS SYSTEM AND THEN
+#LOG BACK IN IMMEDIATELY
+#OR THESE CHANGES TO TAKE
+#EFFECT!
+#*************************
+#LOGOUT_MESSAGE
+				#exit 0
+			#fi
 		else
 			echo "Skipping docker installation..."
 		fi
@@ -160,6 +160,8 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 [default]
 aws_access_key_id=${user_aws_key}
 aws_secret_access_key=${user_aws_secret_key}
+region=us-east-1
+output=json
 AWS_CONFIG
 
 		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
@@ -180,6 +182,30 @@ AWS_CONFIG
 			FLEET_NAME_STR=" -f $user_fleet_name "
 		fi
 
+    user_fleet_size=''
+		while [[ -z "${user_fleet_size// /}" ]] ; do
+			if [ ! -z $FLEET_SIZE ] ; then
+				read -ep $'What is the size of your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
+			else
+				read -ep $'What is the size of your fleet?\n' user_fleet_size
+			fi
+			if [[ -z "${user_fleet_size// /}" ]] ; then
+				echo 'Key name cannot be blank.'
+			fi
+		done
+
+    user_sec_grp=''
+		while [[ -z "${user_sec_grp// /}" ]] ; do
+			if [ ! -z $SECURITY_GROUP ] ; then
+				read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
+			else
+				read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
+			fi
+			if [[ -z "${user_sec_grp// /}" ]] ; then
+				echo 'Security Group name cannot be blank.'
+			fi
+		done
+
 		# now wget the start_launcher_container script and call it with the values from above:
 		$(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
     chmod u+x start_launcher_container.sh
@@ -192,6 +218,8 @@ AWS_CONFIG
 PEM_PATH=${user_pem_path}
 KEY_NAME=${user_key_name}
 FLEET_NAME=${user_fleet_name}
+FLEET_SIZE=${user_fleet_size}
+SECURITY_GROUP=${user_sec_grp}
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config

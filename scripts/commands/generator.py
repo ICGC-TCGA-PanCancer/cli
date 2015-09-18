@@ -4,6 +4,8 @@ import cliff.command
 import configparser
 import workflowlister
 import json
+from commands.daemons import Provisioner
+from commands.sysconfig import SysConfig
 
 class Generator(cliff.command.Command):
     "This Generator will generate new job orders. Be aware that it will also rewrite your params.json file and your ~.youxia/config file."
@@ -57,6 +59,16 @@ class Generator(cliff.command.Command):
                 config.write(youxia_configfile,space_around_delimiters=True)
 
             # After the config has been updated, should the provisioner be restarted and sysconfig re-run? probably...
+            # Calling pancancer commands as shell commands... ugly. But I'm not sure how to call a Command class from within the program.
+            sysconfig_cmd = 'pancancer sysconfig'
+            #subprocess.call(sysconfig_cmd.split(' '))            
+            provisioner_cmd = 'pancancer provisioner restart'
+            #subprocess.call(provisioner_cmd.split(' '))
+            sysconfig = SysConfig()
+            sysconfig.run(self, sysconfig_cmd.split(' '))
+            provisioner = Provisioner()
+            provisioner.run(self, provisioner_cmd.split(' '))
+            
             subprocess.call(generator_cmd.split(' '))
             self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
             #TODO: Show the job requests in the queue??

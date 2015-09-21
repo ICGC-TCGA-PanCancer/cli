@@ -21,6 +21,12 @@ class Generator(cliff.command.Command):
         if not (workflow_name in workflowlister.WorkflowLister.get_workflow_names()):
             self.log.info('Oh, I\'m SO sorry, but '+workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
         else:
+            sysconfig_cmd = 'pancancer sysconfig'
+            return_code = subprocess.call(sysconfig_cmd.split(' '))
+            if return_code != 0:
+                self.log.warn('Attempt to (re)configure system may have encountered an error...')
+
+            
             workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
             generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_details['http_workflow']['version']+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
             self.log.debug(generator_cmd)
@@ -58,19 +64,23 @@ class Generator(cliff.command.Command):
             with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
                 config.write(youxia_configfile,space_around_delimiters=True)
 
-            # After the config has been updated, should the provisioner be restarted and sysconfig re-run? probably...
-            # Calling pancancer commands as shell commands... ugly. But I'm not sure how to call a Command class from within the program.
-            sysconfig_cmd = 'pancancer sysconfig'
-            #subprocess.call(sysconfig_cmd.split(' '))            
+           
             provisioner_cmd = 'pancancer provisioner restart'
-            #subprocess.call(provisioner_cmd.split(' '))
-            sysconfig = SysConfig()
-            sysconfig.run(self, sysconfig_cmd.split(' '))
-            provisioner = Provisioner()
-            provisioner.run(self, provisioner_cmd.split(' '))
+            return_code = subprocess.call(provisioner_cmd.split(' '))
+            if return_code != 0:
+                self.log.warn('Attempt to restart the provisioner may have encountered an error...')
+
+            #sysconfig = SysConfig(SysConfig)
+            #parsed_args = sysconfig.get_parser('SysConfig').parse_args('')
+            #sysconfig.run()
+            #provisioner = Provisioner()
+            #provisioner.run(self, provisioner_cmd.split(' '))
             
-            subprocess.call(generator_cmd.split(' '))
-            self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
+            return_code = subprocess.call(generator_cmd.split(' '))
+            if return_code != 0:
+                self.log.warn('Attempt to generate jobs may have encountered an error...')
+            else:
+                self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
             #TODO: Show the job requests in the queue??
             
             

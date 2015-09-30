@@ -4,23 +4,37 @@ import cliff.command
 import configparser
 import workflowlister
 import json
-from commands.daemons import Provisioner
-from commands.sysconfig import SysConfig
+import os
+# from commands.daemons import Provisioner
+# from commands.sysconfig import SysConfig
+
 
 class Generator(cliff.command.Command):
-    "This Generator will generate new job orders. Be aware that it will also rewrite your params.json file and your ~.youxia/config file."
+    "This Generator will generate new job orders based on the contents of ~/ini-dir. Be aware that it will also rewrite your params.json file and your ~.youxia/config file."
     log = logging.getLogger(__name__)
     def get_parser(self,prog_name):
         parser = super(Generator,self).get_parser(prog_name)
         parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.',required=True)
+        parser.add_argument('--force',dest='force_generate',help='Force the generation of the jobs, even if the system detects that the job has already been generated once before.', required=False, default=False)
         return parser
 
     def take_action(self, parsed_args):
         workflow_name=vars(parsed_args)['workflow_name']
+        force_generate=vars(parsed_args)['force_generate']
         self.log.debug('workflow_name: %s',workflow_name)
         if not (workflow_name in workflowlister.WorkflowLister.get_workflow_names()):
-            self.log.info('Oh, I\'m SO sorry, but '+workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
+            self.log.info(workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
         else:
+            if force_generate:
+                master_config_path = os.path.expanduser('~/arch3/config/masterConfig.ini')
+                self.log.debug('setting check_previous_job_hash to false in '+master_config_path)
+                master_config = configparser.ConfigParser()            
+                # We have to update the master config file so that the generator process will allow duplicates.
+                master_config.read(master_config_path)
+                master_config['deployer']['check_previous_job_hash']=False
+                with open(master_config_path,'w') as master_config_file:
+                    master_config.write(master_config_file,space_around_delimiters=True)
+            
             sysconfig_cmd = 'pancancer sysconfig'
             return_code = subprocess.call(sysconfig_cmd.split(' '))
             if return_code != 0:
@@ -29,7 +43,7 @@ class Generator(cliff.command.Command):
             
             workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
             generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_details['http_workflow']['version']+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
-            self.log.debug(generator_cmd)
+            self.log.debug('generator command will be: '+generator_cmd)
             # Before generating the job, we have to update params.json with the workflow/container info about the requested workflow.
             paramsData=''
             with open('/home/ubuntu/params.json','r') as params_file:
@@ -81,6 +95,6 @@ class Generator(cliff.command.Command):
                 self.log.warn('Attempt to generate jobs may have encountered an error...')
             else:
                 self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
-            #TODO: Show the job requests in the queue??
+            #TODO: Show the job requests in the queue, or in the database... If wa can find a way to actually show the details of what was generated. 
             
             

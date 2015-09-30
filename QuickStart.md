@@ -40,7 +40,7 @@ Setting tags on your instance. Here, you can set the instance name that your VM 
 Configuring security groups for your instance. You can use an existing group, or let AWS create a new one. *Notice that the rules have been set to allow ssh access from the source "My IP".* It is **very** important to restrict traffic to your VMs to *only* the machines that *need* access. **Avoid** using the "Anywhere" source. If you need to allow access from an IP address that is not "My IP", you can use a Custom IP source.
 
 Make a note of the *name* of the security group that is chosen at this step, you will need it later.
-<!--- TODO: note about not putting spaces in the security group name -->
+<!--- TODO: note about not putting spaces in the security group name  - actually, this does not appear to be an issue. -->
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
@@ -61,24 +61,22 @@ Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
 $ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.4/install_bootstrap && bash install_bootstrap
 ```
-This script will install docker, the pancancer_launcher image, and collect some basic configuration info to get the launcher started.
-
-**NOTE:**
-Please be aware that if docker has not been installed on your VM before, you *will* need to log out and log in again for user permission changes to take effect (the script will exit automatically at this point to let you do this). This will *only* happen the first time that docker is installed.
-
-**After logging out and logging back in to your VM**, you can resume the setup process by simply typing:
-<!-- TODO: Update architecture-setup to not require ubuntu in docker group to run (ie let sudo docker work fine) -->
-```
-bash install_bootstrap
-```
-
-When you are asked if you wish to install Docker, you can answer "N" for "no", and continue with the rest of the setup process.
+This script will install docker (you can skip this step by answering "N" if you already have docker installed), the pancancer_launcher image, and collect some basic configuration info to get the launcher started. 
 
 This installer script will ask you some questions about how to get started. It will need to know:
  - The absolute path to your AWS pem key (this should be copied into `~/.ssh` before begining the installer, as per instructions above)
  - The *name* of your AWS key. This is *usually* the same as the name of the key file you download from AWS. For example, an AWS key with the name "MyKey" is normally downloaded and saved as the file "MyKey.pem".
  - Your AWS Key and AWS Secret Key. If you do not know these, [this document](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) might be able to help you.
  - The name that you would like to give to your fleet. This will make it easier to find your VMs in the AWS EC2 Management Console. If you do not specify a fleet name, a randomly generated name will be used.
+ - The number of VMs you want to have in your fleet (you will be able to change this later, if you want).
+ - The name of the security group for your fleet. It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. 
+
+If for some reason you need to exit this script, you can re-run it simply by executing this command:
+
+```
+bash install_bootstrap
+```
+
 
 ##Inside the Pancancer Launcher.
 
@@ -88,24 +86,6 @@ If you follow the directions above you will find yourself dropped into the docke
 
     [LAUNCHER 3.1.3] ubuntu@f27e86874dfb:~/arch3$
 
-###Configuration
-
-Once you are in the Pancancer Launcher docker container, you will want to do some basic pancancer system configuration. You can do this using the command:
-```
-$ pancancer sysconfig
-```
-<!-- TODO: Ask these questions in the bootstrap script so there is less to do when they get in. can wait... done? needs test -->
-You should do this before you run any workflows. This configuration tool will ask you questions about:
- - How many VMs you want in your fleet.
- - The name of the AWS Security Group you would like your VMs to be a part of. If you do not specify a security group, the security group name "default" will be used. You may have to configure your Security Group to allow inbound TCP connections from the *public* IP address of the machine on which the pancancer launcher is running. This is **necessary** for provisoning to work. If you are not familiar with working with AWS EC2 Security Groups, you may want to read [this document](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html).
-
-<!-- TODO: Write a script that uses AWS CLI and boto to dynamically update security groups --> 
-
-If the tool detects missing values for AWS Key, AWS Secret Key, the path to the pem key, or the key name, it may ask you to fill in these values.
-
-You will need to update your security group settings at this point. You need to ensure that there is an inbound rule allowing connections from the *public* IP address of your launcher host. In the image below, this is blank. Fill it in with your launcher's public IP address.
-You will also need to ensure that there is a rule allowing inbound traffic from your security group *itself*. This allows your worker VMs to communicate with your launcher. Add a rule and start typing the *name* of your security group as the Custom IP source. The group ID should appear as you type the name. Click on the group ID to select it.
-![Final security group configuration](/images/Final_Security_Group_Config.png?raw=true "Click for larger view")
 
 ###Running workflows
 
@@ -139,7 +119,7 @@ The generated file has *default* values only. Sometimes, you may need to edit th
 
 <!-- TODO: Add links to workflows (done!) with details about the INI files (not yet) -->
 
-**You will want to edit this file before generating job requests. Please do this now, before continuing.**
+**You will want to edit this file before generating job requests. Please make any workflow-specific changes now, before continuing.**
 
 ####Generating a work order
 A work order is contains information about what work needs to be done, and what kind of VM needs to be provisioned for it.
@@ -148,7 +128,7 @@ To generate work order for a workflow:
 ```
 $ pancancer generator --workflow HelloWorld
 ```
-<!-- TODO: auto-backup old INI files? can wait... -->
+<!-- TODO: auto-backup old INI files? can wait... Done, needs test -->
 
 The job generator will attempt to generate one job for *each and every* INI file in `~/ini-dir`. It is important to ensure that this directory *only* contains INI files for jobs you wish to run, *and* that you have made any necessary edits to them.
 
@@ -230,12 +210,18 @@ When looking at your AWS EC2 console, you will notice that when a workflow finis
 
 If a workflow fails, you will see that its status is "FAILED". The VM where the failed workflow ran will *not* be terminated. You will need to log in to this VM using ssh to examine the workflow output to determine why it failed, and troubleshoot the problem.
 
-<!--
-TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
-
- Most workflows will write their results to a GNOS respository or an AWS S3 bucket, so you will want to check there for -->
+<!-- TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
+Most workflows will write their results to a GNOS respository or an AWS S3 bucket, so you will want to check there for -->
 
 <!-- TODO: Add section on reporting tool -->
+
+###Configuration
+
+Configuration should already be complete once you have entered the Pancancer Launcher, but if you need to change or adjust some configuration options (such as fleet size), you can use this command:
+
+```
+$ pancancer sysconfig --force
+```
 
 
 
@@ -279,7 +265,7 @@ If the configuration is changed while the provisioner and coordinator are runnin
 ```
 $ pancancer coordinator stop
 $ pancancer provisioner stop
-$ pancancer sysconfig
+$ pancancer sysconfig --force
 $ pancancer coordinator start
 $ pancancer provisioner start
 ```

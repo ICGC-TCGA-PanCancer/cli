@@ -122,8 +122,7 @@
     },
     "report":
     {
-      "namespace":"pipboy",
-      "slack_token":""
+      "namespace":"pipboy"
     },
     "coordinator":
     {
@@ -133,7 +132,7 @@
     {
       "max_running_containers":1,
       "youxia_deployer_parameters":"--max-spot-price 0.001 --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file server-tags.json",
-      "youxia_reaper_params":"--test"
+      "youxia_reaper_parameters":"--test"
     }
   }
 }

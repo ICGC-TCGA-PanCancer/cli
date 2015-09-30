@@ -10,8 +10,9 @@ class DaemonCommand(cliff.command.Command):
     service_name=''
     log = logging.getLogger(__name__)
 
-    def _do_start(self,start_cmd):
+    def _do_start(self):
         "Start a process, using flock to ensure that it can't be started multiple times."
+        start_cmd='flock -n /tmp/arch3_'+self.service_name+'.lock ' +self.service_name+' --config /home/ubuntu/arch3/config/masterConfig.ini --endless'
         self.log.debug (start_cmd)
         pid_file_path='/tmp/arch3_'+self.service_name+'.pid'
         # set start_new_session=True so that we can kill flock and all it's child processes by killing the process group whose pgid is the same as the flock pid.
@@ -19,7 +20,7 @@ class DaemonCommand(cliff.command.Command):
         # we really don't want *this* script to run endlessly - we want to start the child and let it keep running in the background.
         p = subprocess.Popen(start_cmd.split(' '),start_new_session=True)
         # Wait a moment... if we get ANY response, it means that the process did not start, probably because it's already been started.
-        time.sleep(2)
+        time.sleep(4)
         p.poll()
 
         if p.returncode==1:
@@ -34,6 +35,7 @@ class DaemonCommand(cliff.command.Command):
 
     def _do_stop(self,stop_cmd):
         "Stop a process."
+        stop_cmd='kill -KILL -'
         pid = ''
         # Read the pid from the file.
         pid_file_path='/tmp/arch3_'+self.service_name+'.pid'
@@ -50,11 +52,20 @@ class DaemonCommand(cliff.command.Command):
                 returncode = subprocess.call(stop_cmd.split(' '))
                 if returncode == 0:
                     self.log.info ('The '+self.service_name+' process has been stopped.')
-                    os.remove(pid_file_path)
+                    self._clean_up_pid_and_lock()
             else:
                 self.log.info('The '+self.service_name+' process with PID '+pid+' does not appear to be running.')
+                # If the process is not running, clean up any .lock files that may have been left behind.
+                self._clean_up_pid_and_lock()
         else:
             self.log.info('The '+self.service_name+' process does not appear to be running.')
+
+    def _clean_up_pid_and_lock(self):
+        "Remove the .pid and .lock files."
+        pid_file_path='/tmp/arch3_'+self.service_name+'.pid'
+        lock_file_path='/tmp/arch3_'+self.service_name+'.lock'
+        os.remove(pid_file_path)
+        os.remove(lock_file_path)
 
     def get_parser(self,prog_name):
         parser = super(DaemonCommand,self).get_parser(prog_name)
@@ -70,16 +81,16 @@ class DaemonCommand(cliff.command.Command):
         self.log.debug('working on service: '+self.service_name)
         self.log.debug('subparser: %s',subparser_name)
         # Use flock to ensure that multiple instances of the "service" cannot run at the same time.
-        start_cmd='flock -n /tmp/arch3_'+self.service_name+'.lock ' +self.service_name+' --config /home/ubuntu/arch3/config/masterConfig.ini --endless'
+        
         # Negate the PID of the process to kill the process group.
-        stop_cmd='kill -KILL -'
+        
         if subparser_name=='start':
-            self._do_start(start_cmd)
+            self._do_start()
         elif subparser_name=='stop':
-            self._do_stop(stop_cmd)
+            self._do_stop()
         elif subparser_name=='restart':
-            self._do_stop(stop_cmd)
-            self._do_start(start_cmd)
+            self._do_stop()
+            self._do_start()
 
 ###
 

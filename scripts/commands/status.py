@@ -57,7 +57,7 @@ class Status(cliff.command.Command):
             sql='select count(*), status from job group by status;'
             self._do_sql_status(sql)
         elif subcmd == 'jobs':
-            sql='select status, job_id, job_uuid, workflow, create_timestamp, update_timestamp from job;'
+            sql='select status, job_id, job_uuid, workflow, create_timestamp, update_timestamp from job order by job_id asc;'
             self._do_sql_status(sql)
         elif subcmd == 'services':
             self._do_service_checks()

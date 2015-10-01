@@ -33,7 +33,7 @@ class DaemonCommand(cliff.command.Command):
                 pidfile.write(str(p.pid))
 
 
-    def _do_stop(self,stop_cmd):
+    def _do_stop(self):
         "Stop a process."
         stop_cmd='kill -KILL -'
         pid = ''

@@ -30,7 +30,7 @@ class Workflows(cliff.command.Command):
         if workflow_name in workflowlister.WorkflowLister.get_workflow_names():
             backup_dir=os.path.expanduser('~/ini-backups')
             ini_dir=os.path.expanduser('~/ini-dir')
-            self.log.debug("backup old INIS: "+backup_old_INIs)
+            self.log.debug("backup old INIS: "+str(backup_old_INIs))
             if backup_old_INIs:
                 # do the backup stuff
                 # First, check that there is a backup folder and create it if it does not exist.
@@ -76,7 +76,7 @@ class Workflows(cliff.command.Command):
             workflow_name = vars(parsed_args)['workflow_name']
             num_INIs = vars(parsed_args)['num_INI']
             backup_old_INIs = vars(parsed_args)['backup_old_INIs']
-            self.log.debug("backup old INIS: "+backup_old_INIs)
+            self.log.debug("backup old INIS: "+str(backup_old_INIs))
             self._do_config(workflow_name,int(num_INIs),backup_old_INIs)
         else:
             self.get_parser('Workflows').print_help()

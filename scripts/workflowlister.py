@@ -19,7 +19,9 @@ class WorkflowLister:
                         'ami_id':'ami-791c5b1c',
                         'default-ini':'http://something.ini',
                         'instance-type':'m1.xlarge',
-                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
+                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde',
+                        'workflow_uses_gnos':'false',
+                        'workflow_uses_s3':'false'
                     }
 #                     ,'Sanger':
 #                     {
@@ -40,6 +42,9 @@ class WorkflowLister:
 #                         'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore/1.0.8/workflow/config/CgpCnIndelSnvStrWorkflow.ini',
 #                         'instance-type':'m1.xlarge',
 #                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
+#                         'workflow_uses_gnos':'true',
+#                         'gnos_keys':['gnos.pem'],
+#                         'workflow_uses_s3':'false'
 #                     },
 #                     'BWA':
 #                     {
@@ -59,7 +64,10 @@ class WorkflowLister:
 #                         'ami_id':'ami-270cc34c',
 #                         'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.5/workflow/config/workflow.ini',
 #                         'instance-type':'m1.xlarge',
-#                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
+#                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde',
+#                         'workflow_uses_gnos':'true',
+#                         'gnos_keys':['gnos.pem'],
+#                         'workflow_uses_s3':'false'
 #                     },
 #                     'DKFZ_EMBL':
 #                     {
@@ -97,6 +105,9 @@ class WorkflowLister:
 #                         'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/1.0.6/workflow/config/DEWrapperWorkflow.ini',
 #                         'instance-type':'m1.xlarge',
 #                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
+#                         'workflow_uses_gnos':'true',
+#                         'gnos_keys':['gnos.pem'],
+#                         'workflow_uses_s3':'false'
 #                     }
                 }
 

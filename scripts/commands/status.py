@@ -6,6 +6,19 @@ class Status(cliff.command.Command):
     "This will return status information about the launcher."
     log = logging.getLogger(__name__)
 
+    def _get_job_results(self, job_id, results_type, out_path):
+        "Gets the stdout/stderr for a job and writes it to a file."
+        cmd = 'psql -U queue_user queue_status -c'
+        sql = 'select '+results_type+' from job where job_id = '+job_id;
+        cmd = cmd.split(' ')
+        cmd.append(sql)
+        file_name = out_path+'job_'+job_id+'.'+results_type
+        cmd.append('-o')
+        cmd.append(file_name)
+        self.log.debug(cmd)
+        subprocess.call(cmd)
+        self.log.info('Job results ('+results_type+') have been written to '+file_name)
+
     def _do_sql_status(self, sql):
         "Executes a command against the postgres database"
         cmd = 'psql -U queue_user queue_status -c'
@@ -43,6 +56,10 @@ class Status(cliff.command.Command):
         subparser.add_parser('job_status',help='Prints counts of jobs by status.')
         subparser.add_parser('jobs',help='Prints data from the job table (omits standard error and standard out).')
         subparser.add_parser('services',help='Prints the status of the coordinator and provisioner')
+        job_results_parser = subparser.add_parser('job_results', help='Writes the stdout or stderr for a given job id to a file.')
+        job_results_parser.add_argument('--type',help='Can be stderr or stdout', required=True, dest='results_type', choices=['stderr','stdout'])
+        job_results_parser.add_argument('--job_id',help='The ID of the job', required=True, dest='job_id')
+        job_results_parser.add_argument('--out_path',help='The path to the directory where you want the results file to be written to.', required=False,dest='out_path', default='/home/ubuntu/arch3/')
         return parser
 
     def take_action(self,parsed_args):
@@ -57,7 +74,17 @@ class Status(cliff.command.Command):
             sql='select count(*), status from job group by status;'
             self._do_sql_status(sql)
         elif subcmd == 'jobs':
-            sql='select status, job_id, job_uuid, workflow, create_timestamp, update_timestamp from job;'
+            sql='select status, job_id, job_uuid, workflow, create_timestamp, update_timestamp from job order by job_id asc;'
             self._do_sql_status(sql)
         elif subcmd == 'services':
             self._do_service_checks()
+        elif subcmd == 'job_results':
+            job_id = vars(parsed_args)['job_id']
+            if job_id is None or job_id.strip() == '':
+                self.log.info('You must specify a job_id.')
+            else:
+                results_type = vars(parsed_args)['results_type']
+                out_path = vars(parsed_args)['out_path']
+                self._get_job_results(job_id, results_type, out_path)
+        else:
+            self.get_parser('Status').print_help()

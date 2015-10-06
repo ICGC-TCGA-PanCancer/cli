@@ -19,3 +19,8 @@ nytprof.out
 *.bs
 /_eumm/
 __pycache__
+# Eclipse stuff
+.project
+.pydevproject
+.metadata
+*.pyc

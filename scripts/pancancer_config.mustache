@@ -95,7 +95,7 @@
     "queueName": "pancancer_arch_3",
     "lvm_device_whitelist": "{{lvm_devices}}",
     "single_node_lvm": true,
-    "pancancer_arch3_version": "1.1-beta.4",
+    "pancancer_arch3_version": "1.1-beta.6",
     "seqware_engine":"whitestar-parallel",
     "seqware_use_custom_settings":false,
     "azure": false
@@ -123,8 +123,7 @@
     },
     "report":
     {
-      "namespace":"pipboy",
-      "slack_token":""
+      "namespace":"pipboy"
     },
     "coordinator":
     {
@@ -134,7 +133,8 @@
     {
       "max_running_containers":{{max_fleet_size}},
       "youxia_deployer_parameters":"--max-spot-price 0.001 --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file server-tags.json",
-      "youxia_reaper_params":"--test"
+      "youxia_reaper_parameters":"--test"
+      "reap_failed_workers":"false"
     }
   }
 }

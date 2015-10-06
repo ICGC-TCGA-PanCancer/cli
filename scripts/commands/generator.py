@@ -16,6 +16,8 @@ class Generator(cliff.command.Command):
         parser = super(Generator,self).get_parser(prog_name)
         parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.',required=True)
         parser.add_argument('--force',dest='force_generate',help='Force the generation of the jobs, even if the system detects that the job has already been generated once before.', required=False, default=False)
+        #parser.add_argument('--uses_gnos', dest='use_gnos',help='Indicates that your worfklow will be using GNOS repositories. --use_gnos and --use_s3 are not mutually exclusive - you could configure your workflow\'s INI file to use both GNOS and AWS S3 repositories.',required=False, default=True, choices=[True,False])
+        #parser.add_argument('--uses_s3', dest='use_s3',help='Indicates that your worfklow will be using S3 repositories.  --use_gnos and --use_s3 are not mutually exclusive - you could configure your workflow\'s INI file to use both GNOS and AWS S3 repositories.',required=False, default=False, choices=[True,False])
         return parser
 
     def take_action(self, parsed_args):

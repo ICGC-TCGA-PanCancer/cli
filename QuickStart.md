@@ -215,7 +215,7 @@ Your next step, now that you have successfully run one workflow on one VM, could
 Configuration should already be complete once you have entered the Pancancer Launcher, but if you need to change or adjust some configuration options (such as fleet size), you can use this command:
 
 ```
-$ pancancer sysconfig --force
+$ pancancer sysconfig --force True
 ```
 
 ####Running the coordinator and provisioner
@@ -288,7 +288,7 @@ If the configuration is changed while the provisioner and coordinator are runnin
 ```
 $ pancancer coordinator stop
 $ pancancer provisioner stop
-$ pancancer sysconfig --force
+$ pancancer sysconfig --force True
 $ pancancer coordinator start
 $ pancancer provisioner start
 ```

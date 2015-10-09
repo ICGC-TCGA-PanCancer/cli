@@ -27,6 +27,7 @@ class Generator(cliff.command.Command):
         if not (workflow_name in workflowlister.WorkflowLister.get_workflow_names()):
             self.log.info(workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
         else:
+            # This code could be refactored easily...
             if force_generate:
                 master_config_path = os.path.expanduser('~/arch3/config/masterConfig.ini')
                 self.log.debug('setting check_previous_job_hash to false in '+master_config_path)
@@ -36,7 +37,16 @@ class Generator(cliff.command.Command):
                 master_config['deployer']['check_previous_job_hash']=False
                 with open(master_config_path,'w') as master_config_file:
                     master_config.write(master_config_file,space_around_delimiters=True)
-            
+            else:
+                master_config_path = os.path.expanduser('~/arch3/config/masterConfig.ini')
+                self.log.debug('setting check_previous_job_hash to true in '+master_config_path)
+                master_config = configparser.ConfigParser()            
+                # We have to update the master config file so that the generator process will NOT allow duplicates.
+                master_config.read(master_config_path)
+                master_config['deployer']['check_previous_job_hash']=True
+                with open(master_config_path,'w') as master_config_file:
+                    master_config.write(master_config_file,space_around_delimiters=True)
+
             sysconfig_cmd = 'pancancer sysconfig'
             return_code = subprocess.call(sysconfig_cmd.split(' '))
             if return_code != 0:
@@ -44,7 +54,14 @@ class Generator(cliff.command.Command):
 
             
             workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
-            generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_details['http_workflow']['version']+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
+            
+            workflow_version = ''            
+            if 'http_workflow' in workflow_details:
+                workflow_version = workflow_details['http_workflow']['version']
+            else:
+                 workflow_version = workflow_details['s3_workflow']['version']
+            
+            generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_version+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
             self.log.debug('generator command will be: '+generator_cmd)
             # Before generating the job, we have to update params.json with the workflow/container info about the requested workflow.
             paramsData=''
@@ -54,7 +71,7 @@ class Generator(cliff.command.Command):
                     paramsData['http_workflows'] = {}
                     paramsData['http_workflows'][workflow_name] = workflow_details['http_workflow']
                     paramsData['http_workflows'][workflow_name]['name'] = workflow_details['full_name']
-                if 's3_workflows' in workflow_details:
+                if 's3_workflow' in workflow_details:
                     paramsData['s3_workflows'] = {}
                     paramsData['s3_workflows'][workflow_name] = workflow_details['s3_workflows']
                     paramsData['s3_workflows'][workflow_name]['name'] = workflow_details['full_name']

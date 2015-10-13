@@ -82,9 +82,9 @@ bash install_bootstrap
 
 <!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console.  can wait... done? needs test -->
 
-If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, will be different):
+If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, and possibly the version number, will be different):
 
-    [LAUNCHER 3.1.3] ubuntu@f27e86874dfb:~/arch3$
+    [LAUNCHER 3.1.6] ubuntu@f27e86874dfb:~/arch3$
 
 
 ###Running workflows
@@ -185,6 +185,16 @@ $ pancancer status jobs
 ---------+--------+--------------------------------------+------------+----------------------------+----------------------------
  SUCCESS |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | HelloWorld | 2015-09-02 19:45:26.023313 | 2015-09-02 20:04:27.033118
 ```
+
+To write the full results of a Worker to a file, you can use the `status job_results` command. It has this form:
+```
+$ cd ~/arch3
+$ pancancer status job_results --type stdout  --job_id 1
+Job results (stdout) have been written to /home/ubuntu/arch3/job_1.stdout
+$ pancancer status job_results --type stderr  --job_id 1
+Job results (stderr) have been written to /home/ubuntu/arch3/job_1.stderr
+```
+Worker VMs report the stdout and stderr from seqware back to your launcher's database. The command above can extract this data and write it to a text file to make it easier to use, if you are interested in seeing the details of the workflow's execution.
 
 The HelloWorld workflow does not do much - it does not read or write data anywhere. It is useful to test your setup and configuration is correct.
 

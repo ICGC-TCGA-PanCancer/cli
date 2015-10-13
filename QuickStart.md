@@ -13,8 +13,8 @@ The diagram above shows some detail about how the Pancancer CLI tool is used to 
 Before you get started, there are a few items you will need to have available:
  - A valid account on Amazon AWS EC2, with access to the "us-east-1" (North Virginia) AWS region.
  - A valid key file that you can use to log in to your EC2 VMs. Click [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) for a document about how to generate these pem keys.
- - Valid GNOS key files.
  - Your AWS Key and Secret Key. If you don't know your Key and Secret Key, [this](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) document may be able to help you.
+ - If you are downloading or uploading data from/to a GNOS respository, you will need a valid GNOS key. If you are only working with S3 then a GNOS key will not be necessary.
 
 
 ##Getting started
@@ -54,7 +54,7 @@ You will now need to set up a few files on your VM.
 chmod 600 ~/.ssh/FillInYourKeyName.pem
 ```
    You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
-  - You will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`, create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+  - If you are working with GNOS repositories, you will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`, create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
 
 ### Run installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
@@ -69,7 +69,7 @@ This installer script will ask you some questions about how to get started. It w
  - Your AWS Key and AWS Secret Key. If you do not know these, [this document](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) might be able to help you.
  - The name that you would like to give to your fleet. This will make it easier to find your VMs in the AWS EC2 Management Console. If you do not specify a fleet name, a randomly generated name will be used.
  - The number of VMs you want to have in your fleet (you will be able to change this later, if you want).
- - The name of the security group for your fleet. It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. 
+ - The name of the security group for your fleet. It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. This _must_ be the same as the security group that the launcher is in.
 
 If for some reason you need to exit this script, you can re-run it simply by executing this command:
 
@@ -82,9 +82,9 @@ bash install_bootstrap
 
 <!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console.  can wait... done? needs test -->
 
-If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, will be different):
+If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, and possibly the version number, will be different):
 
-    [LAUNCHER 3.1.3] ubuntu@f27e86874dfb:~/arch3$
+    [LAUNCHER 3.1.6] ubuntu@f27e86874dfb:~/arch3$
 
 
 ###Running workflows
@@ -94,18 +94,16 @@ The Pancancer Launcher can generate a template INI file for workflows. To see wh
 ```
 $ pancancer workflows list
 Available workflows are:
-Sanger
 HelloWorld
 BWA
-DKFZ_EMBL
 ```
 
 For more information about these workflows and how to configure their INI files, see the workflows' home pages:
 
- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore)
+<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore)
+ - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
  - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow)
- - HelloWorld - This is a very simple workflow that is good to use when testing basic setup and infrastructure.
+ - HelloWorld - This is a very simple workflow that does not read or write any data, but it is good to use when testing basic setup and infrastructure.
 
 ####Generating an INI file
 To generate an INI file:
@@ -115,7 +113,7 @@ $ pancancer workflows config --workflow HelloWorld
 
 A new HelloWorld-specific INI file should be generated in `~/ini-dir`.
 
-The generated file has *default* values only. Sometimes, you may need to edit these INI files with your own specific values. For example, for the Sanger workflow, you may need to change the IP address of the tabix server. Other workflows will have other edits that may be necessary.
+The generated file has *default* values only. You _will_ need to edit these INI files with your own specific values. For example, for BWA, you will need to specify the upload and download URLs for your BAM files. Other workflows will have other edits that are necessary for the workflow to run correctly.
 
 <!-- TODO: Add links to workflows (done!) with details about the INI files (not yet) -->
 
@@ -187,6 +185,18 @@ $ pancancer status jobs
 ---------+--------+--------------------------------------+------------+----------------------------+----------------------------
  SUCCESS |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | HelloWorld | 2015-09-02 19:45:26.023313 | 2015-09-02 20:04:27.033118
 ```
+
+To write the full results of a Worker to a file, you can use the `status job_results` command. It has this form:
+```
+$ cd ~/arch3
+$ pancancer status job_results --type stdout  --job_id 1
+Job results (stdout) have been written to /home/ubuntu/arch3/job_1.stdout
+$ pancancer status job_results --type stderr  --job_id 1
+Job results (stderr) have been written to /home/ubuntu/arch3/job_1.stderr
+```
+Worker VMs report the stdout and stderr from seqware back to your launcher's database. The command above can extract this data and write it to a text file to make it easier to use, if you are interested in seeing the details of the workflow's execution.
+
+The HelloWorld workflow does not do much - it does not read or write data anywhere. It is useful to test your setup and configuration is correct.
 
 At this point, you have successfully installed the Pancancer Launcher, and used it to schedule and execute a workflow!
 
@@ -270,6 +280,18 @@ To get a list of all pancancer commands, you can type `pancancer -h` and the hel
 * how do you get the output of the workflows? e.g. helloworld?
 * what do you do next? -->
 
+####Detaching and reattaching with Docker
+If you need to do some work on the host machine, it is better to _detach_ from the pancancer\_launcher container than to exit. If you exit, the container should restart automatically, but any processes that are running (such as the provisioning process) may be terminated and that could affect any VMs that are in mid-provision.
+
+To detach safely, press <kbd>Ctrl</kbd>-<kbd>P</kbd> <kbd>Ctrl</kbd>-<kbd>Q</kbd>
+
+To re-attach to your pancancer\_launcher container, issue this command on your host machine:
+```
+$ sudo docker attach pancancer_launcher
+```
+
+Press <kbd>Enter</kbd> if the prompt does not appear right away.
+
 ###Troubleshooting
 
 #### The provisioner keeps getting SSH errors!
@@ -291,4 +313,38 @@ $ pancancer provisioner stop
 $ pancancer sysconfig --force True
 $ pancancer coordinator start
 $ pancancer provisioner start
+```
+
+#### My Worker VMs fail and get shut down, but I want them to stay up and running so I can debug problems.
+
+Normally, failed workers are cleaned up automatically. It is sometimes useful to leave failed workers up and running if you are interested in debugging a problematic workflow.
+
+To do this, you will need to manually edit the file `~/arch3/config/masterConfig.ini`. You will need to change the value of `reap_failed_workers` to `false`:
+```
+reap_failed_workers=false
+```
+
+You will then need to stop and then start the provisioner (this should _not_ be done if the Provisioner is in the middle of actively provisioning VMs):
+```
+$ pancancer provisioner stop
+$ pancancer provisioner start
+```
+
+The result of this is that if a Worker VM completes its work successfully, it will be automatically removed from the fleet, but if a worker fails, it will be left alone, and you will be able to log in to it and debug whatever caused it fo fail.
+
+
+#### There is a worker that is stuck in a bad state and I need to get rid of it.
+
+Normally, Worker VM are removed from the fleet when they have finished working. Failed workers are usually cleaned up automatically as well. If it happens that a worker gets stuck in a bad state and cannot be removed automatically, you may need to manually remove it from the fleet.
+
+To remove a Worker VM from the fleet, create a file named `kill-list.json`. This will will contain a _list_ of IP addresses of any Worker VMs that need to be removed:
+
+    [ "0.0.0.1","0.0.0.2"]
+ 
+Then run the Reaper command, passing it the file name containing the list:
+
+```
+$ Reaper --kill-list kill-list.json 
+[2015/10/13 18:06:59] | Killing {i-346db1a6=i-346db1a6},
+[2015/10/13 18:06:59] | Marking instances for death i-346db1a6
 ```

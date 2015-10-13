@@ -20,8 +20,8 @@ class WorkflowLister:
                         'default-ini':'http://something.ini',
                         'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
-                    }
-#                     ,'Sanger':
+                    },
+#                     'Sanger':
 #                     {
 #                         'full_name':'Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0',
 #                         'http_workflow':
@@ -41,27 +41,27 @@ class WorkflowLister:
 #                         'instance-type':'m1.xlarge',
 #                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
 #                     },
-#                     'BWA':
-#                     {
-#                         'full_name':'Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1',
-#                         'http_workflow':
-#                         {
-#                             'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.5_SeqWare_1.1.1.zip',
-#                             'version':'2.6.5'
-#                         },
-#                         'containers':
-#                         {
-#                             'seqware_whitestar_pancancer': {
-#                                 'name':'seqware_whitestar_pancancer',
-#                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
-#                             }
-#                         },
-#                         'ami_id':'ami-270cc34c',
-#                         'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.5/workflow/config/workflow.ini',
-#                         'instance-type':'m1.xlarge',
-#                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
-#                     },
-#                     'DKFZ_EMBL':
+                    'BWA':
+                    {
+                        'full_name':'Workflow_Bundle_BWA_2.6.7_SeqWare_1.1.1',
+                        'http_workflow':
+                        {
+                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.7_SeqWare_1.1.1.zip',
+                            'version':'2.6.7'
+                        },
+                        'containers':
+                        {
+                            'seqware_whitestar_pancancer': {
+                                'name':'seqware_whitestar_pancancer',
+                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
+                            }
+                        },
+                        'ami_id':'ami-4f95df2a',
+                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.7/workflow/config/workflow.ini',
+                        'instance-type':'m1.xlarge',
+                        'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
+                    }
+#                     ,'DKFZ_EMBL':
 #                     {
 #                         'full_name':'Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1',
 #                         'http_workflow':

@@ -13,8 +13,8 @@ The diagram above shows some detail about how the Pancancer CLI tool is used to 
 Before you get started, there are a few items you will need to have available:
  - A valid account on Amazon AWS EC2, with access to the "us-east-1" (North Virginia) AWS region.
  - A valid key file that you can use to log in to your EC2 VMs. Click [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) for a document about how to generate these pem keys.
- - Valid GNOS key files.
  - Your AWS Key and Secret Key. If you don't know your Key and Secret Key, [this](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) document may be able to help you.
+ - If you are downloading or uploading data from/to a GNOS respository, you will need a valid GNOS key.
 
 
 ##Getting started
@@ -54,7 +54,7 @@ You will now need to set up a few files on your VM.
 chmod 600 ~/.ssh/FillInYourKeyName.pem
 ```
    You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
-  - You will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`, create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+  - If you are working with GNOS repositories, you will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`, create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
 
 ### Run installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
@@ -69,7 +69,7 @@ This installer script will ask you some questions about how to get started. It w
  - Your AWS Key and AWS Secret Key. If you do not know these, [this document](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) might be able to help you.
  - The name that you would like to give to your fleet. This will make it easier to find your VMs in the AWS EC2 Management Console. If you do not specify a fleet name, a randomly generated name will be used.
  - The number of VMs you want to have in your fleet (you will be able to change this later, if you want).
- - The name of the security group for your fleet. It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. 
+ - The name of the security group for your fleet. It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. This _must_ be the same as the security group that the launcher is in.
 
 If for some reason you need to exit this script, you can re-run it simply by executing this command:
 

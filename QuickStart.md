@@ -304,3 +304,19 @@ $ pancancer sysconfig --force True
 $ pancancer coordinator start
 $ pancancer provisioner start
 ```
+
+#### There is a worker that is stuck in a bad state and I need to get rid of it.
+
+Normally, Worker VM are removed from the fleet when they have finished working. Workers that fail and get stuck in a bad state may need to be manually removed from the fleet.
+
+To remove a Worker VM from the fleet, create a file named `kill-list.json`. This will will contain a _list_ of IP addresses of any Worker VMs that need to be removed:
+
+    [ "0.0.0.1","0.0.0.2"]
+ 
+Then run the Reaper command, passing it the file name containing the list:
+
+```
+$ Reaper --kill-list kill-list.json 
+[2015/10/13 18:06:59] | Killing {i-346db1a6=i-346db1a6},
+[2015/10/13 18:06:59] | Marking instances for death i-346db1a6
+```

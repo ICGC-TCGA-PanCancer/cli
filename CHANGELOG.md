@@ -1,5 +1,15 @@
 # Changes
 
+## 0.0.6
+ - Updated documentation
+ - Added BWA tutorial
+ - Code fixes:
+  - Fixes for working with workflows that are stored in S3
+  - Reset "check\_previous\_job\_hash" back to True
+ - Added BWA to workflow lister with new AMI ID
+ - Updated consonance version to 1.1-beta.rc.0
+ - Set "reap\_failed\_workers" to True in mustache template, so ALL workers will be reaped by default.
+
 ## 0.0.5
  - Updated documentation
  - Added "--force" option for generator which will change config/masterConfig.ini:check_previous_job_hash to false

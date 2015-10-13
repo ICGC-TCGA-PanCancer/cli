@@ -14,7 +14,7 @@ Before you get started, there are a few items you will need to have available:
  - A valid account on Amazon AWS EC2, with access to the "us-east-1" (North Virginia) AWS region.
  - A valid key file that you can use to log in to your EC2 VMs. Click [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) for a document about how to generate these pem keys.
  - Your AWS Key and Secret Key. If you don't know your Key and Secret Key, [this](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) document may be able to help you.
- - If you are downloading or uploading data from/to a GNOS respository, you will need a valid GNOS key.
+ - If you are downloading or uploading data from/to a GNOS respository, you will need a valid GNOS key. If you are only working with S3 then a GNOS key will not be necessary.
 
 
 ##Getting started

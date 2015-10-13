@@ -305,6 +305,24 @@ $ pancancer coordinator start
 $ pancancer provisioner start
 ```
 
+#### My Worker VMs fail and get shut down, but I want them to stay up and running so I can debug problems.
+
+Normally, failed workers are cleaned up automatically. It is sometimes useful to leave failed workers up and running if you are interested in debugging a problematic workflow.
+
+To do this, you will need to manually edit the file `~/arch3/config/masterConfig.ini`. You will need to change the value of `reap_failed_workers` to `false`:
+```
+reap_failed_workers=false
+```
+
+You will then need to stop and then start the provisioner (this should _not_ be done if the Provisioner is in the middle of actively provisioning VMs):
+```
+$ pancancer provisioner stop
+$ pancancer provisioner start
+```
+
+The result of this is that if a Worker VM completes its work successfully, it will be automatically removed from the fleet, but if a worker fails, it will be left alone, and you will be able to log in to it and debug whatever caused it fo fail.
+
+
 #### There is a worker that is stuck in a bad state and I need to get rid of it.
 
 Normally, Worker VM are removed from the fleet when they have finished working. Failed workers are usually cleaned up automatically as well. If it happens that a worker gets stuck in a bad state and cannot be removed automatically, you may need to manually remove it from the fleet.

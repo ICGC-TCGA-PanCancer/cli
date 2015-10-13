@@ -307,7 +307,7 @@ $ pancancer provisioner start
 
 #### There is a worker that is stuck in a bad state and I need to get rid of it.
 
-Normally, Worker VM are removed from the fleet when they have finished working. Workers that fail and get stuck in a bad state may need to be manually removed from the fleet.
+Normally, Worker VM are removed from the fleet when they have finished working. Failed workers are usually cleaned up automatically as well. If it happens that a worker gets stuck in a bad state and cannot be removed automatically, you may need to manually remove it from the fleet.
 
 To remove a Worker VM from the fleet, create a file named `kill-list.json`. This will will contain a _list_ of IP addresses of any Worker VMs that need to be removed:
 

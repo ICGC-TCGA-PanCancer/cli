@@ -270,6 +270,18 @@ To get a list of all pancancer commands, you can type `pancancer -h` and the hel
 * how do you get the output of the workflows? e.g. helloworld?
 * what do you do next? -->
 
+####Detaching and reattaching with Docker
+If you need to do some work on the host machine, it is better to _detach_ from the pancancer\_launcher container than to exit. If you exit, the container should restart automatically, but any processes that are running (such as the provisioning process) may be terminated and that could affect any VMs that are in mid-provision.
+
+To detach safely, press <kbd>Ctrl</kbd>-<kbd>P</kbd> <kbd>Ctrl</kbd>-<kbd>Q</kbd>
+
+To re-attach to your pancancer\_launcher container, issue this command on your host machine:
+```
+$ sudo docker attach pancancer_launcher
+```
+
+Press <kbd>Enter</kbd> if the prompt does not appear right away.
+
 ###Troubleshooting
 
 #### The provisioner keeps getting SSH errors!

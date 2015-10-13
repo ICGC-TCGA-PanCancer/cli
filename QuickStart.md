@@ -94,18 +94,16 @@ The Pancancer Launcher can generate a template INI file for workflows. To see wh
 ```
 $ pancancer workflows list
 Available workflows are:
-Sanger
 HelloWorld
 BWA
-DKFZ_EMBL
 ```
 
 For more information about these workflows and how to configure their INI files, see the workflows' home pages:
 
- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore)
+<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore)
+ - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
  - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow)
- - HelloWorld - This is a very simple workflow that is good to use when testing basic setup and infrastructure.
+ - HelloWorld - This is a very simple workflow that does not read or write any data, but it is good to use when testing basic setup and infrastructure.
 
 ####Generating an INI file
 To generate an INI file:
@@ -187,6 +185,8 @@ $ pancancer status jobs
 ---------+--------+--------------------------------------+------------+----------------------------+----------------------------
  SUCCESS |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | HelloWorld | 2015-09-02 19:45:26.023313 | 2015-09-02 20:04:27.033118
 ```
+
+The HelloWorld workflow does not do much - it does not read or write data anywhere. It is useful to test your setup and configuration is correct.
 
 At this point, you have successfully installed the Pancancer Launcher, and used it to schedule and execute a workflow!
 

@@ -113,7 +113,7 @@ $ pancancer workflows config --workflow HelloWorld
 
 A new HelloWorld-specific INI file should be generated in `~/ini-dir`.
 
-The generated file has *default* values only. Sometimes, you may need to edit these INI files with your own specific values. For example, for the Sanger workflow, you may need to change the IP address of the tabix server. Other workflows will have other edits that may be necessary.
+The generated file has *default* values only. You _will_ need to edit these INI files with your own specific values. For example, for BWA, you will need to specify the upload and download URLs for your BAM files. Other workflows will have other edits that are necessary for the workflow to run correctly.
 
 <!-- TODO: Add links to workflows (done!) with details about the INI files (not yet) -->
 

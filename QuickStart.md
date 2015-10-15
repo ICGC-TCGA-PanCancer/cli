@@ -150,7 +150,7 @@ queues:
 
 As you can see there is one message in the message queue named "pancancer_arch_3_orders". This indicates that the system successfully generated a job order from your INI file in `~/ini-dir`.
 
-The process that provisiones VMs should detect this request and begin provisioning a new VM. Provisioning may take several minutes. There are a few ways that you can monitor progress. You can watch the progress using this command:
+The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take several minutes (10 minutes is not unreasonable). There are a few ways that you can monitor progress. You can watch the progress using this command:
 ```
 $ tail -f provisioner.out
 ```

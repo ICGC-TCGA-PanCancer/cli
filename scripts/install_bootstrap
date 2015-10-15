@@ -44,30 +44,7 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			echo "Pulling latest pancancer_launcher image..."
 			sudo docker pull pancancer/pancancer_launcher:latest
 			echo "Done pulling pancancer_launcher!"
-			#set +e
-			#ubuntu_is_docker_user="$(groups ubuntu | grep docker)"
-			#set -e
-			# If the user is not in the docker group, they need to be added and they need to log out and then log in again.
-			# Otherwise, it will make running the start_launcher_container script difficult (since it tries to write into $HOME,
-			# which should exapand to "ubuntu").
-			#if [ -z "$ubuntu_is_docker_user" ] ; then
-				#echo "Updating user permissions..."
-				#sudo usermod -aG docker ubuntu
-				#sleep 1
-				#cat <<LOGOUT_MESSAGE
-#*************************
-#ATTENTION!!
-#
-#USER GROUP SETTINGS HAVE
-#CHANGED. PLEASE LOG OUT
-#OF THIS SYSTEM AND THEN
-#LOG BACK IN IMMEDIATELY
-#OR THESE CHANGES TO TAKE
-#EFFECT!
-#*************************
-#LOGOUT_MESSAGE
-				#exit 0
-			#fi
+
 		else
 			echo "Skipping docker installation..."
 		fi

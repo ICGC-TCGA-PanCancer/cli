@@ -14,7 +14,6 @@ This system requires the following:
 * A GNOS key (or keys) which are used to both download Docker images for our workflows, dependencies, as well as data from from GNOS servers used in the project.
   Please ensure that these files are in ~/.gnos
 * Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
-
 MSG
 
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
@@ -39,9 +38,11 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			sudo apt-get install wget curl
 			echo "Installing docker..."
 			sleep 2
+			# TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
 			curl -sSL https://get.docker.com/ | sh
 			echo "Done installing docker!"
 			echo "Pulling latest pancancer_launcher image..."
+			# TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
 			sudo docker pull pancancer/pancancer_launcher:latest
 			echo "Done pulling pancancer_launcher!"
 
@@ -54,9 +55,6 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 	fi
 done
 
-#TODO: let user do their config stuff. Once configuration is finished, give them the option of starting up pancancer_launcher right away (they shouldn't have to call start_launcher_container.sh manually.)
-# pre-pancancer_launcher config: pem key path, fleet name, environment (AWS, OpenStack, Azure), Image version (default to specific tag or "latest"?)
-# post-pancancer_launcher config (once inside the container): AWS keys (if AWS), AMI/ImageID, VM flavour, # nodes, batch size, Slack webhook, AWS region/zones, OpenStack region, path to key, workflows, endless worker, Azure-specific stuff...?
 run_pancancer_launcher=''
 while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" != 'N' ]] ; do
 	echo "Would you like to run the pancancer_launcher now? [Y/N]"
@@ -200,8 +198,7 @@ SECURITY_GROUP=${user_sec_grp}
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config
-
-		echo $CMD_STR
+		echo $CMD_STR > start_launcher_container.cmd
 		$(echo -e $CMD_STR)
 	elif [ "${run_pancancer_launcher^^}" = 'N' ] ; then
 		echo "You can run this script at another time to run the pancancer launcher"

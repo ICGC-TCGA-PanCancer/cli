@@ -89,9 +89,8 @@ If you follow the directions above you will find yourself dropped into the docke
 
 ###Running workflows
 
-The Pancancer Launcher can generate a template INI file for workflows. To see which workflows are available, you can use the command `pancancer workflows list`:
+The Pancancer Launcher can generate a template INI file for workflows. These INI files are used to set specific parameters for a workflow, such as which files to download or upload. To see which workflows are available, you can use the command `pancancer workflows list`:
 
-```
 $ pancancer workflows list
 Available workflows are:
 HelloWorld

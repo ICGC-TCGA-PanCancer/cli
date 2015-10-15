@@ -53,7 +53,7 @@ class WorkflowLister:
                         {
                             'seqware_whitestar_pancancer': {
                                 'name':'seqware_whitestar_pancancer',
-                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
+                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.2'
                             }
                         },
                         'ami_id':'ami-4f95df2a',

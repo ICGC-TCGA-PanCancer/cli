@@ -105,7 +105,7 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 			if [ ! -z $PEM_PATH ] ; then
 				read -ep $'What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
 			else
-				read -ep "What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment?" user_pem_path
+				read -ep "What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment?\n" user_pem_path
 			fi
 			if [[ ! -f $user_pem_path ]] ; then
 				echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
@@ -185,9 +185,9 @@ AWS_CONFIG
     user_fleet_size=''
 		while [[ -z "${user_fleet_size// /}" ]] ; do
 			if [ ! -z $FLEET_SIZE ] ; then
-				read -ep $'What is the size of your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
+				read -ep $'What is the maximum number of worker VMs you want to run in your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
 			else
-				read -ep $'What is the size of your fleet?\n' user_fleet_size
+				read -ep $'What is the maximum number of worker VMs you want to run in your fleet?\n' user_fleet_size
 			fi
 			if [[ -z "${user_fleet_size// /}" ]] ; then
 				echo 'Key name cannot be blank.'

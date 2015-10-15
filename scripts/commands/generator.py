@@ -38,7 +38,8 @@ class Generator(cliff.command.Command):
 
             master_config_path = os.path.expanduser('~/arch3/config/masterConfig.ini')
             self.log.debug('setting check_previous_job_hash to false in '+master_config_path)
-            master_config = configparser.ConfigParser()            
+            master_config = configparser.ConfigParser()
+            master_config.optionxform = str
             # We have to update the master config file so that the generator process will allow duplicates.
             master_config.read(master_config_path)
  

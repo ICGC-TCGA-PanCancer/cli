@@ -56,7 +56,7 @@ class Generator(cliff.command.Command):
             if 'http_workflow' in workflow_details:
                 workflow_version = workflow_details['http_workflow']['version']
             else:
-                 workflow_version = workflow_details['s3_workflow']['version']
+                workflow_version = workflow_details['s3_workflow']['version']
             
             generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_version+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
             self.log.debug('generator command will be: '+generator_cmd)
@@ -115,6 +115,5 @@ class Generator(cliff.command.Command):
                 self.log.warn('Attempt to generate jobs may have encountered an error...')
             else:
                 self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
-            #TODO: Show the job requests in the queue, or in the database... If wa can find a way to actually show the details of what was generated. 
             
             

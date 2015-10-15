@@ -17,6 +17,7 @@ class Generator(cliff.command.Command):
         parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.',required=True)
         parser.add_argument('--force',dest='force_generate',help='Force the generation of the jobs, even if the system detects that the job has already been generated once before.', required=False, action='store_true')
         parser.add_argument('--keep_failed',dest='keep_failed',help='Keep failed workers in the fleet. Useful for debugging workflows.', required=False, action='store_true')
+        #parser.add_argument('--no_config_update',dest='no_config_update',help='Do not update any configuration files.', required=False, action='store_true')
         #parser.add_argument('--uses_gnos', dest='use_gnos',help='Indicates that your worfklow will be using GNOS repositories. --use_gnos and --use_s3 are not mutually exclusive - you could configure your workflow\'s INI file to use both GNOS and AWS S3 repositories.',required=False, default=True, choices=[True,False])
         #parser.add_argument('--uses_s3', dest='use_s3',help='Indicates that your worfklow will be using S3 repositories.  --use_gnos and --use_s3 are not mutually exclusive - you could configure your workflow\'s INI file to use both GNOS and AWS S3 repositories.',required=False, default=False, choices=[True,False])
         return parser
@@ -29,13 +30,18 @@ class Generator(cliff.command.Command):
         if not (workflow_name in workflowlister.WorkflowLister.get_workflow_names()):
             self.log.info(workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
         else:
-            # This code could be refactored easily...
+            sysconfig_cmd = 'pancancer sysconfig'
+            return_code = subprocess.call(sysconfig_cmd.split(' '))
+            if return_code != 0:
+                self.log.warn('Attempt to (re)configure system may have encountered an error...')
+
+
             master_config_path = os.path.expanduser('~/arch3/config/masterConfig.ini')
             self.log.debug('setting check_previous_job_hash to false in '+master_config_path)
             master_config = configparser.ConfigParser()            
             # We have to update the master config file so that the generator process will allow duplicates.
             master_config.read(master_config_path)
-
+ 
             # if --force then do NOT check previous hash
             master_config['generator']['check_previous_job_hash']=str(not force_generate)
             # keep_failed==true -> reap_failed_workers=false
@@ -44,13 +50,6 @@ class Generator(cliff.command.Command):
             with open(master_config_path,'w') as master_config_file:
                 master_config.write(master_config_file,space_around_delimiters=True)
 
-
-            sysconfig_cmd = 'pancancer sysconfig'
-            return_code = subprocess.call(sysconfig_cmd.split(' '))
-            if return_code != 0:
-                self.log.warn('Attempt to (re)configure system may have encountered an error...')
-
-            
             workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
             
             workflow_version = ''            
@@ -80,6 +79,10 @@ class Generator(cliff.command.Command):
                 if 'http_containers' in workflow_details:
                     paramsData['http_containers'] = workflow_details['http_containers']
 
+                # if --force then do NOT check previous hash
+                #paramsData['generator']['check_previous_job_hash']=str(not force_generate)
+                # keep_failed==true -> reap_failed_workers=false
+                #paramsData['provision']['reap_failed_workers']=str(not keep_failed)
                 paramsData['lvm_device_whitelist'] = workflow_details['lvm_devices']
                 paramsData['workflow_name'] = workflow_name
 

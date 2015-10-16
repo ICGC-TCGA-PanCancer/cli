@@ -27,7 +27,7 @@ class Workflows(cliff.command.Command):
         self.log.info(workflow_list)
 
     def _do_config(self, workflow_name, num_INIs, backup_old_INIs):
-        if workflow_name in workflowlister.WorkflowLister.get_workflow_names():
+        if workflow_name in workflowlister.WorkflowLister.get_workflow_keys():
             backup_dir=os.path.expanduser('~/ini-backups')
             ini_dir=os.path.expanduser('~/ini-dir')
             self.log.debug("backup old INIS: "+str(backup_old_INIs))

@@ -59,7 +59,7 @@ chmod 600 ~/.ssh/FillInYourKeyName.pem
 ### Run installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
-$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.6/install_bootstrap && bash install_bootstrap
+$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.7/install_bootstrap && bash install_bootstrap
 ```
 This script will install docker (you can skip this step by answering "N" if you already have docker installed), the pancancer_launcher image, and collect some basic configuration info to get the launcher started. 
 

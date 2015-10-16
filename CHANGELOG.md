@@ -1,5 +1,13 @@
 # Changes
 
+## 0.0.7
+ - Minor documentation updates
+ - Added new "--keep_failed" option for generator to prevent failed workers from being reaped (useful for debugging)
+ - Fixed some logic bugs in generator related to updating the master config file.
+ - Minor updates to install_bootstrap (changed wording of questions, cleaned up some old code).
+ - Added version numbers to workflow names in descriptors in workflowlister.py
+ - Set reap\_failed\_workers and check\_previous\_job\_hash to null in mustache template - these will be directly set by the generator.
+
 ## 0.0.6
  - Updated documentation
  - Added BWA tutorial

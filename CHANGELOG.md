@@ -7,6 +7,7 @@
  - Minor updates to install_bootstrap (changed wording of questions, cleaned up some old code).
  - Added version numbers to workflow names in descriptors in workflowlister.py
  - Set reap\_failed\_workers and check\_previous\_job\_hash to null in mustache template - these will be directly set by the generator.
+ - A number of smaller bug fixes.
 
 ## 0.0.6
  - Updated documentation

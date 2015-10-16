@@ -16,7 +16,7 @@ class WorkflowLister:
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
                             }
                         },
-                        'ami_id':'ami-791c5b1c',
+                        'ami_id':'ami-21286f44',
                         'default-ini':'http://something.ini',
                         'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
@@ -56,7 +56,7 @@ class WorkflowLister:
                                 'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.2'
                             }
                         },
-                        'ami_id':'ami-4f95df2a',
+                        'ami_id':'ami-430c5a26',
                         'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.7/workflow/config/workflow.ini',
                         'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'

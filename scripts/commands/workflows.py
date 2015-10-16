@@ -18,7 +18,7 @@ class Workflows(cliff.command.Command):
         config_parser = workflows_subparser.add_parser('config', help='Generate a default config file for a specific workflow')
         config_parser.add_argument('--workflow', dest='workflow_name', help='Name of workflow to configure')
         config_parser.add_argument('--num-INI', dest='num_INI', help='The number of config files to generate.',required=False,default=1)
-        config_parser.add_argument('--backup-old-INIs', dest='backup_old_INIs', help='Should old INI files be moved to a backup directory?',required=False,default=True)
+        config_parser.add_argument('--no-INI-backup', dest='backup_old_INIs', help='Do NOT back up INI files to ~/ini-backups', required=False, action='store_false')
         return parser
 
     def _do_list(self):
@@ -26,7 +26,7 @@ class Workflows(cliff.command.Command):
         self.log.info ('Available workflows are:')
         self.log.info(workflow_list)
 
-    def _do_config(self, workflow_name, num_INIs=1, backup_old_INIs=True):
+    def _do_config(self, workflow_name, num_INIs, backup_old_INIs):
         if workflow_name in workflowlister.WorkflowLister.get_workflow_names():
             backup_dir=os.path.expanduser('~/ini-backups')
             ini_dir=os.path.expanduser('~/ini-dir')
@@ -50,7 +50,7 @@ class Workflows(cliff.command.Command):
                 ini_file_name='~/ini-dir/' + workflow_name + '_' + datestr + '_' + str(i) + '.ini'
                 self.log.info('Generating INI file: '+ini_file_name)
                 ini_file_path = os.path.expanduser(ini_file_name)
-                if workflow_name != 'HelloWorld':
+                if 'HelloWorld' not in workflow_name:
                     workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
                     url = workflow_details['default-ini']
 

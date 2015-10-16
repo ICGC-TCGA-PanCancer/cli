@@ -76,13 +76,15 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 		fi
 
 		user_pem_path=''
-		while [[ ! -f $user_pem_path || -z "${user_pem_path// /}" ]] ; do
+		while [[ ! -f $user_pem_path || ! -e $user_pem_path || -z "${user_pem_path// /}" ]] ; do
 			if [ ! -z $PEM_PATH ] ; then
-				read -ep $'What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
+				read -ep $'What is the path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
+				user_pem_path="${user_pem_path/#\~/$HOME}"
 			else
-				read -ep "What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment?\n" user_pem_path
+				read -ep "What is the path to the pem key file you will use to authenticate in this environment?\n" user_pem_path
+				user_pem_path="${user_pem_path/#\~/$HOME}"
 			fi
-			if [[ ! -f $user_pem_path ]] ; then
+			if [[ ! -f $user_pem_path && ! -e $user_pem_path ]] ; then
 				echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
 			fi
 	  done

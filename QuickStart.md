@@ -224,7 +224,7 @@ Your next step, now that you have successfully run one workflow on one VM, could
 Configuration should already be complete once you have entered the Pancancer Launcher, but if you need to change or adjust some configuration options (such as fleet size), you can use this command:
 
 ```
-$ pancancer sysconfig --force True
+$ pancancer sysconfig --force
 ```
 
 ####Running the coordinator and provisioner
@@ -309,7 +309,7 @@ If the configuration is changed while the provisioner and coordinator are runnin
 ```
 $ pancancer coordinator stop
 $ pancancer provisioner stop
-$ pancancer sysconfig --force True
+$ pancancer sysconfig --force
 $ pancancer coordinator start
 $ pancancer provisioner start
 ```
@@ -318,15 +318,10 @@ $ pancancer provisioner start
 
 Normally, failed workers are cleaned up automatically. It is sometimes useful to leave failed workers up and running if you are interested in debugging a problematic workflow.
 
-To do this, you will need to manually edit the file `~/arch3/config/masterConfig.ini`. You will need to change the value of `reap_failed_workers` to `false`:
-```
-reap_failed_workers=false
-```
+Keeping failed workers must be configured when generating job requests:
 
-You will then need to stop and then start the provisioner (this should _not_ be done if the Provisioner is in the middle of actively provisioning VMs):
 ```
-$ pancancer provisioner stop
-$ pancancer provisioner start
+$ pancancer generator --workflow HelloWorld --keep_failed
 ```
 
 The result of this is that if a Worker VM completes its work successfully, it will be automatically removed from the fleet, but if a worker fails, it will be left alone, and you will be able to log in to it and debug whatever caused it fo fail.

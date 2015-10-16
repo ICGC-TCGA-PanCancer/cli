@@ -29,7 +29,7 @@ class Generator(cliff.command.Command):
         self.log.debug('workflow_name: %s',workflow_name)
         self.log.debug('all workflows: '+workflowlister.WorkflowLister.get_workflow_names())
             
-        if workflow_name in workflowlister.WorkflowLister.get_workflow_names():
+        if workflow_name in workflowlister.WorkflowLister.get_workflow_keys():
             sysconfig_cmd = 'pancancer sysconfig'
             return_code = subprocess.call(sysconfig_cmd.split(' '))
             if return_code != 0:

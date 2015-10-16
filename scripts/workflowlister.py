@@ -108,5 +108,9 @@ class WorkflowLister:
         return keys
 
     @staticmethod
+    def get_workflow_keys():
+        return WorkflowLister._workflows.keys()
+
+    @staticmethod
     def get_workflow_details(workflow_name):
         return WorkflowLister._workflows[workflow_name]

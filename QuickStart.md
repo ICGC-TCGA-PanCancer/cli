@@ -89,41 +89,50 @@ If you follow the directions above you will find yourself dropped into the docke
 
 ###Running workflows
 
-The Pancancer Launcher can generate a template INI file for workflows. These INI files are used to set specific parameters for a workflow, such as which files to download or upload. To see which workflows are available, you can use the command `pancancer workflows list`:
-
+The Pancancer Launcher can generate a template INI file for workflows. These INI files are used to set workflow-specific parameters, such as which files to download or upload. To see which workflows are available, you can use the command `pancancer workflows list`:
+```
 $ pancancer workflows list
 Available workflows are:
-HelloWorld
-BWA
+HelloWorld_1.0-SNAPSHOT
+BWA_2.6.7
 ```
 
 For more information about these workflows and how to configure their INI files, see the workflows' home pages:
 
-<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore)
- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
+<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
+<!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
  - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
  - HelloWorld - This is a very simple workflow that does not read or write any data, but it is good to use when testing basic setup and infrastructure.
 
 ####Generating an INI file
 To generate an INI file:
+
 ```
-$ pancancer workflows config --workflow HelloWorld
+$ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT
 ```
 
-A new HelloWorld-specific INI file should be generated in `~/ini-dir`.
-
+A new HelloWorld-specific INI file should be generated in `~/ini-dir`. 
 The generated file has *default* values only. You _will_ need to edit these INI files with your own specific values. For example, for BWA, you will need to specify the upload and download URLs for your BAM files. Other workflows will have other edits that are necessary for the workflow to run correctly.
 
 <!-- TODO: Add links to workflows (done!) with details about the INI files (not yet) -->
 
 **You will want to edit this file before generating job requests. Please make any workflow-specific changes now, before continuing.**
 
+If you would like to generate a batch of INI files, you can do it like this:
+
+```
+$ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --num-INI 3
+```
+
+And 3 INI files will be created, though you will need to edit them to ensure that they are not identical. The Pancancer Launcher will try to prevent you from generating job requests that reference the same INI file contents, as that is considered running the same job multiple times.
+
+
 ####Generating a work order
 A work order is contains information about what work needs to be done, and what kind of VM needs to be provisioned for it.
 
 To generate work order for a workflow:
 ```
-$ pancancer generator --workflow HelloWorld
+$ pancancer generator --workflow HelloWorld_1.0-SNAPSHOT
 ```
 <!-- TODO: auto-backup old INI files? can wait... Done, needs test -->
 
@@ -321,7 +330,7 @@ Normally, failed workers are cleaned up automatically. It is sometimes useful to
 Keeping failed workers must be configured when generating job requests:
 
 ```
-$ pancancer generator --workflow HelloWorld --keep_failed
+$ pancancer generator --workflow HelloWorld_1.0-SNAPSHOT --keep_failed
 ```
 
 The result of this is that if a Worker VM completes its work successfully, it will be automatically removed from the fleet, but if a worker fails, it will be left alone, and you will be able to log in to it and debug whatever caused it fo fail.

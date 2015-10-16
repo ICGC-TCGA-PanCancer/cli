@@ -1,7 +1,7 @@
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
     # Eventually, this data structure should come from some sort of online registry. For now, just define it in code.
-    _workflows= {   'HelloWorld':
+    _workflows= {   'HelloWorld_1.0-SNAPSHOT':
                     {
                         'full_name':'Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.1',
                         'http_workflow':
@@ -21,7 +21,7 @@ class WorkflowLister:
                         'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     },
-#                     'Sanger':
+#                     'Sanger_1.0.8':
 #                     {
 #                         'full_name':'Workflow_Bundle_SangerPancancerCgpCnIndelSnvStr_1.0.8_SeqWare_1.1.0',
 #                         'http_workflow':
@@ -41,7 +41,7 @@ class WorkflowLister:
 #                         'instance-type':'m1.xlarge',
 #                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
 #                     },
-                    'BWA':
+                    'BWA_2.6.7':
                     {
                         'full_name':'Workflow_Bundle_BWA_2.6.7_SeqWare_1.1.1',
                         'http_workflow':
@@ -53,7 +53,7 @@ class WorkflowLister:
                         {
                             'seqware_whitestar_pancancer': {
                                 'name':'seqware_whitestar_pancancer',
-                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.1'
+                                'image_name': 'pancancer/seqware_whitestar_pancancer:1.1.2'
                             }
                         },
                         'ami_id':'ami-4f95df2a',
@@ -61,7 +61,7 @@ class WorkflowLister:
                         'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     }
-#                     ,'DKFZ_EMBL':
+#                     ,'DKFZ_EMBL_1.0.5':
 #                     {
 #                         'full_name':'Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1',
 #                         'http_workflow':
@@ -106,6 +106,10 @@ class WorkflowLister:
         for k in WorkflowLister._workflows:
             keys += k+'\n'
         return keys
+
+    @staticmethod
+    def get_workflow_keys():
+        return WorkflowLister._workflows.keys()
 
     @staticmethod
     def get_workflow_details(workflow_name):

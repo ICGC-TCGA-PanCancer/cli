@@ -27,9 +27,9 @@ class Generator(cliff.command.Command):
         force_generate=vars(parsed_args)['force_generate']
         keep_failed=vars(parsed_args)['keep_failed']
         self.log.debug('workflow_name: %s',workflow_name)
-        if not (workflow_name in workflowlister.WorkflowLister.get_workflow_names()):
-            self.log.info(workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')
-        else:
+        self.log.debug('all workflows: '+workflowlister.WorkflowLister.get_workflow_names())
+            
+        if workflow_name in workflowlister.WorkflowLister.get_workflow_names():
             sysconfig_cmd = 'pancancer sysconfig'
             return_code = subprocess.call(sysconfig_cmd.split(' '))
             if return_code != 0:
@@ -116,5 +116,6 @@ class Generator(cliff.command.Command):
                 self.log.warn('Attempt to generate jobs may have encountered an error...')
             else:
                 self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
-            
+        else:
+            self.log.info(workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')   
             

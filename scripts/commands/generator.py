@@ -28,94 +28,100 @@ class Generator(cliff.command.Command):
         keep_failed=vars(parsed_args)['keep_failed']
         self.log.debug('workflow_name: %s',workflow_name)
         self.log.debug('all workflows: '+workflowlister.WorkflowLister.get_workflow_names())
-            
+        
         if workflow_name in workflowlister.WorkflowLister.get_workflow_keys():
-            sysconfig_cmd = 'pancancer sysconfig'
-            return_code = subprocess.call(sysconfig_cmd.split(' '))
-            if return_code != 0:
-                self.log.warn('Attempt to (re)configure system may have encountered an error...')
 
-
-            master_config_path = os.path.expanduser('~/arch3/config/masterConfig.ini')
-            self.log.debug('setting check_previous_job_hash to false in '+master_config_path)
-            master_config = configparser.ConfigParser()
-            master_config.optionxform = str
-            # We have to update the master config file so that the generator process will allow duplicates.
-            master_config.read(master_config_path)
- 
-            # if --force then do NOT check previous hash
-            master_config['generator']['check_previous_job_hash']=str(not force_generate)
-            # keep_failed==true -> reap_failed_workers=false
-            master_config['provision']['reap_failed_workers']=str(not keep_failed)
-
-            with open(master_config_path,'w') as master_config_file:
-                master_config.write(master_config_file,space_around_delimiters=True)
-
-            workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
+            # First thing: if the directory is empty, don't bother going any further.
+            if os.listdir(path='/home/ubuntu/ini-dir') != []:
             
-            workflow_version = ''            
-            if 'http_workflow' in workflow_details:
-                workflow_version = workflow_details['http_workflow']['version']
-            else:
-                workflow_version = workflow_details['s3_workflow']['version']
-            
-            generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_version+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
-            self.log.debug('generator command will be: '+generator_cmd)
-            # Before generating the job, we have to update params.json with the workflow/container info about the requested workflow.
-            paramsData=''
-            with open('/home/ubuntu/params.json','r') as params_file:
-                paramsData = json.load(params_file)
-                if 'http_workflow' in workflow_details:
-                    paramsData['http_workflows'] = {}
-                    paramsData['http_workflows'][workflow_name] = workflow_details['http_workflow']
-                    paramsData['http_workflows'][workflow_name]['name'] = workflow_details['full_name']
-                if 's3_workflow' in workflow_details:
-                    paramsData['s3_workflows'] = {}
-                    paramsData['s3_workflows'][workflow_name] = workflow_details['s3_workflows']
-                    paramsData['s3_workflows'][workflow_name]['name'] = workflow_details['full_name']
-                if 'containers' in workflow_details:
-                    paramsData['containers'] = workflow_details['containers']
-                if 's3_containers' in workflow_details:
-                    paramsData['s3_containers'] = workflow_details['s3_containers']
-                if 'http_containers' in workflow_details:
-                    paramsData['http_containers'] = workflow_details['http_containers']
-
+                sysconfig_cmd = 'pancancer sysconfig'
+                return_code = subprocess.call(sysconfig_cmd.split(' '))
+                if return_code != 0:
+                    self.log.warn('Attempt to (re)configure system may have encountered an error...')
+    
+    
+                master_config_path = os.path.expanduser('~/arch3/config/masterConfig.ini')
+                self.log.debug('setting check_previous_job_hash to false in '+master_config_path)
+                master_config = configparser.ConfigParser()
+                master_config.optionxform = str
+                # We have to update the master config file so that the generator process will allow duplicates.
+                master_config.read(master_config_path)
+     
                 # if --force then do NOT check previous hash
-                #paramsData['generator']['check_previous_job_hash']=str(not force_generate)
+                master_config['generator']['check_previous_job_hash']=str(not force_generate)
                 # keep_failed==true -> reap_failed_workers=false
-                #paramsData['provision']['reap_failed_workers']=str(not keep_failed)
-                paramsData['lvm_device_whitelist'] = workflow_details['lvm_devices']
-                paramsData['workflow_name'] = workflow_name
-
-            # Now write the params.json file.
-            with open('/home/ubuntu/params.json','w+') as params_file:
-                params_file.write(str(json.dumps(paramsData,sort_keys=True, indent=4) ))
-
-            # Update the youxia config file with the correct AMI and instance-type
-            config = configparser.ConfigParser()
-            config.read('/home/ubuntu/.youxia/config')
-            config['deployer']['instance_type']=workflow_details['instance-type']
-            config['deployer']['ami_image']=workflow_details['ami_id']
-            with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
-                config.write(youxia_configfile,space_around_delimiters=True)
-
-           
-            provisioner_cmd = 'pancancer provisioner restart'
-            return_code = subprocess.call(provisioner_cmd.split(' '))
-            if return_code != 0:
-                self.log.warn('Attempt to restart the provisioner may have encountered an error...')
-
-            #sysconfig = SysConfig(SysConfig)
-            #parsed_args = sysconfig.get_parser('SysConfig').parse_args('')
-            #sysconfig.run()
-            #provisioner = Provisioner()
-            #provisioner.run(self, provisioner_cmd.split(' '))
-            
-            return_code = subprocess.call(generator_cmd.split(' '))
-            if return_code != 0:
-                self.log.warn('Attempt to generate jobs may have encountered an error...')
+                master_config['provision']['reap_failed_workers']=str(not keep_failed)
+    
+                with open(master_config_path,'w') as master_config_file:
+                    master_config.write(master_config_file,space_around_delimiters=True)
+    
+                workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
+                
+                workflow_version = ''            
+                if 'http_workflow' in workflow_details:
+                    workflow_version = workflow_details['http_workflow']['version']
+                else:
+                    workflow_version = workflow_details['s3_workflow']['version']
+                
+                generator_cmd = 'Generator --workflow-name '+workflow_name+' --workflow-version '+workflow_version+' --workflow-path '+'/workflows/'+workflow_details['full_name']+' --ini-dir '+'/home/ubuntu/ini-dir --config /home/ubuntu/arch3/config/masterConfig.ini'
+                self.log.debug('generator command will be: '+generator_cmd)
+                # Before generating the job, we have to update params.json with the workflow/container info about the requested workflow.
+                paramsData=''
+                with open('/home/ubuntu/params.json','r') as params_file:
+                    paramsData = json.load(params_file)
+                    if 'http_workflow' in workflow_details:
+                        paramsData['http_workflows'] = {}
+                        paramsData['http_workflows'][workflow_name] = workflow_details['http_workflow']
+                        paramsData['http_workflows'][workflow_name]['name'] = workflow_details['full_name']
+                    if 's3_workflow' in workflow_details:
+                        paramsData['s3_workflows'] = {}
+                        paramsData['s3_workflows'][workflow_name] = workflow_details['s3_workflows']
+                        paramsData['s3_workflows'][workflow_name]['name'] = workflow_details['full_name']
+                    if 'containers' in workflow_details:
+                        paramsData['containers'] = workflow_details['containers']
+                    if 's3_containers' in workflow_details:
+                        paramsData['s3_containers'] = workflow_details['s3_containers']
+                    if 'http_containers' in workflow_details:
+                        paramsData['http_containers'] = workflow_details['http_containers']
+    
+                    # if --force then do NOT check previous hash
+                    #paramsData['generator']['check_previous_job_hash']=str(not force_generate)
+                    # keep_failed==true -> reap_failed_workers=false
+                    #paramsData['provision']['reap_failed_workers']=str(not keep_failed)
+                    paramsData['lvm_device_whitelist'] = workflow_details['lvm_devices']
+                    paramsData['workflow_name'] = workflow_name
+    
+                # Now write the params.json file.
+                with open('/home/ubuntu/params.json','w+') as params_file:
+                    params_file.write(str(json.dumps(paramsData,sort_keys=True, indent=4) ))
+    
+                # Update the youxia config file with the correct AMI and instance-type
+                config = configparser.ConfigParser()
+                config.read('/home/ubuntu/.youxia/config')
+                config['deployer']['instance_type']=workflow_details['instance-type']
+                config['deployer']['ami_image']=workflow_details['ami_id']
+                with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
+                    config.write(youxia_configfile,space_around_delimiters=True)
+    
+               
+                provisioner_cmd = 'pancancer provisioner restart'
+                return_code = subprocess.call(provisioner_cmd.split(' '))
+                if return_code != 0:
+                    self.log.warn('Attempt to restart the provisioner may have encountered an error...')
+    
+                #sysconfig = SysConfig(SysConfig)
+                #parsed_args = sysconfig.get_parser('SysConfig').parse_args('')
+                #sysconfig.run()
+                #provisioner = Provisioner()
+                #provisioner.run(self, provisioner_cmd.split(' '))
+                
+                return_code = subprocess.call(generator_cmd.split(' '))
+                if return_code != 0:
+                    self.log.warn('Attempt to generate jobs may have encountered an error...')
+                else:
+                    self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
             else:
-                self.log.info('Job requests have been generated for the '+workflow_name+' using the INIs in ~/ini-dir')
+                self.log.info('/home/ubuntu/ini-dir is empty. Place your INI files here before attempting to run the generator.')
         else:
             self.log.info(workflow_name+' is not the name of an available workflow.\nPlease use the command \'workflows list\' to see the list of currently available workflows.')   
             

@@ -59,7 +59,7 @@ chmod 600 ~/.ssh/FillInYourKeyName.pem
 ### Run installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
-$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.5/install_bootstrap && bash install_bootstrap
+$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.7/install_bootstrap && bash install_bootstrap
 ```
 This script will install docker (you can skip this step by answering "N" if you already have docker installed), the pancancer_launcher image, and collect some basic configuration info to get the launcher started. 
 
@@ -89,42 +89,50 @@ If you follow the directions above you will find yourself dropped into the docke
 
 ###Running workflows
 
-The Pancancer Launcher can generate a template INI file for workflows. To see which workflows are available, you can use the command `pancancer workflows list`:
-
+The Pancancer Launcher can generate a template INI file for workflows. These INI files are used to set workflow-specific parameters, such as which files to download or upload. To see which workflows are available, you can use the command `pancancer workflows list`:
 ```
 $ pancancer workflows list
 Available workflows are:
-HelloWorld
-BWA
+HelloWorld_1.0-SNAPSHOT
+BWA_2.6.7
 ```
 
 For more information about these workflows and how to configure their INI files, see the workflows' home pages:
 
-<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore)
- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
+<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
+<!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
  - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
  - HelloWorld - This is a very simple workflow that does not read or write any data, but it is good to use when testing basic setup and infrastructure.
 
 ####Generating an INI file
 To generate an INI file:
+
 ```
-$ pancancer workflows config --workflow HelloWorld
+$ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT
 ```
 
-A new HelloWorld-specific INI file should be generated in `~/ini-dir`.
-
+A new HelloWorld-specific INI file should be generated in `~/ini-dir`. 
 The generated file has *default* values only. You _will_ need to edit these INI files with your own specific values. For example, for BWA, you will need to specify the upload and download URLs for your BAM files. Other workflows will have other edits that are necessary for the workflow to run correctly.
 
 <!-- TODO: Add links to workflows (done!) with details about the INI files (not yet) -->
 
 **You will want to edit this file before generating job requests. Please make any workflow-specific changes now, before continuing.**
 
+If you would like to generate a batch of INI files, you can do it like this:
+
+```
+$ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --num-INI 3
+```
+
+And 3 INI files will be created, though you will need to edit them to ensure that they are not identical. The Pancancer Launcher will try to prevent you from generating job requests that reference the same INI file contents, as that is considered running the same job multiple times.
+
+
 ####Generating a work order
 A work order is contains information about what work needs to be done, and what kind of VM needs to be provisioned for it.
 
 To generate work order for a workflow:
 ```
-$ pancancer generator --workflow HelloWorld
+$ pancancer generator --workflow HelloWorld_1.0-SNAPSHOT
 ```
 <!-- TODO: auto-backup old INI files? can wait... Done, needs test -->
 
@@ -150,7 +158,7 @@ queues:
 
 As you can see there is one message in the message queue named "pancancer_arch_3_orders". This indicates that the system successfully generated a job order from your INI file in `~/ini-dir`.
 
-The process that provisiones VMs should detect this request and begin provisioning a new VM. Provisioning may take several minutes. There are a few ways that you can monitor progress. You can watch the progress using this command:
+The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take several minutes (10 minutes is not unreasonable). There are a few ways that you can monitor progress. You can watch the progress using this command:
 ```
 $ tail -f provisioner.out
 ```
@@ -225,7 +233,7 @@ Your next step, now that you have successfully run one workflow on one VM, could
 Configuration should already be complete once you have entered the Pancancer Launcher, but if you need to change or adjust some configuration options (such as fleet size), you can use this command:
 
 ```
-$ pancancer sysconfig --force True
+$ pancancer sysconfig --force
 ```
 
 ####Running the coordinator and provisioner
@@ -310,7 +318,7 @@ If the configuration is changed while the provisioner and coordinator are runnin
 ```
 $ pancancer coordinator stop
 $ pancancer provisioner stop
-$ pancancer sysconfig --force True
+$ pancancer sysconfig --force
 $ pancancer coordinator start
 $ pancancer provisioner start
 ```
@@ -319,15 +327,10 @@ $ pancancer provisioner start
 
 Normally, failed workers are cleaned up automatically. It is sometimes useful to leave failed workers up and running if you are interested in debugging a problematic workflow.
 
-To do this, you will need to manually edit the file `~/arch3/config/masterConfig.ini`. You will need to change the value of `reap_failed_workers` to `false`:
-```
-reap_failed_workers=false
-```
+Keeping failed workers must be configured when generating job requests:
 
-You will then need to stop and then start the provisioner (this should _not_ be done if the Provisioner is in the middle of actively provisioning VMs):
 ```
-$ pancancer provisioner stop
-$ pancancer provisioner start
+$ pancancer generator --workflow HelloWorld_1.0-SNAPSHOT --keep_failed
 ```
 
 The result of this is that if a Worker VM completes its work successfully, it will be automatically removed from the fleet, but if a worker fails, it will be left alone, and you will be able to log in to it and debug whatever caused it fo fail.

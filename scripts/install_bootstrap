@@ -1,6 +1,6 @@
 #! /bin/bash
 set -e
-PANCANCER_LAUNCHER_VERSION=3.1.6
+PANCANCER_LAUNCHER_VERSION=3.1.7
 cat <<MSG
 PANCANCER COMMAND LINE INTERFACE - INSTALLATION
 -----------------------------------------------
@@ -14,7 +14,6 @@ This system requires the following:
 * A GNOS key (or keys) which are used to both download Docker images for our workflows, dependencies, as well as data from from GNOS servers used in the project.
   Please ensure that these files are in ~/.gnos
 * Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
-
 MSG
 
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
@@ -39,35 +38,14 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			sudo apt-get install wget curl
 			echo "Installing docker..."
 			sleep 2
+			# TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
 			curl -sSL https://get.docker.com/ | sh
 			echo "Done installing docker!"
 			echo "Pulling latest pancancer_launcher image..."
+			# TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
 			sudo docker pull pancancer/pancancer_launcher:latest
 			echo "Done pulling pancancer_launcher!"
-			#set +e
-			#ubuntu_is_docker_user="$(groups ubuntu | grep docker)"
-			#set -e
-			# If the user is not in the docker group, they need to be added and they need to log out and then log in again.
-			# Otherwise, it will make running the start_launcher_container script difficult (since it tries to write into $HOME,
-			# which should exapand to "ubuntu").
-			#if [ -z "$ubuntu_is_docker_user" ] ; then
-				#echo "Updating user permissions..."
-				#sudo usermod -aG docker ubuntu
-				#sleep 1
-				#cat <<LOGOUT_MESSAGE
-#*************************
-#ATTENTION!!
-#
-#USER GROUP SETTINGS HAVE
-#CHANGED. PLEASE LOG OUT
-#OF THIS SYSTEM AND THEN
-#LOG BACK IN IMMEDIATELY
-#OR THESE CHANGES TO TAKE
-#EFFECT!
-#*************************
-#LOGOUT_MESSAGE
-				#exit 0
-			#fi
+
 		else
 			echo "Skipping docker installation..."
 		fi
@@ -77,9 +55,6 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 	fi
 done
 
-#TODO: let user do their config stuff. Once configuration is finished, give them the option of starting up pancancer_launcher right away (they shouldn't have to call start_launcher_container.sh manually.)
-# pre-pancancer_launcher config: pem key path, fleet name, environment (AWS, OpenStack, Azure), Image version (default to specific tag or "latest"?)
-# post-pancancer_launcher config (once inside the container): AWS keys (if AWS), AMI/ImageID, VM flavour, # nodes, batch size, Slack webhook, AWS region/zones, OpenStack region, path to key, workflows, endless worker, Azure-specific stuff...?
 run_pancancer_launcher=''
 while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" != 'N' ]] ; do
 	echo "Would you like to run the pancancer_launcher now? [Y/N]"
@@ -101,13 +76,15 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 		fi
 
 		user_pem_path=''
-		while [[ ! -f $user_pem_path || -z "${user_pem_path// /}" ]] ; do
+		while [[ ! -f $user_pem_path || ! -e $user_pem_path || -z "${user_pem_path// /}" ]] ; do
 			if [ ! -z $PEM_PATH ] ; then
-				read -ep $'What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
+				read -ep $'What is the path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
+				user_pem_path="${user_pem_path/#\~/$HOME}"
 			else
-				read -ep "What is the ABSOLUTE path to the pem key file you will use to authenticate in this environment?" user_pem_path
+				read -ep "What is the path to the pem key file you will use to authenticate in this environment?\n" user_pem_path
+				user_pem_path="${user_pem_path/#\~/$HOME}"
 			fi
-			if [[ ! -f $user_pem_path ]] ; then
+			if [[ ! -f $user_pem_path && ! -e $user_pem_path ]] ; then
 				echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
 			fi
 	  done
@@ -185,9 +162,9 @@ AWS_CONFIG
     user_fleet_size=''
 		while [[ -z "${user_fleet_size// /}" ]] ; do
 			if [ ! -z $FLEET_SIZE ] ; then
-				read -ep $'What is the size of your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
+				read -ep $'What is the maximum number of worker VMs you want to run in your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
 			else
-				read -ep $'What is the size of your fleet?\n' user_fleet_size
+				read -ep $'What is the maximum number of worker VMs you want to run in your fleet?\n' user_fleet_size
 			fi
 			if [[ -z "${user_fleet_size// /}" ]] ; then
 				echo 'Key name cannot be blank.'
@@ -223,8 +200,7 @@ SECURITY_GROUP=${user_sec_grp}
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config
-
-		echo $CMD_STR
+		echo $CMD_STR > start_launcher_container.cmd
 		$(echo -e $CMD_STR)
 	elif [ "${run_pancancer_launcher^^}" = 'N' ] ; then
 		echo "You can run this script at another time to run the pancancer launcher"

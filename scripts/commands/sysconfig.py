@@ -12,7 +12,7 @@ class SysConfig(cliff.command.Command):
     def get_parser(self,prog_name):
         parser = super(SysConfig,self).get_parser(prog_name)
         parser.add_argument('--config',dest='config_path',help='The path to your pancancer config file, if it already exists.',required=False)
-        parser.add_argument("--force",dest='force_config',required=False, default=False)
+        parser.add_argument("--force",dest='force_config',required=False, action='store_true')
         # Need to have a "force" option
         return parser
 

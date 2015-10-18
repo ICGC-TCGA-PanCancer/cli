@@ -1,12 +1,12 @@
-#Pancancer CLI
+#Pancancer Workflow Launcher & CLI
 
 This quick-start guide will help you get started using the Pancancer CLI tool.
 
-The Pancancer CLI tool is a command-line interface tool that will allow you to interact with the pancancer components. The Pancancer CLI tool can be used to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMBL) on a fleet of virtual machines in a cloud-computing environment.
+The Pancancer Workflow Launcher and Command Line Tool (CLI) is a system that will allow you to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMBL) on a fleet of virtual machines in a cloud-computing environment.  Currently, these directions focus on Amazon Web Services (AWS) but other environments are supported and will be documented in the future (OpenStack and Azure specifically).
 
 ![Pancancer CLI Diagram - Overview](/images/Pancancer_CLI_system_diagram.png?raw=true "Click for larger view")
 
-The diagram above shows some detail about how the Pancancer CLI tool is used to manage a fleet of VMs executing pancancer workflows. The details of how this is done can be found in the document below.
+The diagram above shows some detail about how the Pancancer Workflow Launcher and CLI tool are used to manage a fleet of VMs executing pancancer workflows. The details of how this is done can be found in the document below.
 
 ##What You Need
 

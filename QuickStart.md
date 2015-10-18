@@ -99,7 +99,7 @@ HelloWorld_1.0-SNAPSHOT
 BWA_2.6.7
 ```
 
-For more information about these workflows and how to configure their INI files, see the workflows' home pages:
+For more information about these workflows and how to configure their INI files, see the workflows' home pages but for now we will walk through using HelloWorld to ensure everything works:
 
 <!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
 <!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
@@ -224,8 +224,13 @@ Most workflows will write their results to a GNOS respository or an AWS S3 bucke
 <!-- TODO: Add section on reporting tool -->
 
 
-###What's next?
-In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of workflows.
+###What's Next?
+
+In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of different types of workflows.  Over time, the complete set of PanCancer "core" workflows will be available in this launcher.  Each have distinct INI parameters that you need to know how to fill in properly to analyze your data.  See details in the README for each of the project's core workflows, they will provide enough information for you to process your own data using these workflows so you can co-analyze your dat with the larger PanCancer dataset:
+
+<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
+<!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
+ - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
 
 <!-- TODO: Should we eventually have a tool that lets the use create n INI files? Might not be that hard, will need to investigate... -->
 Your next step, now that you have successfully run one workflow on one VM, could be to create several INI files (you can use `pancancer workflows config --workflow <SOME WORKFLOW NAME>` to create a default INI file and then copy it as many times as you need and edit the copies) and then execute them in a larger fleet.

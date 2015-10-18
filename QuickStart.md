@@ -1,6 +1,6 @@
 #Pancancer Workflow Launcher & CLI
 
-This quick-start guide will help you get started using the Pancancer CLI tool.
+This quick-start guide will help you get started using the Pancancer CLI tool on Amazon's cloud.  **You are responsible for your cloud expenses for this tutorial, be careful to monitor your usage and terminate VMs when you are finished.**
 
 The Pancancer Workflow Launcher and Command Line Tool (CLI) is a system that will allow you to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMBL) on a fleet of virtual machines in a cloud-computing environment.  Currently, these directions focus on Amazon Web Services (AWS) but other environments are supported and will be documented in the future (OpenStack and Azure specifically).
 
@@ -216,7 +216,7 @@ When looking at your AWS EC2 console, you will notice that when a workflow finis
 
 <!-- TODO: Add section on failed workflow -->
 
-If a workflow fails, you will see that its status is "FAILED". The VM where the failed workflow ran will *not* be terminated. You will need to log in to this VM using ssh to examine the workflow output to determine why it failed, and troubleshoot the problem.
+If a workflow fails, you will see that its status is "FAILED". The VM where the failed workflow ran will *not* be terminated. You will need to log in to this VM using ssh to examine the workflow output to determine why it failed, and troubleshoot the problem. **You must terminate failed worker nodes yourself, you are responsible for your cloud usage.**
 
 <!-- TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
 Most workflows will write their results to a GNOS respository or an AWS S3 bucket, so you will want to check there for -->

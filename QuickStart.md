@@ -43,6 +43,8 @@ Make a note of the *name* of the security group that is chosen at this step, you
 <!--- TODO: note about not putting spaces in the security group name  - actually, this does not appear to be an issue. -->
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
+### SSH to VM
+
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
 ![Connect to Instance](/images/AWS_connect_to_VM2.png?raw=true "Click for larger view")
 
@@ -56,7 +58,7 @@ chmod 600 ~/.ssh/FillInYourKeyName.pem
    You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
   - If you are working with GNOS repositories, which you typically only will be if you are involved in core analysis of PanCancer data through the Technical Working Group, you will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`. Create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.  **Most users will want to analyze their own data from S3 and write the results back to S3, in this scenario GNOS is not used and you can ignore this step.**
 
-### Run installer
+### Run Installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
 $ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.7/install_bootstrap && bash install_bootstrap

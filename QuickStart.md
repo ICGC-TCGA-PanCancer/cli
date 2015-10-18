@@ -22,7 +22,7 @@ Before you get started, there are a few items you will need to have available:
 ### Launch a VM
 Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html). When setting up your instance, be sure to include enough storage space to install docker and download docker images. 40 GB should be enough. The instance type normally used for this is m3.large. The following screen-shots  illustrate how the VM should be configured.
 
-Choosing an AMI (here, AMI ami-d05e75b8 was used)
+Choosing an Ubuntu 14.04 AMI (here, AMI ami-d05e75b8 was used)
 ![choosing an AMI](/images/1_Choose_AMI.png?raw=true "Click for larger view")
 
 Choosing an m3.large instance type

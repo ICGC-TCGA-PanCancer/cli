@@ -1,4 +1,5 @@
 import urllib, json
+import os
 class WorkflowLister:
     "Get a listing of workflows from a source of workflow metadata."
     _workflows = {}
@@ -29,5 +30,5 @@ class WorkflowLister:
             #Read the pancancer_config.json file if it exists
             with open(pancancer_config_path,'r') as pancancer_config_file:
                 config_data = json.load(pancancer_config_file)
-        response = urllib.urlopen(config_data['workflow_listing_url'])
-        WorkflowLister._workflows = json.loads(response.read())
+        response = urllib.request.urlopen(config_data['workflow_listing_url'])
+        WorkflowLister._workflows = json.loads(response.read().decode('utf-8'))

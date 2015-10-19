@@ -128,6 +128,13 @@ $ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --num-INI 3
 
 And 3 INI files will be created, though you will need to edit them to ensure that they are not identical. The Pancancer Launcher will try to prevent you from generating job requests that reference the same INI file contents, as that is considered running the same job multiple times.
 
+By default, INI files will be moved to a backup-location (`~/ini-backups`) every time you run `pancancer workflows config`, though if you want to turn this behaviour off, you can do so like this:
+
+```
+$ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --no-INI-backup
+```
+
+Doing this will leave all of the old INI files in `~/ini-dir`.
 
 ####Generating a work order
 A work order is contains information about what work needs to be done, and what kind of VM needs to be provisioned for it.
@@ -138,7 +145,7 @@ $ pancancer generator --workflow HelloWorld_1.0-SNAPSHOT
 ```
 <!-- TODO: auto-backup old INI files? can wait... Done, needs test -->
 
-The job generator will attempt to generate one job for *each and every* INI file in `~/ini-dir`. It is important to ensure that this directory *only* contains INI files for jobs you wish to run, *and* that you have made any necessary edits to them.
+The job generator will attempt to generate one job for *each and every* INI file in `~/ini-dir`. It is important to ensure that this directory *only* contains INI files for jobs you wish to run, *and* that you have made any necessary edits to them. 
 
 <!-- TODO: need better notes on contents of ini-dir, need to move ini out of here once submitted. or not? hash check should prevent duplicates... -->
 
@@ -216,7 +223,14 @@ When looking at your AWS EC2 console, you will notice that when a workflow finis
 
 <!-- TODO: Add section on failed workflow -->
 
-If a workflow fails, you will see that its status is "FAILED". The VM where the failed workflow ran will *not* be terminated. You will need to log in to this VM using ssh to examine the workflow output to determine why it failed, and troubleshoot the problem. **You must terminate failed worker nodes yourself, you are responsible for your cloud usage.**
+If a workflow fails, you will see that its status is "FAILED". To see the output from the VM, you can use the `pancancer status job_results` command like this:
+
+```
+$ pancancer status job_results --job_id <THE JOB_ID OF THE JOB THAT FAILED> --type stdout 
+```
+This will write data to a file containing the standard output that SeqWare captured while running the workflow. You can also get the standard error messages by running the above command with `stderr` instead of `stdout`. 
+
+If you this is not enough information to properly debug the failure, you can try using the [`--keep_failed` option when running the generator command, as explained in the Troubleshooting section](#My Worker VMs fail and get shut down, but I want them to stay up and running so I can debug problems.).
 
 <!-- TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
 Most workflows will write their results to a GNOS respository or an AWS S3 bucket, so you will want to check there for -->
@@ -226,7 +240,7 @@ Most workflows will write their results to a GNOS respository or an AWS S3 bucke
 
 ###What's Next?
 
-In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of different types of workflows.  Over time, the complete set of PanCancer "core" workflows will be available in this launcher.  Each have distinct INI parameters that you need to know how to fill in properly to analyze your data.  See details in the README for each of the project's core workflows, they will provide enough information for you to process your own data using these workflows so you can co-analyze your dat with the larger PanCancer dataset:
+In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of different types of workflows.  Over time, the complete set of PanCancer "core" workflows will be available in this launcher.  Each have distinct INI parameters that you need to know how to fill in properly to analyze your data.  See details in the README for each of the project's core workflows, they will provide enough information for you to process your own data using these workflows so you can co-analyze your data with the larger PanCancer dataset:
 
 <!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
 <!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
@@ -234,6 +248,8 @@ In this guide, we executed a single HelloWorld workflow. Now that you are famili
 
 <!-- TODO: Should we eventually have a tool that lets the use create n INI files? Might not be that hard, will need to investigate... -->
 Your next step, now that you have successfully run one workflow on one VM, could be to create several INI files (you can use `pancancer workflows config --workflow <SOME WORKFLOW NAME>` to create a default INI file and then copy it as many times as you need and edit the copies) and then execute them in a larger fleet.
+
+You can also try running the BWA workflow with your launcher. For more information on this topic, click [here](./run_bwa_tutorial.md).
 
 ###Other useful tips
 

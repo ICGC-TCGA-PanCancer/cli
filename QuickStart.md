@@ -1,12 +1,12 @@
-#Pancancer CLI
+#Pancancer Workflow Launcher & CLI
 
-This quick-start guide will help you get started using the Pancancer CLI tool.
+This quick-start guide will help you get started using the Pancancer CLI tool on Amazon's cloud.  **You are responsible for your cloud expenses for this tutorial, be careful to monitor your usage and terminate VMs when you are finished.**
 
-The Pancancer CLI tool is a command-line interface tool that will allow you to interact with the pancancer components. The Pancancer CLI tool can be used to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMBL) on a fleet of virtual machines in a cloud-computing environment.
+The Pancancer Workflow Launcher and Command Line Tool (CLI) is a system that will allow you to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMBL) on a fleet of virtual machines in a cloud-computing environment.  Currently, these directions focus on Amazon Web Services (AWS) but other environments are supported and will be documented in the future (OpenStack and Azure specifically).
 
 ![Pancancer CLI Diagram - Overview](/images/Pancancer_CLI_system_diagram.png?raw=true "Click for larger view")
 
-The diagram above shows some detail about how the Pancancer CLI tool is used to manage a fleet of VMs executing pancancer workflows. The details of how this is done can be found in the document below.
+The diagram above shows some detail about how the Pancancer Workflow Launcher and CLI tool are used to manage a fleet of VMs executing pancancer workflows. The details of how this is done can be found in the document below.
 
 ##What You Need
 
@@ -22,7 +22,7 @@ Before you get started, there are a few items you will need to have available:
 ### Launch a VM
 Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html). When setting up your instance, be sure to include enough storage space to install docker and download docker images. 40 GB should be enough. The instance type normally used for this is m3.large. The following screen-shots  illustrate how the VM should be configured.
 
-Choosing an AMI (here, AMI ami-d05e75b8 was used)
+Choosing an Ubuntu 14.04 AMI (here, AMI ami-d05e75b8 was used)
 ![choosing an AMI](/images/1_Choose_AMI.png?raw=true "Click for larger view")
 
 Choosing an m3.large instance type
@@ -43,6 +43,8 @@ Make a note of the *name* of the security group that is chosen at this step, you
 <!--- TODO: note about not putting spaces in the security group name  - actually, this does not appear to be an issue. -->
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
+### SSH to VM
+
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
 ![Connect to Instance](/images/AWS_connect_to_VM2.png?raw=true "Click for larger view")
 
@@ -54,9 +56,9 @@ You will now need to set up a few files on your VM.
 chmod 600 ~/.ssh/FillInYourKeyName.pem
 ```
    You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
-  - If you are working with GNOS repositories, you will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`, create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+  - If you are working with GNOS repositories, which you typically only will be if you are involved in core analysis of PanCancer data through the Technical Working Group, you will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`. Create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.  **Most users will want to analyze their own data from S3 and write the results back to S3, in this scenario GNOS is not used and you can ignore this step.**
 
-### Run installer
+### Run Installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
 $ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.7/install_bootstrap && bash install_bootstrap
@@ -89,7 +91,7 @@ If you follow the directions above you will find yourself dropped into the docke
 
 ###Running workflows
 
-The Pancancer Launcher can generate a template INI file for workflows. These INI files are used to set workflow-specific parameters, such as which files to download or upload. To see which workflows are available, you can use the command `pancancer workflows list`:
+The Pancancer Launcher can generate a template INI file for workflows. These INI files are used to set workflow-specific parameters, such as which input files to download or where to upload workflow results. To see which workflows are available, you can use the command `pancancer workflows list`:
 ```
 $ pancancer workflows list
 Available workflows are:
@@ -97,7 +99,7 @@ HelloWorld_1.0-SNAPSHOT
 BWA_2.6.7
 ```
 
-For more information about these workflows and how to configure their INI files, see the workflows' home pages:
+For more information about these workflows and how to configure their INI files, see the workflows' home pages but for now we will walk through using HelloWorld to ensure everything works:
 
 <!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
 <!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
@@ -158,7 +160,9 @@ queues:
 
 As you can see there is one message in the message queue named "pancancer_arch_3_orders". This indicates that the system successfully generated a job order from your INI file in `~/ini-dir`.
 
-The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take several minutes (10 minutes is not unreasonable). There are a few ways that you can monitor progress. You can watch the progress using this command:
+The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take several minutes (10 minutes is not unreasonable) because we setup various infrastructure on these VMs using Ansible.  The process was designed for the PanCancer workflows which can run for *days* or *weeks* so the startup time of the worker VMs has yet to be optimized.
+
+There are a few ways that you can monitor progress. You can watch the progress using this command:
 ```
 $ tail -f provisioner.out
 ```
@@ -212,7 +216,7 @@ When looking at your AWS EC2 console, you will notice that when a workflow finis
 
 <!-- TODO: Add section on failed workflow -->
 
-If a workflow fails, you will see that its status is "FAILED". The VM where the failed workflow ran will *not* be terminated. You will need to log in to this VM using ssh to examine the workflow output to determine why it failed, and troubleshoot the problem.
+If a workflow fails, you will see that its status is "FAILED". The VM where the failed workflow ran will *not* be terminated. You will need to log in to this VM using ssh to examine the workflow output to determine why it failed, and troubleshoot the problem. **You must terminate failed worker nodes yourself, you are responsible for your cloud usage.**
 
 <!-- TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
 Most workflows will write their results to a GNOS respository or an AWS S3 bucket, so you will want to check there for -->
@@ -220,8 +224,13 @@ Most workflows will write their results to a GNOS respository or an AWS S3 bucke
 <!-- TODO: Add section on reporting tool -->
 
 
-###What's next?
-In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of workflows.
+###What's Next?
+
+In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of different types of workflows.  Over time, the complete set of PanCancer "core" workflows will be available in this launcher.  Each have distinct INI parameters that you need to know how to fill in properly to analyze your data.  See details in the README for each of the project's core workflows, they will provide enough information for you to process your own data using these workflows so you can co-analyze your dat with the larger PanCancer dataset:
+
+<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
+<!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
+ - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
 
 <!-- TODO: Should we eventually have a tool that lets the use create n INI files? Might not be that hard, will need to investigate... -->
 Your next step, now that you have successfully run one workflow on one VM, could be to create several INI files (you can use `pancancer workflows config --workflow <SOME WORKFLOW NAME>` to create a default INI file and then copy it as many times as you need and edit the copies) and then execute them in a larger fleet.
@@ -351,3 +360,9 @@ $ Reaper --kill-list kill-list.json
 [2015/10/13 18:06:59] | Killing {i-346db1a6=i-346db1a6},
 [2015/10/13 18:06:59] | Marking instances for death i-346db1a6
 ```
+##Known Issues
+
+1. the script /home/ubuntu/arch3/cli/scripts/workflowlister.py has a URL for BWA's INI file for a ​_released_​ version of the workflow but this will produce a 404 error if it's not updated to: https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/feature/solomon_BWA_use_S3/workflow/config/workflow_s3.ini
+Once there is a released version of BWA 2.6.7 in github, this shouldn't be an issue.
+2. the INI file needs to be modified. Replace ${version} with 2.6.7. I think this normally happens during the release process...
+3. Make sure you put your AWS config file (containing your AWS Key and AWS Secret Key) into .gnos on the launcher host (is this within the host machine or within the launcher docker container?). This is needed so that BWA can talk with S3 for download and upload. This is not pretty but there's no way around it with the current version of Consonance (only `~/.gnos` gets mounted into the running seqware container and aws cli will let you specify an alternate location for the config file but ​_not_​ the credentials file - fortunately, credentials can also go in the config file so `aws s3 cp...` will still work).  The file the workflow looks for is `/home/ubuntu/.gnos/config`

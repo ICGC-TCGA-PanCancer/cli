@@ -29,5 +29,5 @@ class WorkflowLister:
             #Read the pancancer_config.json file if it exists
             with open(pancancer_config_path,'r') as pancancer_config_file:
                 config_data = json.load(pancancer_config_file)
-        response = urllib.urlopen(config_data['WORKFLOW_LISTING_URL'])
+        response = urllib.urlopen(config_data['workflow_listing_url'])
         WorkflowLister._workflows = json.loads(response.read())

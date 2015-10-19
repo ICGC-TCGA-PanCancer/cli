@@ -5,7 +5,7 @@ class WorkflowLister:
 
     @staticmethod
     def get_workflow_names():
-        read_workflow_details()
+        WorkflowLister.read_workflow_details()
         keys = ''
         for k in WorkflowLister._workflows:
             keys += k+'\n'
@@ -13,12 +13,12 @@ class WorkflowLister:
 
     @staticmethod
     def get_workflow_keys():
-        read_workflow_details()
+        WorkflowLister.read_workflow_details()
         return WorkflowLister._workflows.keys()
 
     @staticmethod
     def get_workflow_details(workflow_name):
-        read_workflow_details()
+        WorkflowLister.read_workflow_details()
         return WorkflowLister._workflows[workflow_name]
 
     @staticmethod

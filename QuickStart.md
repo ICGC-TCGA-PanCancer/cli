@@ -360,3 +360,9 @@ $ Reaper --kill-list kill-list.json
 [2015/10/13 18:06:59] | Killing {i-346db1a6=i-346db1a6},
 [2015/10/13 18:06:59] | Marking instances for death i-346db1a6
 ```
+##Known Issues
+
+1. the script /home/ubuntu/arch3/cli/scripts/workflowlister.py has a URL for BWA's INI file for a ​_released_​ version of the workflow but this will produce a 404 error if it's not updated to: https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/feature/solomon_BWA_use_S3/workflow/config/workflow_s3.ini
+Once there is a released version of BWA 2.6.7 in github, this shouldn't be an issue.
+2. the INI file needs to be modified. Replace ${version} with 2.6.7. I think this normally happens during the release process...
+3. Make sure you put your AWS config file (containing your AWS Key and AWS Secret Key) into .gnos on the launcher host. This is needed so that BWA can talk with S3 for download and upload. This is not pretty but there's no way around it with the current version of Consonance (only `~/.gnos` gets mounted into the running seqware container and aws cli will let you specify an alternate location for the config file but ​_not_​ the credentials file - fortunately, credentials can also go in the config file so `aws s3 cp...` will still work).

@@ -59,28 +59,31 @@
           "instance-type":"m1.xlarge",
           "lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"
       },
-     "DKFZ_EMBL_1.0.5":
+     "DKFZ_EMBL_1.0.6":
          {
-             "full_name":"Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1",
+             "full_name":"Workflow_Bundle_DEWrapperWorkflow_1.0.6_SeqWare_1.1.1",
              "http_workflow":
              {
-                 "url":"https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_DEWrapperWorkflow_1.0.5_SeqWare_1.1.1.zip",
-
-                 "version":"1.0.5"
+                 "url":"https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_DEWrapperWorkflow_1.0.6_SeqWare_1.1.1.zip",
+                 "version":"1.0.6"
              },
              "containers":
              {
                  "pcawg-delly-workflow": {
                      "name":"pcawg-delly-workflow",
-                     "image_name": "pancancer/pcawg-delly-workflow:1.0"
+                     "image_name": "pancancer/pcawg-delly-workflow:1.3"
                  },
                  "seqware_whitestar_pancancer": {
                      "name":"seqware_whitestar_pancancer",
-                     "image_name": "pancancer/seqware_whitestar_pancancer:1.1.1"
+                     "image_name": "pancancer/seqware_whitestar_pancancer:1.1.2"
                  },
                  "pancancer_upload_download": {
                      "name":"pancancer_upload_download",
                      "image_name":"pancancer/pancancer_upload_download:1.2"
+                 },
+                 "pcawg-dewrapper-workflow": {
+                     "name":"pcawg-dewrapper-workflow",
+                     "image_name":"pancancer/pcawg-dewrapper-workflow:1.0.6"
                  }
              },
              "s3_containers":
@@ -91,10 +94,10 @@
                      "url":"s3://oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar"
                  }
              },
-             "ami_id":"ami-270cc34c",
-             "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/1.0.6/workflow/config/DEWrapperWorkflow.ini",
-             "instance-type":"m1.xlarge",
-             "lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"
+             "ami_id":"ami-d05e75b8",
+             "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0.ini",
+             "instance-type":"r3.8xlarge",
+             "lvm_devices":"/dev/xvdb,/dev/xvdc"
          },
         "Broad_1.0.0":
             {

@@ -45,6 +45,7 @@ def processYouxiaSettings(d):
 def processParams(d):
     return str(json.dumps(d,sort_keys=True, indent=4) )
 
+# TODO: Add code to ensure that "--openstack" or "--azure" are properly added to deployer/reaper commands
 def processConsonanceSettings(d):
     outstr=''
     for k,v in d.items():

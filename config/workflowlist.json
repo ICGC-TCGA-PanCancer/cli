@@ -34,10 +34,10 @@
                      "image_name": "pancancer/seqware_whitestar_pancancer:1.1.1"
                  }
              },
-             "ami_id":"ami-270cc34c",
+             "ami_id":"ami-f583d190",
              "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore/1.0.8/workflow/config/CgpCnIndelSnvStrWorkflow.ini",
-             "instance-type":"m1.xlarge",
-             "lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"
+             "instance-type":"r3.8xlarge",
+             "lvm_devices":"/dev/xvdb,/dev/xvdc"
          },
     "BWA_2.6.6":
       {

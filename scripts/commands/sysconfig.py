@@ -4,6 +4,7 @@ import cliff.command
 import configparser
 import json
 import process_config
+import shutil
 
 class SysConfig(cliff.command.Command):
     "This command will setup the pancancer system configuration."
@@ -71,6 +72,10 @@ class SysConfig(cliff.command.Command):
                 aws_config['default'] = {'aws_access_key_id':aws_key, 'aws_secret_access_key':aws_secret_key}
                 with open(aws_config_path,'w') as aws_configfile:
                     aws_config.write(aws_configfile,space_around_delimiters=False)
+
+                # Copy the AWS config file to ~/.gnos, because some workflows may need it to access S3 and it's just easier to do this automatically
+                # then to tell the user to do it.
+                shutil.copy2(aws_config_path,os.path.expanduser('~/.gnos/config'))
             else:
                 aws_key = prev_aws_key
                 aws_secret_key = prev_aws_secret_key

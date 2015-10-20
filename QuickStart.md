@@ -1,4 +1,4 @@
-#Pancancer Workflow Launcher & CLI
+#AWS Pancancer Workflow Launcher & CLI
 
 This quick-start guide will help you get started using the Pancancer CLI tool on Amazon's cloud.  **You are responsible for your cloud expenses for this tutorial, be careful to monitor your usage and terminate VMs when you are finished.**
 

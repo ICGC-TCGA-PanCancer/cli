@@ -41,13 +41,13 @@ class WorkflowLister:
 #                         'instance-type':'m1.xlarge',
 #                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
 #                     },
-                    'BWA_2.6.7':
+                    'BWA_2.6.6':
                     {
-                        'full_name':'Workflow_Bundle_BWA_2.6.7_SeqWare_1.1.1',
+                        'full_name':'Workflow_Bundle_BWA_2.6.6_SeqWare_1.1.1',
                         'http_workflow':
                         {
-                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.7_SeqWare_1.1.1.zip',
-                            'version':'2.6.7'
+                            'url':'https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_BWA_2.6.6_SeqWare_1.1.1.zip',
+                            'version':'2.6.6'
                         },
                         'containers':
                         {
@@ -57,7 +57,7 @@ class WorkflowLister:
                             }
                         },
                         'ami_id':'ami-832670e6',
-                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.7/workflow/config/workflow.ini',
+                        'default-ini':'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.6/workflow/config/workflow.ini',
                         'instance-type':'m1.xlarge',
                         'lvm_devices':'/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde'
                     }

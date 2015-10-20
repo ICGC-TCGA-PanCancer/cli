@@ -21,6 +21,39 @@ $ wget -qO install_bootstrap https://raw.githubusercontent.com/ICGC-TCGA-PanCanc
 # QuickStart guide
 The Quick Start guide can be found [here](QuickStart.md).
 
+## Notes for Testing Pre-Release Branches
+
+This feature branch makes changes to the bootstrap script to include:
+
+```
+WORKFLOW_LISTING_URL=${workflow_listing_url}
+```
+
+In the `~/.pancancer/pancancer.config ` file on the host VM.  This is further
+converted to `~/.pancancer/simple_pancancer_config.json` within the launcher.
+These files need to be updated in the launcher container to contain the `workflow_listing_url`
+parameter.
+
+```
+{
+    "aws_key": "*****",
+    "aws_secret_key": "*****",
+    "max_fleet_size": "5",
+    "name_of_key": "my-key",
+    "path_to_key": "/home/ubuntu/.ssh/my-key.pem",
+    "security_group": "launch-wizard-***",
+    "workflow_listing_url": "https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/feature/solomon_workflowlist_from_url/config/workflowlist.json"
+}
+```
+
+You also need to update the `~/arch3/cli` to be whatever branch is currently being used, e.g.:
+
+```
+[LAUNCHER 3.1.7] ubuntu@490276e119cf:~/arch3/cli$ git checkout feature/solomon_workflowlist_from_url
+Branch feature/solomon_workflowlist_from_url set up to track remote branch feature/solomon_workflowlist_from_url from origin.
+Switched to a new branch 'feature/solomon_workflowlist_from_url'
+```
+
 # Launcher PanCancer Command
 
 See the specification at the [CLI](https://wiki.oicr.on.ca/display/PANCANCER/PanCancer+Command+Line) wiki page.

@@ -1,6 +1,10 @@
 #! /bin/bash
 set -e
 PANCANCER_LAUNCHER_VERSION=3.1.7
+PANCANCER_CLI_VERSION=0.0.7
+WORKFLOW_LISTING_URL=https://github.com/ICGC-TCGA-PanCancer/cli/blob/${PANCANCER_CLI_VERSION}/config/workflowlist.json
+
+# TODO: make CLI version string here for URL for workflow info
 cat <<MSG
 PANCANCER COMMAND LINE INTERFACE - INSTALLATION
 -----------------------------------------------
@@ -131,6 +135,18 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
       fi
     done
 
+    user_sec_grp=''
+		while [[ -z "${user_sec_grp// /}" ]] ; do
+			if [ ! -z $SECURITY_GROUP ] ; then
+				read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
+			else
+				read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
+			fi
+			if [[ -z "${user_sec_grp// /}" ]] ; then
+				echo 'Security Group name cannot be blank.'
+			fi
+		done
+
     # Write the AWS config file, so that it will be available when the start_launcher_container script runs.
     [[ -d ~/.aws ]] || mkdir ~/.aws
     cat >~/.aws/config <<AWS_CONFIG
@@ -171,15 +187,15 @@ AWS_CONFIG
 			fi
 		done
 
-    user_sec_grp=''
-		while [[ -z "${user_sec_grp// /}" ]] ; do
-			if [ ! -z $SECURITY_GROUP ] ; then
-				read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
+    workflow_listing_url=''
+		while [[ -z "${workflow_listing_url// /}" ]] ; do
+			if [ ! -z $WORKFLOW_LISTING_URL ] ; then
+				read -ep $'What is the URL that lists available workflows? Default value: \n' -i $WORKFLOW_LISTING_URL workflow_listing_url
 			else
-				read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
+				read -ep $'What is the URL that lists available workflows?\n' workflow_listing_url
 			fi
-			if [[ -z "${user_sec_grp// /}" ]] ; then
-				echo 'Security Group name cannot be blank.'
+			if [[ -z "${workflow_listing_url// /}" ]] ; then
+				echo 'Key name cannot be blank.'
 			fi
 		done
 
@@ -197,6 +213,7 @@ KEY_NAME=${user_key_name}
 FLEET_NAME=${user_fleet_name}
 FLEET_SIZE=${user_fleet_size}
 SECURITY_GROUP=${user_sec_grp}
+WORKFLOW_LISTING_URL=${workflow_listing_url}
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config

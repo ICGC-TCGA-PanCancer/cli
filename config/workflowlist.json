@@ -95,7 +95,7 @@
                  }
              },
              "ami_id":"ami-d05e75b8",
-             "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0.ini",
+             "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0_GNOS.ini",
              "instance-type":"r3.8xlarge",
              "lvm_devices":"/dev/xvdb,/dev/xvdc"
          },

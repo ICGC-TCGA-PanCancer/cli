@@ -41,7 +41,7 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			curl -sSL https://get.docker.com/ | sh &> install_docker.log
 			echo "Done installing docker!"
 			echo "Pulling latest pancancer_launcher image..."
-			sudo docker pull pancancer/pancancer_launcher:latest > pull_image.log
+			sudo docker pull pancancer/pancancer_launcher:latest &> pull_image.log
 			echo "Done pulling pancancer_launcher!"
 
 		else

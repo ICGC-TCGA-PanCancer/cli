@@ -4,7 +4,6 @@ PANCANCER_LAUNCHER_VERSION=3.1.7
 PANCANCER_CLI_VERSION=0.0.7
 WORKFLOW_LISTING_URL=https://github.com/ICGC-TCGA-PanCancer/cli/blob/${PANCANCER_CLI_VERSION}/config/workflowlist.json
 
-# TODO: make CLI version string here for URL for workflow info
 cat <<MSG
 PANCANCER COMMAND LINE INTERFACE - INSTALLATION
 -----------------------------------------------
@@ -66,18 +65,23 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 	# If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
 	if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
 
-		# This question isn't needed for the Aug31 demo
-		# echo "What cloud environment would you like to use (default will be \"AWS\")? [AWS/OPENSTACK]"
-		# read user_cloud_env
-
-		# if [ -z $user_cloud_env ] ; then
-			user_cloud_env=AWS
-		# fi
 
 		#Read the config file if it exists and then show previous values...
 		if [ -f ~/.pancancer/pancancer.config ] ; then
 			source ~/.pancancer/pancancer.config
 		fi
+
+		user_cloud_env=''
+		while [[ -z "${user_cloud_env// /}" ]] ; do
+			if [ ! -z $CLOUD_ENV ] ; then
+				read -ep $'What cloud environment are you working (allowed values are \"AWS\", \"OpenStack\", \"Azure\")? Previous value: \n' -i "$CLOUD_ENV" user_cloud_env
+			else
+				read -ep "What cloud environment are you working (allowed values are \"AWS\", \"OpenStack\", \"Azure\")? \n" user_cloud_env
+			fi
+			if [[ -z "${user_cloud_env// /}" || ( ${user_cloud_env} != 'AWS' && ${user_cloud_env} != 'OpenStack' && ${user_cloud_env} != 'Azure' ) ]] ; then
+				echo 'Cloud environment must be one of \"AWS\", \"OpenStack\", \"Azure\".'
+			fi
+		done
 
 		user_pem_path=''
 		while [[ ! -f $user_pem_path || ! -e $user_pem_path || -z "${user_pem_path// /}" ]] ; do
@@ -91,7 +95,7 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 			if [[ ! -f $user_pem_path && ! -e $user_pem_path ]] ; then
 				echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
 			fi
-	  done
+		done
 
 		user_key_name=''
 		while [[ -z "${user_key_name// /}" ]] ; do
@@ -214,6 +218,7 @@ FLEET_NAME=${user_fleet_name}
 FLEET_SIZE=${user_fleet_size}
 SECURITY_GROUP=${user_sec_grp}
 WORKFLOW_LISTING_URL=${workflow_listing_url}
+CLOUD_ENV=${user_cloud_env}
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config

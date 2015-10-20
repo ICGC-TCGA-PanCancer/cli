@@ -54,7 +54,7 @@
                   "image_name": "pancancer/seqware_whitestar_pancancer:1.1.2"
               }
           },
-          "ami_id":"ami-d85e75b0",
+          "ami_id":"ami-4387d526",
           "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/feature/solomon_BWA_use_S3/workflow/config/workflow_s3.ini",
           "instance-type":"m1.xlarge",
           "lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"

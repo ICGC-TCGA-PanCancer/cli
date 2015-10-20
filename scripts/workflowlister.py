@@ -21,7 +21,6 @@ class WorkflowLister:
     def get_workflow_details(workflow_name):
         WorkflowLister.read_workflow_details()
         return WorkflowLister._workflows[workflow_name]
-
     @staticmethod
     def read_workflow_details():
         pancancer_config_path=os.path.expanduser('~/.pancancer/simple_pancancer_config.json')

@@ -72,7 +72,6 @@ class SysConfig(cliff.command.Command):
                 aws_config['default'] = {'aws_access_key_id':aws_key, 'aws_secret_access_key':aws_secret_key}
                 with open(aws_config_path,'w') as aws_configfile:
                     aws_config.write(aws_configfile,space_around_delimiters=False)
-                
                 # Copy the AWS config file to ~/.gnos, because some workflows may need it to access S3 and it's just easier to do this automatically
                 # then to tell the user to do it.
                 shutil.copy2(aws_config_path,os.path.expanduser('~/.gnos/config'))
@@ -102,13 +101,16 @@ class SysConfig(cliff.command.Command):
                 if 'KEY_NAME' in H:
                     prev_key_name = H['KEY_NAME']
 
+                # pull the workflow URL from the config
+                if 'WORKFLOW_LISTING_URL' in H:
+                    workflow_listing_url = H['WORKFLOW_LISTING_URL']
                 # Fleet size could be defined in the bootstrap config file which should come from the host machine, or it could be defined in the pancancer config file.
-                # If there's nothing in pancancer config, we'll check in the bootstrap config, and if nothing there, default to 1  
+                # If there's nothing in pancancer config, we'll check in the bootstrap config, and if nothing there, default to 1
                 if 'max_fleet_size' in config_data:
                     prev_fleet_size = config_data['max_fleet_size']
                 else:
                     if 'FLEET_SIZE' in H:
-                        prev_fleet_size = H['FLEET_SIZE']                    
+                        prev_fleet_size = H['FLEET_SIZE']
                 if str(prev_fleet_size).strip() == '':
                     prev_fleet_size = 1
                 if force_config:
@@ -149,7 +151,8 @@ class SysConfig(cliff.command.Command):
             # Now, write the simple JSON config that will be used for the rest of pancancer system.
             pancancer_config = { 'max_fleet_size':fleet_size, 'path_to_key': pem_key_path,
                                 'name_of_key':key_name, 'aws_secret_key':aws_secret_key,
-                                'security_group': security_group, 'aws_key':aws_key }
+                                'security_group': security_group, 'aws_key':aws_key,
+                                'workflow_listing_url': workflow_listing_url}
 
             if not os.path.exists(os.path.expanduser('~/.pancancer')):
                 os.makedirs(os.path.expanduser('~/.pancancer'))

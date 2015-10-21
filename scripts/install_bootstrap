@@ -64,8 +64,6 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 	read run_pancancer_launcher
 	# If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
 	if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
-
-
 		#Read the config file if it exists and then show previous values...
 		if [ -f ~/.pancancer/pancancer.config ] ; then
 			source ~/.pancancer/pancancer.config
@@ -109,57 +107,124 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 			fi
 		done
 
-    # load AWS config
-    if [ -f ~/.aws/config ] ; then
-      AWS_KEY=$(grep aws_access_key_id ~/.aws/config | sed 's/\(.*=\)//g')
-      AWS_SECRET_KEY=$(grep aws_secret_access_key ~/.aws/config | sed 's/\(.*=\)//g')
-    fi
+		if [ $user_cloud_env == 'AWS' ] ; then
 
-    user_aws_key=''
-		while [[ -z "${user_aws_key// /}" ]] ; do
-			if [ ! -z $AWS_KEY ] ; then
-				read -ep $'What is your AWS Key? Previous value: \n' -i $AWS_KEY user_aws_key
-			else
-				read -ep $'What is your AWS Key?\n' user_aws_key
+	    	# load AWS config
+	    	if [ -f ~/.aws/config ] ; then
+	    		AWS_KEY=$(grep aws_access_key_id ~/.aws/config | sed 's/\(.*=\)//g')
+	    		AWS_SECRET_KEY=$(grep aws_secret_access_key ~/.aws/config | sed 's/\(.*=\)//g')
 			fi
-			if [[ -z "${user_aws_key// /}" ]] ; then
-				echo 'AWS Key name cannot be blank.'
-			fi
-		done
-
-    user_aws_secret_key=''
-    while [[ -z "${user_aws_secret_key// /}" ]] ; do
-      if [ ! -z $AWS_SECRET_KEY ] ; then
-        read -ep $'What is your AWS Secret Key? Previous value: \n' -i $AWS_SECRET_KEY user_aws_secret_key
-      else
-        read -ep $'What is your AWS Secret Key?\n' user_aws_secret_key
-      fi
-      if [[ -z "${user_aws_secret_key// /}" ]] ; then
-        echo 'AWS Secret Key name cannot be blank.'
-      fi
-    done
-
-    user_sec_grp=''
-		while [[ -z "${user_sec_grp// /}" ]] ; do
-			if [ ! -z $SECURITY_GROUP ] ; then
-				read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
-			else
-				read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
-			fi
-			if [[ -z "${user_sec_grp// /}" ]] ; then
-				echo 'Security Group name cannot be blank.'
-			fi
-		done
-
-    # Write the AWS config file, so that it will be available when the start_launcher_container script runs.
-    [[ -d ~/.aws ]] || mkdir ~/.aws
-    cat >~/.aws/config <<AWS_CONFIG
+	
+	    	user_aws_key=''
+			while [[ -z "${user_aws_key// /}" ]] ; do
+				if [ ! -z $AWS_KEY ] ; then
+					read -ep $'What is your AWS Key? Previous value: \n' -i $AWS_KEY user_aws_key
+				else
+					read -ep $'What is your AWS Key?\n' user_aws_key
+				fi
+				if [[ -z "${user_aws_key// /}" ]] ; then
+					echo 'AWS Key name cannot be blank.'
+				fi
+			done
+	
+	    	user_aws_secret_key=''
+	    	while [[ -z "${user_aws_secret_key// /}" ]] ; do
+	    		if [ ! -z $AWS_SECRET_KEY ] ; then
+	        		read -ep $'What is your AWS Secret Key? Previous value: \n' -i $AWS_SECRET_KEY user_aws_secret_key
+	    		else
+	        		read -ep $'What is your AWS Secret Key?\n' user_aws_secret_key
+	    		fi
+	    		if [[ -z "${user_aws_secret_key// /}" ]] ; then
+	        		echo 'AWS Secret Key name cannot be blank.'
+	    		fi
+	    	done
+	
+	    	user_sec_grp=''
+			while [[ -z "${user_sec_grp// /}" ]] ; do
+				if [ ! -z $SECURITY_GROUP ] ; then
+					read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
+				else
+					read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
+				fi
+				if [[ -z "${user_sec_grp// /}" ]] ; then
+					echo 'Security Group name cannot be blank.'
+				fi
+			done
+	
+	    	# Write the AWS config file, so that it will be available when the start_launcher_container script runs.
+	    	[[ -d ~/.aws ]] || mkdir ~/.aws
+	    	cat >~/.aws/config <<AWS_CONFIG
 [default]
 aws_access_key_id=${user_aws_key}
 aws_secret_access_key=${user_aws_secret_key}
 region=us-east-1
 output=json
 AWS_CONFIG
+		
+		elif [ $user_cloud_env == 'Azure' ] ; then
+	    	user_azure_subscription_id=''
+			while [[ -z "${user_azure_subscription_id// /}" ]] ; do
+				if [ ! -z $AZURE_SUBSCRIPTION ] ; then
+					read -ep $'What is your Azure subscription? Previous value: \n' -i $AZURE_SUBSCRIPTION user_azure_subscription_id
+				else
+					read -ep $'What is your Azure subscription?\n' user_azure_subscription_id
+				fi
+				if [[ -z "${user_azure_subscription_id// /}" ]] ; then
+					echo 'Azure subscription cannot be blank.'
+				fi
+			done
+			
+			user_azure_storage_account_name=''
+			while [[ -z "${user_azure_storage_account_name// /}" ]] ; do
+				if [ ! -z $AZURE_STORAGE_ACCOUNT ] ; then
+					read -ep $'What is your Azure storage account name? Previous value: \n' -i $AZURE_STORAGE_ACCOUNT user_azure_storage_account_name
+				else
+					read -ep $'What is your Azure storage account name?\n' user_azure_storage_account_name
+				fi
+				if [[ -z "${user_azure_storage_account_name// /}" ]] ; then
+					echo 'Azure storage account cannot be blank.'
+				fi
+			done
+
+			user_azure_storage_account_key=''
+			while [[ -z "${user_azure_storage_account_key// /}" ]] ; do
+				if [ ! -z $AZURE_STORAGE_ACCOUNT_KEY ] ; then
+					read -ep $'What is your Azure storage account key? Previous value: \n' -i $AZURE_STORAGE_ACCOUNT_KEY user_azure_storage_account_key
+				else
+					read -ep $'What is your Azure storage account key?\n' user_azure_storage_account_key
+				fi
+				if [[ -z "${user_azure_storage_account_key// /}" ]] ; then
+					echo 'Azure storage account key cannot be blank.'
+				fi
+			done
+
+			user_azure_AD_user=''
+			while [[ -z "${user_azure_AD_user// /}" ]] ; do
+				if [ ! -z $AZURE_AD_USER ] ; then
+					read -ep $'What is your Azure Active Directory user name? Previous value: \n' -i $AZURE_AD_USER user_azure_AD_user
+				else
+					read -ep $'What is your Azure storage account key?\n' user_azure_AD_user
+				fi
+				if [[ -z "${user_azure_AD_user// /}" ]] ; then
+					echo 'Azure Active Directory username cannot be blank.'
+				fi
+			done
+
+			user_azure_AD_passwd=''
+			while [[ -z "${user_azure_AD_passwd// /}" ]] ; do
+				if [ ! -z $AZURE_AD_PASSWD ] ; then
+					read -ep $'What is your Azure Active Directory user name? Previous value: \n' -i $AZURE_AD_PASSWD user_azure_AD_passwd
+				else
+					read -ep $'What is your Azure storage account key?\n' user_azure_AD_passwd
+				fi
+				if [[ -z "${user_azure_AD_passwd// /}" ]] ; then
+					echo 'Azure Active Directory username cannot be blank.'
+				fi
+			done
+
+		elif [ $user_cloud_env == 'OpenStack' ] ; then
+			#TODO: finish
+		fi
 
 		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
 		# read user_pancancer_version
@@ -179,7 +244,7 @@ AWS_CONFIG
 			FLEET_NAME_STR=" -f $user_fleet_name "
 		fi
 
-    user_fleet_size=''
+    	user_fleet_size=''
 		while [[ -z "${user_fleet_size// /}" ]] ; do
 			if [ ! -z $FLEET_SIZE ] ; then
 				read -ep $'What is the maximum number of worker VMs you want to run in your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
@@ -191,7 +256,7 @@ AWS_CONFIG
 			fi
 		done
 
-    workflow_listing_url=''
+    	workflow_listing_url=''
 		while [[ -z "${workflow_listing_url// /}" ]] ; do
 			if [ ! -z $WORKFLOW_LISTING_URL ] ; then
 				read -ep $'What is the URL that lists available workflows? Default value: \n' -i $WORKFLOW_LISTING_URL workflow_listing_url
@@ -205,7 +270,7 @@ AWS_CONFIG
 
 		# now wget the start_launcher_container script and call it with the values from above:
 		$(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
-    chmod u+x start_launcher_container.sh
+    	chmod u+x start_launcher_container.sh
 		CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e $user_cloud_env $FLEET_NAME_STR"
 
 		#Now write a config for this file.

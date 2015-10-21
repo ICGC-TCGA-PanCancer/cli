@@ -35,7 +35,7 @@
                  }
              },
              "ami_id":"ami-f583d190",
-             "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore/1.0.8/workflow/config/CgpCnIndelSnvStrWorkflow.ini",
+             "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore/develop/workflow/config/CgpCnIndelSnvStrWorkflow_1.0.8.ini",
              "instance-type":"r3.8xlarge",
              "lvm_devices":"/dev/xvdb,/dev/xvdc"
          },

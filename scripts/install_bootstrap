@@ -42,12 +42,10 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			sudo apt-get install wget curl
 			echo "Installing docker..."
 			sleep 2
-			# TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
-			curl -sSL https://get.docker.com/ | sh
+			curl -sSL https://get.docker.com/ | sh &> install_docker.log
 			echo "Done installing docker!"
 			echo "Pulling latest pancancer_launcher image..."
-			# TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
-			sudo docker pull pancancer/pancancer_launcher:latest
+			sudo docker pull pancancer/pancancer_launcher:latest &> pull_image.log
 			echo "Done pulling pancancer_launcher!"
 
 		else

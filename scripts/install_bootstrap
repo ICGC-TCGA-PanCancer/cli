@@ -39,6 +39,13 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			done
 		fi
 		if [ "$user_install_docker" = 'Y' ] ; then
+
+			# Remove eXecute permission from /etc/grub.d/30_os-prober because sometimes the docker installer will hang when this hangs. This has happened in OpenStack
+			# and could happen elsewhere.
+			if [ -f /etc/grub.d/30_os-prober ] ; then
+				sudo chmod a-x /etc/grub.d/30_os-prober
+			fi
+
 			sudo apt-get install wget curl
 			echo "Installing docker..."
 			sleep 2

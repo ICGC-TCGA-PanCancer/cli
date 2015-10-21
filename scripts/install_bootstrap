@@ -22,349 +22,349 @@ MSG
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 install_pancancer_launcher=''
 while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launcher^^}" != 'N' ]] ; do
-	echo "DO YOU WISH TO CONTINUE [Y/N]:"
-	read install_pancancer_launcher
-	if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
-		user_install_docker=''
-		set +e
-		DOCKER_PATH="$(which docker)"
-		set -e
-		if [ -z "$DOCKER_PATH" ] ; then
-			user_install_docker='Y'
-		else
-			while [[ "${user_install_docker^^}" != 'Y' &&  "${user_install_docker^^}" != 'N' ]] ; do
-				echo "It looks like docker may already be installed. Would you like to run this step anyway, which may attempt to upgrade docker? [Y/N]"
-				read user_install_docker
-			done
-		fi
-		if [ "$user_install_docker" = 'Y' ] ; then
-			sudo apt-get install wget curl
-			echo "Installing docker..."
-			sleep 2
-			# TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
-			curl -sSL https://get.docker.com/ | sh
-			echo "Done installing docker!"
-			echo "Pulling latest pancancer_launcher image..."
-			# TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
-			sudo docker pull pancancer/pancancer_launcher:latest
-			echo "Done pulling pancancer_launcher!"
+    echo "DO YOU WISH TO CONTINUE [Y/N]:"
+    read install_pancancer_launcher
+    if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
+        user_install_docker=''
+        set +e
+        DOCKER_PATH="$(which docker)"
+        set -e
+        if [ -z "$DOCKER_PATH" ] ; then
+            user_install_docker='Y'
+        else
+            while [[ "${user_install_docker^^}" != 'Y' &&  "${user_install_docker^^}" != 'N' ]] ; do
+                echo "It looks like docker may already be installed. Would you like to run this step anyway, which may attempt to upgrade docker? [Y/N]"
+                read user_install_docker
+            done
+        fi
+        if [ "$user_install_docker" = 'Y' ] ; then
+            sudo apt-get install wget curl
+            echo "Installing docker..."
+            sleep 2
+            # TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
+            curl -sSL https://get.docker.com/ | sh
+            echo "Done installing docker!"
+            echo "Pulling latest pancancer_launcher image..."
+            # TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
+            sudo docker pull pancancer/pancancer_launcher:latest
+            echo "Done pulling pancancer_launcher!"
 
-		else
-			echo "Skipping docker installation..."
-		fi
-	elif [ "${install_pancancer_launcher^^}" = 'N' ] ; then
-		echo "You are exiting the installer now, but you can always run it again when you are ready."
-		exit 0
-	fi
+        else
+            echo "Skipping docker installation..."
+        fi
+    elif [ "${install_pancancer_launcher^^}" = 'N' ] ; then
+        echo "You are exiting the installer now, but you can always run it again when you are ready."
+        exit 0
+    fi
 done
 
 run_pancancer_launcher=''
 while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" != 'N' ]] ; do
-	echo "Would you like to run the pancancer_launcher now? [Y/N]"
-	read run_pancancer_launcher
-	# If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
-	if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
-		#Read the config file if it exists and then show previous values...
-		if [ -f ~/.pancancer/pancancer.config ] ; then
-			source ~/.pancancer/pancancer.config
-		fi
+    echo "Would you like to run the pancancer_launcher now? [Y/N]"
+    read run_pancancer_launcher
+    # If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
+    if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
+        #Read the config file if it exists and then show previous values...
+        if [ -f ~/.pancancer/pancancer.config ] ; then
+            source ~/.pancancer/pancancer.config
+        fi
 
-		user_cloud_env=''
-		while [[ -z "${user_cloud_env// /}" ]] ; do
-			if [ ! -z $CLOUD_ENV ] ; then
-				read -ep $'What cloud environment are you working (allowed values are \"AWS\", \"OpenStack\", \"Azure\")? Previous value: \n' -i "$CLOUD_ENV" user_cloud_env
-			else
-				read -ep "What cloud environment are you working (allowed values are \"AWS\", \"OpenStack\", \"Azure\")? \n" user_cloud_env
-			fi
-			if [[ -z "${user_cloud_env// /}" || ( ${user_cloud_env} != 'AWS' && ${user_cloud_env} != 'OpenStack' && ${user_cloud_env} != 'Azure' ) ]] ; then
-				echo 'Cloud environment must be one of \"AWS\", \"OpenStack\", \"Azure\".'
-			fi
-		done
+        user_cloud_env=''
+        while [[ -z "${user_cloud_env// /}" ]] ; do
+            if [ ! -z $CLOUD_ENV ] ; then
+                read -ep $'What cloud environment are you working (allowed values are \"AWS\", \"OpenStack\", \"Azure\")? Previous value: \n' -i "$CLOUD_ENV" user_cloud_env
+            else
+                read -ep "What cloud environment are you working (allowed values are \"AWS\", \"OpenStack\", \"Azure\")? \n" user_cloud_env
+            fi
+            if [[ -z "${user_cloud_env// /}" || ( ${user_cloud_env} != 'AWS' && ${user_cloud_env} != 'OpenStack' && ${user_cloud_env} != 'Azure' ) ]] ; then
+                echo 'Cloud environment must be one of \"AWS\", \"OpenStack\", \"Azure\".'
+            fi
+        done
 
-		user_pem_path=''
-		while [[ ! -f $user_pem_path || ! -e $user_pem_path || -z "${user_pem_path// /}" ]] ; do
-			if [ ! -z $PEM_PATH ] ; then
-				read -ep $'What is the path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
-				user_pem_path="${user_pem_path/#\~/$HOME}"
-			else
-				read -ep "What is the path to the pem key file you will use to authenticate in this environment?\n" user_pem_path
-				user_pem_path="${user_pem_path/#\~/$HOME}"
-			fi
-			if [[ ! -f $user_pem_path && ! -e $user_pem_path ]] ; then
-				echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
-			fi
-		done
+        user_pem_path=''
+        while [[ ! -f $user_pem_path || ! -e $user_pem_path || -z "${user_pem_path// /}" ]] ; do
+            if [ ! -z $PEM_PATH ] ; then
+                read -ep $'What is the path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
+                user_pem_path="${user_pem_path/#\~/$HOME}"
+            else
+                read -ep "What is the path to the pem key file you will use to authenticate in this environment?\n" user_pem_path
+                user_pem_path="${user_pem_path/#\~/$HOME}"
+            fi
+            if [[ ! -f $user_pem_path && ! -e $user_pem_path ]] ; then
+                echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
+            fi
+        done
 
-		user_key_name=''
-		while [[ -z "${user_key_name// /}" ]] ; do
-			if [ ! -z $KEY_NAME ] ; then
-				read -ep $'What is the name of this key? Previous value: \n' -i $KEY_NAME user_key_name
-			else
-				read -ep $'What is the name of this key?\n' user_key_name
-			fi
-			if [[ -z "${user_key_name// /}" ]] ; then
-				echo 'Key name cannot be blank.'
-			fi
-		done
+        user_key_name=''
+        while [[ -z "${user_key_name// /}" ]] ; do
+            if [ ! -z $KEY_NAME ] ; then
+                read -ep $'What is the name of this key? Previous value: \n' -i $KEY_NAME user_key_name
+            else
+                read -ep $'What is the name of this key?\n' user_key_name
+            fi
+            if [[ -z "${user_key_name// /}" ]] ; then
+                echo 'Key name cannot be blank.'
+            fi
+        done
 
-		if [ $user_cloud_env == 'AWS' ] ; then
-			############################
-	    	# AWS questions
-			############################
-	    	if [ -f ~/.aws/config ] ; then
-	    		AWS_KEY=$(grep aws_access_key_id ~/.aws/config | sed 's/\(.*=\)//g')
-	    		AWS_SECRET_KEY=$(grep aws_secret_access_key ~/.aws/config | sed 's/\(.*=\)//g')
-			fi
-	
-	    	user_aws_key=''
-			while [[ -z "${user_aws_key// /}" ]] ; do
-				if [ ! -z $AWS_KEY ] ; then
-					read -ep $'What is your AWS Key? Previous value: \n' -i $AWS_KEY user_aws_key
-				else
-					read -ep $'What is your AWS Key?\n' user_aws_key
-				fi
-				if [[ -z "${user_aws_key// /}" ]] ; then
-					echo 'AWS Key name cannot be blank.'
-				fi
-			done
-	
-	    	user_aws_secret_key=''
-	    	while [[ -z "${user_aws_secret_key// /}" ]] ; do
-	    		if [ ! -z $AWS_SECRET_KEY ] ; then
-	        		read -ep $'What is your AWS Secret Key? Previous value: \n' -i $AWS_SECRET_KEY user_aws_secret_key
-	    		else
-	        		read -ep $'What is your AWS Secret Key?\n' user_aws_secret_key
-	    		fi
-	    		if [[ -z "${user_aws_secret_key// /}" ]] ; then
-	        		echo 'AWS Secret Key name cannot be blank.'
-	    		fi
-	    	done
-	
-	    	user_sec_grp=''
-			while [[ -z "${user_sec_grp// /}" ]] ; do
-				if [ ! -z $SECURITY_GROUP ] ; then
-					read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
-				else
-					read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
-				fi
-				if [[ -z "${user_sec_grp// /}" ]] ; then
-					echo 'Security Group name cannot be blank.'
-				fi
-			done
-	
-	    	# Write the AWS config file, so that it will be available when the start_launcher_container script runs.
-	    	[[ -d ~/.aws ]] || mkdir ~/.aws
-	    	cat >~/.aws/config <<AWS_CONFIG
+        if [ $user_cloud_env == 'AWS' ] ; then
+            ############################
+            # AWS questions
+            ############################
+            if [ -f ~/.aws/config ] ; then
+                AWS_KEY=$(grep aws_access_key_id ~/.aws/config | sed 's/\(.*=\)//g')
+                AWS_SECRET_KEY=$(grep aws_secret_access_key ~/.aws/config | sed 's/\(.*=\)//g')
+            fi
+    
+            user_aws_key=''
+            while [[ -z "${user_aws_key// /}" ]] ; do
+                if [ ! -z $AWS_KEY ] ; then
+                    read -ep $'What is your AWS Key? Previous value: \n' -i $AWS_KEY user_aws_key
+                else
+                    read -ep $'What is your AWS Key?\n' user_aws_key
+                fi
+                if [[ -z "${user_aws_key// /}" ]] ; then
+                    echo 'AWS Key name cannot be blank.'
+                fi
+            done
+    
+            user_aws_secret_key=''
+            while [[ -z "${user_aws_secret_key// /}" ]] ; do
+                if [ ! -z $AWS_SECRET_KEY ] ; then
+                    read -ep $'What is your AWS Secret Key? Previous value: \n' -i $AWS_SECRET_KEY user_aws_secret_key
+                else
+                    read -ep $'What is your AWS Secret Key?\n' user_aws_secret_key
+                fi
+                if [[ -z "${user_aws_secret_key// /}" ]] ; then
+                    echo 'AWS Secret Key name cannot be blank.'
+                fi
+            done
+    
+            user_sec_grp=''
+            while [[ -z "${user_sec_grp// /}" ]] ; do
+                if [ ! -z $SECURITY_GROUP ] ; then
+                    read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
+                else
+                    read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
+                fi
+                if [[ -z "${user_sec_grp// /}" ]] ; then
+                    echo 'Security Group name cannot be blank.'
+                fi
+            done
+    
+            # Write the AWS config file, so that it will be available when the start_launcher_container script runs.
+            [[ -d ~/.aws ]] || mkdir ~/.aws
+            cat >~/.aws/config <<AWS_CONFIG
 [default]
 aws_access_key_id=${user_aws_key}
 aws_secret_access_key=${user_aws_secret_key}
 region=us-east-1
 output=json
 AWS_CONFIG
-		
-		############################
-		# AZURE QUESTIONS
-		############################
-		elif [ $user_cloud_env == 'Azure' ] ; then
-	    	user_azure_subscription_id=''
-			while [[ -z "${user_azure_subscription_id// /}" ]] ; do
-				if [ ! -z $AZURE_SUBSCRIPTION ] ; then
-					read -ep $'What is your Azure subscription? Previous value: \n' -i $AZURE_SUBSCRIPTION user_azure_subscription_id
-				else
-					read -ep $'What is your Azure subscription?\n' user_azure_subscription_id
-				fi
-				if [[ -z "${user_azure_subscription_id// /}" ]] ; then
-					echo 'Azure subscription cannot be blank.'
-				fi
-			done
-			
-			user_azure_storage_account_name=''
-			while [[ -z "${user_azure_storage_account_name// /}" ]] ; do
-				if [ ! -z $AZURE_STORAGE_ACCOUNT ] ; then
-					read -ep $'What is your Azure storage account name? Previous value: \n' -i $AZURE_STORAGE_ACCOUNT user_azure_storage_account_name
-				else
-					read -ep $'What is your Azure storage account name?\n' user_azure_storage_account_name
-				fi
-				if [[ -z "${user_azure_storage_account_name// /}" ]] ; then
-					echo 'Azure storage account cannot be blank.'
-				fi
-			done
+        
+        ############################
+        # AZURE QUESTIONS
+        ############################
+        elif [ $user_cloud_env == 'Azure' ] ; then
+            user_azure_subscription_id=''
+            while [[ -z "${user_azure_subscription_id// /}" ]] ; do
+                if [ ! -z $AZURE_SUBSCRIPTION ] ; then
+                    read -ep $'What is your Azure subscription? Previous value: \n' -i $AZURE_SUBSCRIPTION user_azure_subscription_id
+                else
+                    read -ep $'What is your Azure subscription?\n' user_azure_subscription_id
+                fi
+                if [[ -z "${user_azure_subscription_id// /}" ]] ; then
+                    echo 'Azure subscription cannot be blank.'
+                fi
+            done
+            
+            user_azure_storage_account_name=''
+            while [[ -z "${user_azure_storage_account_name// /}" ]] ; do
+                if [ ! -z $AZURE_STORAGE_ACCOUNT ] ; then
+                    read -ep $'What is your Azure storage account name? Previous value: \n' -i $AZURE_STORAGE_ACCOUNT user_azure_storage_account_name
+                else
+                    read -ep $'What is your Azure storage account name?\n' user_azure_storage_account_name
+                fi
+                if [[ -z "${user_azure_storage_account_name// /}" ]] ; then
+                    echo 'Azure storage account cannot be blank.'
+                fi
+            done
 
-			user_azure_storage_account_key=''
-			while [[ -z "${user_azure_storage_account_key// /}" ]] ; do
-				if [ ! -z $AZURE_STORAGE_ACCOUNT_KEY ] ; then
-					read -ep $'What is your Azure storage account key? Previous value: \n' -i $AZURE_STORAGE_ACCOUNT_KEY user_azure_storage_account_key
-				else
-					read -ep $'What is your Azure storage account key?\n' user_azure_storage_account_key
-				fi
-				if [[ -z "${user_azure_storage_account_key// /}" ]] ; then
-					echo 'Azure storage account key cannot be blank.'
-				fi
-			done
+            user_azure_storage_account_key=''
+            while [[ -z "${user_azure_storage_account_key// /}" ]] ; do
+                if [ ! -z $AZURE_STORAGE_ACCOUNT_KEY ] ; then
+                    read -ep $'What is your Azure storage account key? Previous value: \n' -i $AZURE_STORAGE_ACCOUNT_KEY user_azure_storage_account_key
+                else
+                    read -ep $'What is your Azure storage account key?\n' user_azure_storage_account_key
+                fi
+                if [[ -z "${user_azure_storage_account_key// /}" ]] ; then
+                    echo 'Azure storage account key cannot be blank.'
+                fi
+            done
 
-			user_azure_AD_user=''
-			while [[ -z "${user_azure_AD_user// /}" ]] ; do
-				if [ ! -z $AZURE_AD_USER ] ; then
-					read -ep $'What is your Azure Active Directory user name? Previous value: \n' -i $AZURE_AD_USER user_azure_AD_user
-				else
-					read -ep $'What is your Azure Active directory user name?\n' user_azure_AD_user
-				fi
-				if [[ -z "${user_azure_AD_user// /}" ]] ; then
-					echo 'Azure Active Directory username cannot be blank.'
-				fi
-			done
+            user_azure_AD_user=''
+            while [[ -z "${user_azure_AD_user// /}" ]] ; do
+                if [ ! -z $AZURE_AD_USER ] ; then
+                    read -ep $'What is your Azure Active Directory user name? Previous value: \n' -i $AZURE_AD_USER user_azure_AD_user
+                else
+                    read -ep $'What is your Azure Active directory user name?\n' user_azure_AD_user
+                fi
+                if [[ -z "${user_azure_AD_user// /}" ]] ; then
+                    echo 'Azure Active Directory username cannot be blank.'
+                fi
+            done
 
-			user_azure_AD_passwd=''
-			while [[ -z "${user_azure_AD_passwd// /}" ]] ; do
-				if [ ! -z $AZURE_AD_PASSWD ] ; then
-					read -ep $'What is your Azure Active Directory password? Previous value: \n' -i $AZURE_AD_PASSWD user_azure_AD_passwd
-				else
-					read -ep $'What is your Azure Active Directory password?\n' user_azure_AD_passwd
-				fi
-				if [[ -z "${user_azure_AD_passwd// /}" ]] ; then
-					echo 'Azure Active Directory username cannot be blank.'
-				fi
-			done
+            user_azure_AD_passwd=''
+            while [[ -z "${user_azure_AD_passwd// /}" ]] ; do
+                if [ ! -z $AZURE_AD_PASSWD ] ; then
+                    read -ep $'What is your Azure Active Directory password? Previous value: \n' -i $AZURE_AD_PASSWD user_azure_AD_passwd
+                else
+                    read -ep $'What is your Azure Active Directory password?\n' user_azure_AD_passwd
+                fi
+                if [[ -z "${user_azure_AD_passwd// /}" ]] ; then
+                    echo 'Azure Active Directory username cannot be blank.'
+                fi
+            done
 
-			user_azure_AD_tentant=''
-			while [[ -z "${user_azure_AD_tentant// /}" ]] ; do
-				if [ ! -z $AZURE_AD_TENTANT ] ; then
-					read -ep $'What is your Azure Active Directory Tentant ID? Previous value: \n' -i $AZURE_AD_TENTANT user_azure_AD_tenant
-				else
-					read -ep $'What is your Azure Active Directory Tentant ID?\n' user_azure_AD_tenant
-				fi
-				if [[ -z "${user_azure_AD_tentant// /}" ]] ; then
-					echo 'Azure Active Directory Tentant ID cannot be blank.'
-				fi
-			done
+            user_azure_AD_tentant=''
+            while [[ -z "${user_azure_AD_tentant// /}" ]] ; do
+                if [ ! -z $AZURE_AD_TENTANT ] ; then
+                    read -ep $'What is your Azure Active Directory Tentant ID? Previous value: \n' -i $AZURE_AD_TENTANT user_azure_AD_tenant
+                else
+                    read -ep $'What is your Azure Active Directory Tentant ID?\n' user_azure_AD_tenant
+                fi
+                if [[ -z "${user_azure_AD_tentant// /}" ]] ; then
+                    echo 'Azure Active Directory Tentant ID cannot be blank.'
+                fi
+            done
 
-			user_azure_AD_client=''
-			while [[ -z "${user_azure_AD_client// /}" ]] ; do
-				if [ ! -z $AZURE_AD_CLIENT ] ; then
-					read -ep $'What is your Azure Active Directory Client ID? Previous value: \n' -i $AZURE_AD_CLIENT user_azure_AD_client
-				else
-					read -ep $'What is your Azure Active Directory Client ID?\n' user_azure_AD_client
-				fi
-				if [[ -z "${user_azure_AD_client// /}" ]] ; then
-					echo 'Azure Active Directory Client ID cannot be blank.'
-				fi
-			done
+            user_azure_AD_client=''
+            while [[ -z "${user_azure_AD_client// /}" ]] ; do
+                if [ ! -z $AZURE_AD_CLIENT ] ; then
+                    read -ep $'What is your Azure Active Directory Client ID? Previous value: \n' -i $AZURE_AD_CLIENT user_azure_AD_client
+                else
+                    read -ep $'What is your Azure Active Directory Client ID?\n' user_azure_AD_client
+                fi
+                if [[ -z "${user_azure_AD_client// /}" ]] ; then
+                    echo 'Azure Active Directory Client ID cannot be blank.'
+                fi
+            done
 
-		elif [ $user_cloud_env == 'OpenStack' ] ; then
-			############################
-	    	# OpenStack questions
-			############################
-			
-			user_os_username=''
-			while [[ -z "${user_os_username// /}" ]] ; do
-				if [ ! -z $OS_USERNAME ] ; then
-					read -ep $'What is your OpenStack username (<tenant>:<username>)? Previous value: \n' -i $OS_USERNAME user_os_username
-				else
-					read -ep $'What is your OpenStack username (<tenant>:<username>)?\n' user_os_username
-				fi
-				if [[ -z "${user_os_username// /}" ]] ; then
-					echo 'OpenStack username cannot be blank.'
-				fi
-			done
+        elif [ $user_cloud_env == 'OpenStack' ] ; then
+            ############################
+            # OpenStack questions
+            ############################
+            
+            user_os_username=''
+            while [[ -z "${user_os_username// /}" ]] ; do
+                if [ ! -z $OS_USERNAME ] ; then
+                    read -ep $'What is your OpenStack username (<tenant>:<username>)? Previous value: \n' -i $OS_USERNAME user_os_username
+                else
+                    read -ep $'What is your OpenStack username (<tenant>:<username>)?\n' user_os_username
+                fi
+                if [[ -z "${user_os_username// /}" ]] ; then
+                    echo 'OpenStack username cannot be blank.'
+                fi
+            done
 
-			user_os_password=''
-			while [[ -z "${user_os_password// /}" ]] ; do
-				if [ ! -z $OS_PASSWORD ] ; then
-					read -ep $'What is your OpenStack password? Previous value: \n' -i $OS_PASSWORD user_os_password
-				else
-					read -ep $'What is your OpenStack password?\n' user_os_password
-				fi
-				if [[ -z "${user_os_password// /}" ]] ; then
-					echo 'OpenStack password cannot be blank.'
-				fi
-			done
-			
-			user_os_endpoint=''
-			while [[ -z "${user_os_endpoint// /}" ]] ; do
-				if [ ! -z $OS_ENDPOINT ] ; then
-					read -ep $'What is your OpenStack API endpoint? Previous value: \n' -i $OS_ENDPOINT user_os_endpoint
-				else
-					read -ep $'What is your OpenStack API endpoint?\n' user_os_endpoint
-				fi
-				if [[ -z "${user_os_endpoint// /}" ]] ; then
-					echo 'OpenStack endpoint cannot be blank.'
-				fi
-			done
+            user_os_password=''
+            while [[ -z "${user_os_password// /}" ]] ; do
+                if [ ! -z $OS_PASSWORD ] ; then
+                    read -ep $'What is your OpenStack password? Previous value: \n' -i $OS_PASSWORD user_os_password
+                else
+                    read -ep $'What is your OpenStack password?\n' user_os_password
+                fi
+                if [[ -z "${user_os_password// /}" ]] ; then
+                    echo 'OpenStack password cannot be blank.'
+                fi
+            done
+            
+            user_os_endpoint=''
+            while [[ -z "${user_os_endpoint// /}" ]] ; do
+                if [ ! -z $OS_ENDPOINT ] ; then
+                    read -ep $'What is your OpenStack API endpoint? Previous value: \n' -i $OS_ENDPOINT user_os_endpoint
+                else
+                    read -ep $'What is your OpenStack API endpoint?\n' user_os_endpoint
+                fi
+                if [[ -z "${user_os_endpoint// /}" ]] ; then
+                    echo 'OpenStack endpoint cannot be blank.'
+                fi
+            done
 
-			
-			user_os_region=''
-			while [[ -z "${user_os_region// /}" ]] ; do
-				if [ ! -z $OS_REGION ] ; then
-					read -ep $'What is your OpenStack region? Previous value: \n' -i $OS_REGION user_os_region
-				else
-					read -ep $'What is your OpenStack region?\n' user_os_region
-				fi
-				if [[ -z "${user_os_region// /}" ]] ; then
-					echo 'OpenStack region cannot be blank.'
-				fi
-			done
-			
-			user_os_zone=''
-			if [ ! -z $OS_ZONE ] ; then
-				read -ep $'What is your OpenStack zone? Previous value: \n' -i $OS_REGION user_os_zone
-			else
-				read -ep $'What is your OpenStack zone?\n' user_os_zone
-			fi
-		else
-			echo "Unrecognized cloud environment: $user_cloud_env, exiting..."
-			exit 1
-		fi
-		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
-		# read user_pancancer_version
-		# They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
-		user_pancancer_version="latest"
+            
+            user_os_region=''
+            while [[ -z "${user_os_region// /}" ]] ; do
+                if [ ! -z $OS_REGION ] ; then
+                    read -ep $'What is your OpenStack region? Previous value: \n' -i $OS_REGION user_os_region
+                else
+                    read -ep $'What is your OpenStack region?\n' user_os_region
+                fi
+                if [[ -z "${user_os_region// /}" ]] ; then
+                    echo 'OpenStack region cannot be blank.'
+                fi
+            done
+            
+            user_os_zone=''
+            if [ ! -z $OS_ZONE ] ; then
+                read -ep $'What is your OpenStack zone? Previous value: \n' -i $OS_REGION user_os_zone
+            else
+                read -ep $'What is your OpenStack zone?\n' user_os_zone
+            fi
+        else
+            echo "Unrecognized cloud environment: $user_cloud_env, exiting..."
+            exit 1
+        fi
+        # echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
+        # read user_pancancer_version
+        # They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
+        user_pancancer_version="latest"
 
-		user_fleet_name=''
-		if [ ! -z $FLEET_NAME ] ; then
-			read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you. Previous value: \n' -i $FLEET_NAME user_fleet_name
-		else
-			read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you.\n' user_fleet_name
-		fi
+        user_fleet_name=''
+        if [ ! -z $FLEET_NAME ] ; then
+            read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you. Previous value: \n' -i $FLEET_NAME user_fleet_name
+        else
+            read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you.\n' user_fleet_name
+        fi
 
-		FLEET_NAME_STR=''
+        FLEET_NAME_STR=''
 
-		if [ ! -z $user_fleet_name ] ; then
-			FLEET_NAME_STR=" -f $user_fleet_name "
-		fi
+        if [ ! -z $user_fleet_name ] ; then
+            FLEET_NAME_STR=" -f $user_fleet_name "
+        fi
 
-    	user_fleet_size=''
-		while [[ -z "${user_fleet_size// /}" ]] ; do
-			if [ ! -z $FLEET_SIZE ] ; then
-				read -ep $'What is the maximum number of worker VMs you want to run in your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
-			else
-				read -ep $'What is the maximum number of worker VMs you want to run in your fleet?\n' user_fleet_size
-			fi
-			if [[ -z "${user_fleet_size// /}" ]] ; then
-				echo 'Key name cannot be blank.'
-			fi
-		done
+        user_fleet_size=''
+        while [[ -z "${user_fleet_size// /}" ]] ; do
+            if [ ! -z $FLEET_SIZE ] ; then
+                read -ep $'What is the maximum number of worker VMs you want to run in your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
+            else
+                read -ep $'What is the maximum number of worker VMs you want to run in your fleet?\n' user_fleet_size
+            fi
+            if [[ -z "${user_fleet_size// /}" ]] ; then
+                echo 'Key name cannot be blank.'
+            fi
+        done
 
-    	workflow_listing_url=''
-		while [[ -z "${workflow_listing_url// /}" ]] ; do
-			if [ ! -z $WORKFLOW_LISTING_URL ] ; then
-				read -ep $'What is the URL that lists available workflows? Default value: \n' -i $WORKFLOW_LISTING_URL workflow_listing_url
-			else
-				read -ep $'What is the URL that lists available workflows?\n' workflow_listing_url
-			fi
-			if [[ -z "${workflow_listing_url// /}" ]] ; then
-				echo 'Key name cannot be blank.'
-			fi
-		done
+        workflow_listing_url=''
+        while [[ -z "${workflow_listing_url// /}" ]] ; do
+            if [ ! -z $WORKFLOW_LISTING_URL ] ; then
+                read -ep $'What is the URL that lists available workflows? Default value: \n' -i $WORKFLOW_LISTING_URL workflow_listing_url
+            else
+                read -ep $'What is the URL that lists available workflows?\n' workflow_listing_url
+            fi
+            if [[ -z "${workflow_listing_url// /}" ]] ; then
+                echo 'Key name cannot be blank.'
+            fi
+        done
 
-		# now wget the start_launcher_container script and call it with the values from above:
-		$(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
-    	chmod u+x start_launcher_container.sh
-		CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e $user_cloud_env $FLEET_NAME_STR"
+        # now wget the start_launcher_container script and call it with the values from above:
+        $(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
+        chmod u+x start_launcher_container.sh
+        CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e $user_cloud_env $FLEET_NAME_STR"
 
-		#Now write a config for this file.
-		[[ -d ~/.pancancer ]] || mkdir ~/.pancancer
+        #Now write a config for this file.
+        [[ -d ~/.pancancer ]] || mkdir ~/.pancancer
 
-		cat >~/.pancancer/pancancer.config <<CONFIG
+        cat >~/.pancancer/pancancer.config <<CONFIG
 PEM_PATH=${user_pem_path}
 KEY_NAME=${user_key_name}
 FLEET_NAME=${user_fleet_name}
@@ -391,12 +391,12 @@ OS_ZONE=${user_os_zone}
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config
-		echo $CMD_STR > start_launcher_container.cmd
-		$(echo -e $CMD_STR)
-	elif [ "${run_pancancer_launcher^^}" = 'N' ] ; then
-		echo "You can run this script at another time to run the pancancer launcher"
-		exit 0
-	fi
+        echo $CMD_STR > start_launcher_container.cmd
+        $(echo -e $CMD_STR)
+    elif [ "${run_pancancer_launcher^^}" = 'N' ] ; then
+        echo "You can run this script at another time to run the pancancer launcher"
+        exit 0
+    fi
 done
 echo "Exiting now."
 set +e

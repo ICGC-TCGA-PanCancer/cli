@@ -38,14 +38,13 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
             done
         fi
         if [ "$user_install_docker" = 'Y' ] ; then
-            sudo apt-get install wget curl
             echo "Installing docker..."
             sleep 2
-            # TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
-            curl -sSL https://get.docker.com/ | sh
+            # Make sure curl and wget are available.
+            sudo apt-get install wget curl --yes && curl -sSL https://get.docker.com/ | sh
             echo "Done installing docker!"
             echo "Pulling latest pancancer_launcher image..."
-            # TODO: dump the output of this to a log file, but keep if off the console (for less visual clutter).
+            
             sudo docker pull pancancer/pancancer_launcher:latest
             echo "Done pulling pancancer_launcher!"
 
@@ -166,6 +165,9 @@ AWS_CONFIG
         # AZURE QUESTIONS
         ############################
         elif [ $user_cloud_env == 'Azure' ] ; then
+        	
+        	# TODO: SO MUCH REFACTORING FOR ALL OF THESE QUESTIONS!!! Make a function or something.
+        	
             user_azure_subscription_id=''
             while [[ -z "${user_azure_subscription_id// /}" ]] ; do
                 if [ ! -z $AZURE_SUBSCRIPTION ] ; then
@@ -319,6 +321,7 @@ AWS_CONFIG
         # They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
         user_pancancer_version="latest"
 
+		#TODO: For Azure, fleet names MUST be all lower-case because the fleet name also gets used for the storage account (which apparantly can only contain lowercase letters and numbers - no punctuation!) 
         user_fleet_name=''
         if [ ! -z $FLEET_NAME ] ; then
             read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you. Previous value: \n' -i $FLEET_NAME user_fleet_name

@@ -23,8 +23,8 @@ class PancancerApp(cliff.app.App):
             command_manager=commandMgr,
         )
         commands = {
-            'workflows': Workflows,
-            'generator': Generator,
+            'ini-gen': Workflows,
+            'run-workers': Generator,
             'reports': Reports,
             'provisioner': Provisioner,
             'coordinator': Coordinator,

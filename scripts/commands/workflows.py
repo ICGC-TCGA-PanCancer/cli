@@ -7,7 +7,7 @@ import os
 import datetime
 
 class Workflows(cliff.command.Command):
-    "This command  can help you configure and select workflows."
+    "This command will create INI files that will be used by running workflows."
     log = logging.getLogger(__name__)
 
     def get_parser(self, prog_name):

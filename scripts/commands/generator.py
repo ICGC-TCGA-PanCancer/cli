@@ -10,7 +10,7 @@ import os
 
 
 class Generator(cliff.command.Command):
-    "This Generator will generate new job orders based on the contents of ~/ini-dir. Be aware that it will also rewrite your params.json file and your ~.youxia/config file."
+    "Begin the process of starting new workers."
     log = logging.getLogger(__name__)
     def get_parser(self,prog_name):
         parser = super(Generator,self).get_parser(prog_name)

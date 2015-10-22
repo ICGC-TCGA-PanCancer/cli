@@ -21,10 +21,6 @@ class Workflows(cliff.command.Command):
         parser.add_argument('--no-INI-backup', dest='backup_old_INIs', help='Do NOT back up INI files to ~/ini-backups', required=False, action='store_false')
         return parser
 
-#     def _do_list(self):
-#         workflow_list = workflowlister.WorkflowLister.get_workflow_names()
-#         self.log.info ('Available workflows are:')
-#         self.log.info(workflow_list)
 
     def _do_config(self, workflow_name, num_INIs, backup_old_INIs):
         backup_dir=os.path.expanduser('~/ini-backups')

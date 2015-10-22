@@ -14,7 +14,7 @@ class Generator(cliff.command.Command):
     log = logging.getLogger(__name__)
     def get_parser(self,prog_name):
         parser = super(Generator,self).get_parser(prog_name)
-        parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.',required=True)
+        #parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.',required=True)
         parser.add_argument('--force',dest='force_generate',help='Force the generation of the jobs, even if the system detects that the job has already been generated once before.', required=False, action='store_true')
         parser.add_argument('--keep_failed',dest='keep_failed',help='Keep failed workers in the fleet. Useful for debugging workflows.', required=False, action='store_true')
         #parser.add_argument('--no_config_update',dest='no_config_update',help='Do not update any configuration files.', required=False, action='store_true')
@@ -23,7 +23,7 @@ class Generator(cliff.command.Command):
         return parser
 
     def take_action(self, parsed_args):
-        workflow_name=vars(parsed_args)['workflow_name']
+        workflow_name='BWA_2.6.6'
         force_generate=vars(parsed_args)['force_generate']
         keep_failed=vars(parsed_args)['keep_failed']
         self.log.debug('workflow_name: %s',workflow_name)

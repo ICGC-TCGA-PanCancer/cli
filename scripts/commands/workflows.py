@@ -12,7 +12,6 @@ class Workflows(cliff.command.Command):
 
     def get_parser(self, prog_name):
         parser = super(Workflows, self).get_parser(prog_name)
-        # parser.add_mutually_exclusive_group()
         #workflows_subparser = parser.add_subparsers(title='subcommands', help='workflows subcommands: list and config', dest='subparser_name')
         #workflows_subparser.add_parser('list', help='Get a list of workflows')
         #config_parser = workflows_subparser.add_parser('config', help='Generate a default config file for a specific workflow')
@@ -53,8 +52,6 @@ class Workflows(cliff.command.Command):
                 
 
     def take_action(self, parsed_args):
-        subparser_name = vars(parsed_args)['subparser_name']
-        self.log.debug('subparser: %s', subparser_name)
         #Workflow name must always be BWA_2.6.6 for Stouffville (L4A - Launcher For Amazon)
         workflow_name = 'BWA_2.6.6'
         num_INIs = vars(parsed_args)['num_INI']

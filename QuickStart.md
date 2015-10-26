@@ -62,7 +62,7 @@ chmod 600 ~/.ssh/FillInYourKeyName.pem
 ### Run Installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
-$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.7/install_bootstrap && bash install_bootstrap
+$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/L4A/install_bootstrap && bash install_bootstrap
 ```
 This script will install docker (you can skip this step by answering "N" if you already have docker installed), the pancancer_launcher image, and collect some basic configuration info to get the launcher started. 
 
@@ -96,17 +96,21 @@ The most basic INI file for BWA will look like this:
 
 ```
 useGNOS=false
-output_file_url=s3://bwa.test.download/results/<MY RESULTS BUCKET>/
 input_reference=${workflow_bundle_dir}/Workflow_Bundle_BWA/2.6.6/data/reference/bwa-0.6.2/genome.fa.gz
-input_bam_paths=4fb18a5a-9504-11e3-8d90-d1f1d69ccc24/hg19.chr22.5x.normal2.bam,9c414428-9446-11e3-86c1-ab5c73f0e08b/hg19.chr22.5x.normal.bam
+
+# Comma-separated list of S3 URLs to directories of BAMs. Leave unchanged to use test data.
 input_file_urls=s3://bwa.test.download/4fb18a5a-9504-11e3-8d90-d1f1d69ccc24,s3://bwa.test.download/9c414428-9446-11e3-86c1-ab5c73f0e08b
+# Comma-separated list of BAM files. Leave unchanged to use test data.
+input_bam_paths=4fb18a5a-9504-11e3-8d90-d1f1d69ccc24/hg19.chr22.5x.normal2.bam,9c414428-9446-11e3-86c1-ab5c73f0e08b/hg19.chr22.5x.normal.bam
+# S3 URL to output directory or bucket. YOU NEED TO CONFIGURE THIS!
+output_file_url=s3://bwa.test.download/results/<MY RESULTS BUCKET>/
 ```
 
 Here is a summary of these configuration settings that you should configure:
 
- - **output_file_url:** This is the URL to where you want your results to be uploaded to, in S3. You should choose an S3 bucket that you have write-permission on. When the workflow finishes executing, check this bucket to see the uploaded results.
- - **input_bam_paths:** This is a comma-separated list of paths to bam files.
  - **input_file_urls:** This is a comma-separated list of URLs in S3 that refer to directories (not files) in buckets to download. The workflow will download the bucket and save it in a directory with the same name as the buck in the URL. For example, specifying the *directory* `s3://bwa.test.download/4fb18a5a-9504-11e3-8d90-d1f1d69ccc24` will cause the workflow to create its own directory named `4fb18a5a-9504-11e3-8d90-d1f1d69ccc24`, with the contents of the S3 directory. 
+ - **input_bam_paths:** This is a comma-separated list of relative paths to bam files. These BAMs in this list should be in the same order as they were in for `input_file_urls`.
+ - **output_file_url:** This is the URL to where you want your results to be uploaded to, in S3. You should choose an S3 bucket that you have write-permission on. When the workflow finishes executing, check this bucket to see the uploaded results.
 
 For more information about the BWA INI files, you can read about them [here](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow).  
 

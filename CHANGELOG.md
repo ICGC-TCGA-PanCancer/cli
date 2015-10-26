@@ -1,5 +1,9 @@
 # Changes
 
+## L4A_1.0.0-rc.0
+ - Restrict CLI to only work with BWA on AWS ("L4A" ==> "Launcher for Amazon"). This involved simplifying or changing a number of commands. Documentation has also been updated.
+ - New version of consonance: 1.1-rc.1
+
 ## 0.0.7
  - Minor documentation updates
  - Added new "--keep_failed" option for generator to prevent failed workers from being reaped (useful for debugging)

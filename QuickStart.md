@@ -56,8 +56,9 @@ You will now need to set up a few files on your VM.
 chmod 600 ~/.ssh/FillInYourKeyName.pem
 ```
    You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+<!--
   - If you are working with GNOS repositories, which you typically only will be if you are involved in core analysis of PanCancer data through the Technical Working Group, you will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`. Create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.  **Most users will want to analyze their own data from S3 and write the results back to S3, in this scenario GNOS is not used and you can ignore this step.**
-
+-->
 ### Run Installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
@@ -70,7 +71,7 @@ This installer script will ask you some questions about how to get started. It w
  - The *name* of your AWS key. This is *usually* the same as the name of the key file you download from AWS. For example, an AWS key with the name "MyKey" is normally downloaded and saved as the file "MyKey.pem".
  - Your AWS Key and AWS Secret Key. If you do not know these, [this document](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) might be able to help you.
  - The name that you would like to give to your fleet. This will make it easier to find your VMs in the AWS EC2 Management Console. If you do not specify a fleet name, a randomly generated name will be used.
- - The number of VMs you want to have in your fleet (you will be able to change this later, if you want).
+ - The _maximum_ number of VMs you want to have in your fleet (you will be able to change this later, if you want).
  - The name of the security group for your fleet. It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. This _must_ be the same as the security group that the launcher is in.
 
 If for some reason you need to exit this script, you can re-run it simply by executing this command:
@@ -82,44 +83,47 @@ bash install_bootstrap
 
 ##Inside the Pancancer Launcher.
 
-<!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console.  can wait... done? needs test -->
-
 If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, and possibly the version number, will be different):
 
-    [LAUNCHER 3.1.6] ubuntu@f27e86874dfb:~/arch3$
+    [LAUNCHER L4A] ubuntu@f27e86874dfb:~/arch3$
 
 
 ###Running workflows
 
-The Pancancer Launcher can generate a template INI file for workflows. These INI files are used to set workflow-specific parameters, such as which input files to download or where to upload workflow results. To see which workflows are available, you can use the command `pancancer workflows list`:
+This Pancancer Launcher can run the BWA workflows on VMs in AWS. To run the workflow, you need an INI file. The INI file contains all of the configuration details about what you want to happen for a specific run of a workflow, such as the names and URLs for input and output files. 
+
+The most basic INI file for BWA will look like this:
+
 ```
-$ pancancer workflows list
-Available workflows are:
-HelloWorld_1.0-SNAPSHOT
-BWA_2.6.7
+useGNOS=false
+output_file_url=s3://bwa.test.download/results/<MY RESULTS BUCKET>/
+input_reference=${workflow_bundle_dir}/Workflow_Bundle_BWA/2.6.6/data/reference/bwa-0.6.2/genome.fa.gz
+input_bam_paths=4fb18a5a-9504-11e3-8d90-d1f1d69ccc24/hg19.chr22.5x.normal2.bam,9c414428-9446-11e3-86c1-ab5c73f0e08b/hg19.chr22.5x.normal.bam
+input_file_urls=s3://bwa.test.download/4fb18a5a-9504-11e3-8d90-d1f1d69ccc24,s3://bwa.test.download/9c414428-9446-11e3-86c1-ab5c73f0e08b
 ```
 
-For more information about these workflows and how to configure their INI files, see the workflows' home pages but for now we will walk through using HelloWorld to ensure everything works:
+Here is a summary of these configuration settings that you should configure:
 
-<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
-<!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
- - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
- - HelloWorld - This is a very simple workflow that does not read or write any data, but it is good to use when testing basic setup and infrastructure.
+ - **output_file_url:** This is the URL to where you want your results to be uploaded to, in S3. You should choose an S3 bucket that you have write-permission on. When the workflow finishes executing, check this bucket to see the uploaded results.
+ - **input_bam_paths:** This is a comma-separated list of paths to bam files.
+ - **input_file_urls:** This is a comma-separated list of URLs in S3 that refer to directories (not files) in buckets to download. The workflow will download the bucket and save it in a directory with the same name as the buck in the URL. For example, specifying the *directory* `s3://bwa.test.download/4fb18a5a-9504-11e3-8d90-d1f1d69ccc24` will cause the workflow to create its own directory named `4fb18a5a-9504-11e3-8d90-d1f1d69ccc24`, with the contents of the S3 directory. 
+
+For more information about the BWA INI files, you can read about them [here](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow).  
+
+**NOTE:** You can use the default values for `input_file_urls` and `input_bam_paths` as shown above, if you want to run the workflow with existing test data.
 
 ####Generating an INI file
 To generate an INI file:
 
 ```
-$ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT
+$ pancancer ini-gen
 ```
 
-A new HelloWorld-specific INI file should be generated in `~/ini-dir`. 
-The generated file has *default* values only. You _will_ need to edit these INI files with your own specific values. For example, for BWA, you will need to specify the upload and download URLs for your BAM files. Other workflows will have other edits that are necessary for the workflow to run correctly.
-
-<!-- TODO: Add links to workflows (done!) with details about the INI files (not yet) -->
+A new INI file will be generated in `~/ini-dir`.  
 
 **You will want to edit this file before generating job requests. Please make any workflow-specific changes now, before continuing.**
 
+<!--
 If you would like to generate a batch of INI files, you can do it like this:
 
 ```
@@ -135,50 +139,51 @@ $ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --no-INI-backup
 ```
 
 Doing this will leave all of the old INI files in `~/ini-dir`.
+-->
 
-####Generating a work order
-A work order is contains information about what work needs to be done, and what kind of VM needs to be provisioned for it.
+####Running the worker
+To begin the process of provisioning a worker VM that will run your workflow, run this command:
 
-To generate work order for a workflow:
 ```
-$ pancancer generator --workflow HelloWorld_1.0-SNAPSHOT
+$ pancancer run-workers
 ```
-<!-- TODO: auto-backup old INI files? can wait... Done, needs test -->
 
-The job generator will attempt to generate one job for *each and every* INI file in `~/ini-dir`. It is important to ensure that this directory *only* contains INI files for jobs you wish to run, *and* that you have made any necessary edits to them. 
+This command will cause the the Pancancer Launcher to being the process of provisioning one VM for every INI file that is in `~/ini-dir` - _up to the limit you specified when you started the launcher._
 
-<!-- TODO: need better notes on contents of ini-dir, need to move ini out of here once submitted. or not? hash check should prevent duplicates... -->
-
+<!--
 You can verify that your job request has been enqueued with this command:
 ```
 $ pancancer status queues
 ```
 
-You should see that some queues have a message in them.
+You should see that some queues have a message in them, specifically, the pancancer_arch_3_jobs queue
 ```
 queues:
 +-------+-------------------------+---------------------+----------+
 | vhost |          name           |        node         | messages |
 +-------+-------------------------+---------------------+----------+
 | /     | aliveness-test          | rabbit@23aba91e1eaf | 0        |
-| /     | pancancer_arch_3_orders | rabbit@23aba91e1eaf | 1        |
+| /     | pancancer_arch_3_jobs   | rabbit@23aba91e1eaf | 1        |
 +-------+-------------------------+---------------------+----------+
 ```
 
 As you can see there is one message in the message queue named "pancancer_arch_3_orders". This indicates that the system successfully generated a job order from your INI file in `~/ini-dir`.
+-->
 
 The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take several minutes (10 minutes is not unreasonable) because we setup various infrastructure on these VMs using Ansible.  The process was designed for the PanCancer workflows which can run for *days* or *weeks* so the startup time of the worker VMs has yet to be optimized.
 
+####Monitoring Progress
+
 There are a few ways that you can monitor progress. You can watch the progress using this command:
 ```
-$ tail -f provisioner.out
+$ tail -f ~/arch3/logs/provisioner.out
 ```
 Type <kbd>Ctrl</kbd>-<kbd>C</kbd> to terminate `tail`.
 
 You can also monitor progress from the AWS EC2 console. Look for the new instance that is starting up, named `instance_managed_by_<YOUR_FLEET_NAME>`:
 
 
-Once provisioning is complete, you should see output that looks similar to this (the exact numbers for "ok" and "changed" may vary, but everything is OK as long as "unreachable" and "failed" are 0) in the `provision.out` file:
+Once provisioning is complete, you should see output in `~/arch3/logs/provisioner.out` that looks similar to this (the exact numbers for "ok" and "changed" may vary, but everything is OK as long as "unreachable" and "failed" are 0) in the `provision.out` file:
 
 <pre>
 PLAY RECAP ********************************************************************
@@ -193,7 +198,7 @@ At this point, the job should begin executing on the new VM. You can check the s
 $ pancancer status jobs
  status  | job_id |               job_uuid               |  workflow  |      create_timestamp      |      update_timestamp
 ---------+--------+--------------------------------------+------------+----------------------------+----------------------------
- PENDING |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | HelloWorld | 2015-09-02 19:45:26.023313 | 2015-09-02 19:45:26.023313
+ RUNNING |      1 | a3a4da7b-2136-4431-a117-e903590c05d8 | BWA_2.6.6  | 2015-09-02 19:45:26.023313 | 2015-09-02 19:45:26.023313
 ```
 
 When the job has completed successfully, you should see a status result that looks like this:
@@ -215,11 +220,11 @@ Job results (stderr) have been written to /home/ubuntu/arch3/job_1.stderr
 ```
 Worker VMs report the stdout and stderr from seqware back to your launcher's database. The command above can extract this data and write it to a text file to make it easier to use, if you are interested in seeing the details of the workflow's execution.
 
-The HelloWorld workflow does not do much - it does not read or write data anywhere. It is useful to test your setup and configuration is correct.
-
 At this point, you have successfully installed the Pancancer Launcher, and used it to schedule and execute a workflow!
 
-When looking at your AWS EC2 console, you will notice that when a workflow finishes successfully, the VM it was running on will have been automatically terminated. This is done to save on computing resources. The pancancer workflows write their data to GNOS repositories (AWS S3 support will be coming) before their VM is terminated. The VM that is serving as your launcher will *not* be terminated until you choose to do so.
+When looking at your AWS EC2 console, you will notice that when a workflow finishes successfully, the VM it was running on will have been automatically terminated. This is done to save on computing resources. The pancancer workflows write their data to a repository before their VM is terminated. The VM that is serving as your launcher will *not* be terminated until you choose to do so.
+
+You can now verify that your workflow results have been uploaded to the URL that you put in your INI file for `output_file_url`.  
 
 <!-- TODO: Add section on failed workflow -->
 

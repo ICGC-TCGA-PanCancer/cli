@@ -40,7 +40,7 @@ Setting tags on your instance. Here, you can set the instance name that your VM 
 Configuring security groups for your instance. You can use an existing group, or let AWS create a new one. *Notice that the rules have been set to allow ssh access from the source "My IP".* It is **very** important to restrict traffic to your VMs to *only* the machines that *need* access. **Avoid** using the "Anywhere" source. If you need to allow access from an IP address that is not "My IP", you can use a Custom IP source.
 
 Make a note of the *name* of the security group that is chosen at this step, you will need it later.
-<!--- TODO: note about not putting spaces in the security group name  - actually, this does not appear to be an issue. -->
+
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
 ### SSH to VM
@@ -56,9 +56,7 @@ You will now need to set up a few files on your VM.
 chmod 600 ~/.ssh/FillInYourKeyName.pem
 ```
    You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
-<!--
-  - If you are working with GNOS repositories, which you typically only will be if you are involved in core analysis of PanCancer data through the Technical Working Group, you will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`. Create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.  **Most users will want to analyze their own data from S3 and write the results back to S3, in this scenario GNOS is not used and you can ignore this step.**
--->
+
 ### Run Installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
@@ -127,23 +125,6 @@ A new INI file will be generated in `~/ini-dir`.
 
 **You will want to edit this file before generating job requests. Please make any workflow-specific changes now, before continuing.**
 
-<!--
-If you would like to generate a batch of INI files, you can do it like this:
-
-```
-$ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --num-INI 3
-```
-
-And 3 INI files will be created, though you will need to edit them to ensure that they are not identical. The Pancancer Launcher will try to prevent you from generating job requests that reference the same INI file contents, as that is considered running the same job multiple times.
-
-By default, INI files will be moved to a backup-location (`~/ini-backups`) every time you run `pancancer workflows config`, though if you want to turn this behaviour off, you can do so like this:
-
-```
-$ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --no-INI-backup
-```
-
-Doing this will leave all of the old INI files in `~/ini-dir`.
--->
 
 ####Running the worker
 To begin the process of provisioning a worker VM that will run your workflow, run this command:
@@ -154,25 +135,7 @@ $ pancancer run-workers
 
 This command will cause the the Pancancer Launcher to being the process of provisioning one VM for every INI file that is in `~/ini-dir` - _up to the limit you specified when you started the launcher._
 
-<!--
-You can verify that your job request has been enqueued with this command:
-```
-$ pancancer status queues
-```
 
-You should see that some queues have a message in them, specifically, the pancancer_arch_3_jobs queue
-```
-queues:
-+-------+-------------------------+---------------------+----------+
-| vhost |          name           |        node         | messages |
-+-------+-------------------------+---------------------+----------+
-| /     | aliveness-test          | rabbit@23aba91e1eaf | 0        |
-| /     | pancancer_arch_3_jobs   | rabbit@23aba91e1eaf | 1        |
-+-------+-------------------------+---------------------+----------+
-```
-
-As you can see there is one message in the message queue named "pancancer_arch_3_orders". This indicates that the system successfully generated a job order from your INI file in `~/ini-dir`.
--->
 
 The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take several minutes (10 minutes is not unreasonable) because we setup various infrastructure on these VMs using Ansible.  The process was designed for the PanCancer workflows which can run for *days* or *weeks* so the startup time of the worker VMs has yet to be optimized.
 
@@ -230,8 +193,6 @@ When looking at your AWS EC2 console, you will notice that when a workflow finis
 
 You can now verify that your workflow results have been uploaded to the URL that you put in your INI file for `output_file_url`.  
 
-<!-- TODO: Add section on failed workflow -->
-
 If a workflow fails, you will see that its status is "FAILED". To see the output from the VM, you can use the `pancancer status job_results` command like this:
 
 ```
@@ -239,26 +200,14 @@ $ pancancer status job_results --job_id <THE JOB_ID OF THE JOB THAT FAILED> --ty
 ```
 This will write data to a file containing the standard output that SeqWare captured while running the workflow. You can also get the standard error messages by running the above command with `stderr` instead of `stdout`. 
 
-If you this is not enough information to properly debug the failure, you can try using the [`--keep_failed` option when running the generator command, as explained in the Troubleshooting section](#My Worker VMs fail and get shut down, but I want them to stay up and running so I can debug problems.).
-
-<!-- TODO: Fill in more detail here. currently, the user will have to know to configure the INI for where output goes, but maybe if we just have links to all workflow main pages, we can just reference the section that details where output goes...?
-Most workflows will write their results to a GNOS respository or an AWS S3 bucket, so you will want to check there for -->
-
-<!-- TODO: Add section on reporting tool -->
+If you this is not enough information to properly debug the failure, you can try using the [`--keep_failed` option when running the `pancancer run-workers` command, as explained in the Troubleshooting section](#My Worker VMs fail and get shut down, but I want them to stay up and running so I can debug problems.).
 
 
 ###What's Next?
 
-In this guide, we executed a single HelloWorld workflow. Now that you are familiar with some of the capabilities of the Pancancer Launcher, you can understand how it can be used to schedule and execute larger groups of different types of workflows.  Over time, the complete set of PanCancer "core" workflows will be available in this launcher.  Each have distinct INI parameters that you need to know how to fill in properly to analyze your data.  See details in the README for each of the project's core workflows, they will provide enough information for you to process your own data using these workflows so you can co-analyze your data with the larger PanCancer dataset:
 
-<!-- - [Sanger](https://github.com/ICGC-TCGA-PanCancer/SeqWare-CGP-SomaticCore) -->
-<!-- - [DKFZ/EMBL](https://github.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow) -->
- - [BWA](https://github.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow)
+Your next step, now that you have successfully run one workflow on one VM, could be to create several INI files and then execute them in a larger fleet. See [here](#Configuration) for instructions on how to reconfigure your launcher to set a larger value for the maximum fleet size.
 
-<!-- TODO: Should we eventually have a tool that lets the use create n INI files? Might not be that hard, will need to investigate... -->
-Your next step, now that you have successfully run one workflow on one VM, could be to create several INI files (you can use `pancancer workflows config --workflow <SOME WORKFLOW NAME>` to create a default INI file and then copy it as many times as you need and edit the copies) and then execute them in a larger fleet.
-
-You can also try running the BWA workflow with your launcher. For more information on this topic, click [here](./run_bwa_tutorial.md).
 
 ###Other useful tips
 
@@ -270,57 +219,8 @@ Configuration should already be complete once you have entered the Pancancer Lau
 $ pancancer sysconfig --force
 ```
 
-####Running the coordinator and provisioner
-There are two services that are used to provision new VMs for jobs. They are the Coordinator and Provisioner. The coordinator will process job requests into jobs and provisioning requests. The provisioner will provision new VMs that will execute your jobs, based on the requests generated by the coordinator.
+This command will ask you a series of questions that you have already answered, but you may provide a new answer if you wish to. If you do not give a new answer, the original answer you gave will continue to be used.
 
-Normally, the Coordinator is started when the Pancancer Launcher is started and the Provisioner will be started when you generate the first INI file. Sometimes, you may want to "pause" or hold the provisioning process, so it is useful to know how to start and stop these services.
-
-```
-$ pancancer coordinator start
-```
-This process will write to a file named `coordinator.out`. More detailed output can also be found in `arch3.log`.
-
-```
-$ pancancer coordinator stop
-```
-This will stop the coordinator. Job requests will not be processed into jobs or provisioning requests until the service is started again. 
-
-
-```
-$ pancancer provisioner start
-```
-This process will write to a file named `provisioner.out`. More detailed output can also be found in `arch3.log`.
-
-
-```
-$ pancancer provisioner stop
-```
-This will stop the provisioner. No new VMs will be provisioned until the service is started again. It is not a good idea to stop the provisioner if it is in the middle of provisioning something as it may result in that VM being in a bad state. 
-
-
-To get the status of these services: 
-```
-$ pancancer status services
-The Coordinator appears to be running with PID: 41193
-The Provisioner appears to be running with PID: 42520
-```
-
-
-####Interactive shell
-You can also work with the pancancer tool's interactive shell simply by executing the command `pancancer`:
-```
-$ pancancer
-(pancancer) coordinator start
-```
-In this example, the user has started the interactive shell, as can be seen by the shell prompt, which has changed from `$` to `(pancancer)`.
-
-To get a list of all pancancer commands, you can type `pancancer -h` and the help text will be displayed.
-
-<!-- TODO: what happened?  What did I just do?  Why is it significant?  What do I do now?
-
-* reporting
-* how do you get the output of the workflows? e.g. helloworld?
-* what do you do next? -->
 
 ####Detaching and reattaching with Docker
 If you need to do some work on the host machine, it is better to _detach_ from the pancancer\_launcher container than to exit. If you exit, the container should restart automatically, but any processes that are running (such as the provisioning process) may be terminated and that could affect any VMs that are in mid-provision.
@@ -348,7 +248,8 @@ Ensure that the security group allows inbound connections on all TCP ports from 
 
 #### I changed my configuration but it doesn't seem to be having any effect.
 
-If the configuration is changed while the provisioner and coordinator are running, they may need to be restarted to use the new configuration. It is best to avoid doing this while a VM is being provisioned. Try stopping these services, updating your configuration, and then starting them again:
+If the configuration is changed while the Provisioner and Coordinator are running, they may need to be restarted to use the new configuration. It is best to avoid doing this while a VM is being provisioned. Try stopping these services, updating your configuration, and then starting them again:
+
 ```
 $ pancancer coordinator stop
 $ pancancer provisioner stop
@@ -364,7 +265,7 @@ Normally, failed workers are cleaned up automatically. It is sometimes useful to
 Keeping failed workers must be configured when generating job requests:
 
 ```
-$ pancancer generator --workflow HelloWorld_1.0-SNAPSHOT --keep_failed
+$ pancancer run-workers --keep_failed
 ```
 
 The result of this is that if a Worker VM completes its work successfully, it will be automatically removed from the fleet, but if a worker fails, it will be left alone, and you will be able to log in to it and debug whatever caused it fo fail.

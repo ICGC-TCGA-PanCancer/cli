@@ -158,7 +158,7 @@ AWS_CONFIG
 		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
 		# read user_pancancer_version
 		# They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
-		user_pancancer_version="latest"
+		user_pancancer_version="L4A_1.0.0-rc.0"
 
 		user_fleet_name=''
 		if [ ! -z $FLEET_NAME ] ; then

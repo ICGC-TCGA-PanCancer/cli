@@ -137,7 +137,7 @@ This command will cause the the Pancancer Launcher to being the process of provi
 
 
 
-The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take several minutes (10 minutes is not unreasonable) because we setup various infrastructure on these VMs using Ansible.  The process was designed for the PanCancer workflows which can run for *days* or *weeks* so the startup time of the worker VMs has yet to be optimized.
+The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take a while because we setup various infrastructure on these VMs using Ansible. The process was designed for the PanCancer workflows which can run for *days* or *weeks* so the startup time of the worker VMs has yet to be optimized.
 
 ####Monitoring Progress
 

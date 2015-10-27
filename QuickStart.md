@@ -22,27 +22,36 @@ Before you get started, there are a few items you will need to have available:
 ### Launch a VM
 Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html). When setting up your instance, be sure to include enough storage space to install docker and download docker images. 40 GB should be enough. The instance type normally used for this is m3.large. The following screen-shots  illustrate how the VM should be configured.
 
+#### Choosing an AMI
 Choosing an Ubuntu 14.04 AMI (here, AMI ami-d05e75b8 was used)
 ![choosing an AMI](/images/1_Choose_AMI.png?raw=true "Click for larger view")
 
+#### Choosing an instance type
 Choosing an m3.large instance type
 ![choosing an instance type](/images/2_Choose_Instance_Type.png?raw=true "Click for larger view")
 
+#### Configuring your instance
 Configure your instance. If you want to use [termination protection](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html#Using_ChangingDisableAPITermination), this is the screen where you can enable it.
 ![Configuring your instance](/images/3_Configure_Instance.png?raw=true "Click for larger view")
 
+#### Adding storage
 Setting up storage. 40 GB should be sufficient.
 ![Add Storage](/images/4_Add_Storage.png?raw=true "Click for larger view")
 
+#### Setting tags
 Setting tags on your instance. Here, you can set the instance name that your VM will use.
 ![Tag instance](/images/5_Tag_Instance.png?raw=true "Click for larger view")
 
+#### Configuring security groups
 Configuring security groups for your instance. You can use an existing group, or let AWS create a new one. *Notice that the rules have been set to allow ssh access from the source "My IP".* It is **very** important to restrict traffic to your VMs to *only* the machines that *need* access. **Avoid** using the "Anywhere" source. If you need to allow access from an IP address that is not "My IP", you can use a Custom IP source.
+
+When you choose the "MyIP" option, The AWS Console will attempt to determine the IP address that you are using to connect to it. If you are behind a router, it will see the public-facing IP of the router.
 
 Make a note of the *name* of the security group that is chosen at this step, you will need it later.
 
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
+#### Choosing or generating an SSH key pair
 When AWS is ready to launch your VM, it will prompt you to choose an existing SSH key or to create a new one, like this:
 
 ![Choose or Create a key](/images/AWS_Create_Key.png?raw=true "Click for a larger view")
@@ -53,6 +62,8 @@ Click [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.ht
 
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
 ![Connect to Instance](/images/AWS_connect_to_VM2.png?raw=true "Click for larger view")
+
+You will need the key you used in [this step](./#choose or create a key)
 
 ### Set up files
 You will now need to set up a few files on your VM.

@@ -19,7 +19,7 @@ This system requires the following:
   Please ensure that these files are in ~/.gnos
 * Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
 MSG
-user_pancancer_version=latest
+
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 install_pancancer_launcher=''
 while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launcher^^}" != 'N' ]] ; do
@@ -39,6 +39,7 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			done
 		fi
 		if [ "$user_install_docker" = 'Y' ] ; then
+
 			# Remove eXecute permission from /etc/grub.d/30_os-prober because sometimes the docker installer will hang when this hangs. This has happened in OpenStack
 			# and could happen elsewhere.
 			if [ -f /etc/grub.d/30_os-prober ] ; then
@@ -48,13 +49,19 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			sudo apt-get install wget curl
 			echo "Installing docker..."
 			sleep 2
-			sudo apt-get install wget curl --yes && curl -sSL https://get.docker.com/ | sh &> install_docker.log
+			curl -sSL https://get.docker.com/ | sh &> install_docker.log
 			echo "Done installing docker!"
+<<<<<<< HEAD
+			echo "Pulling latest pancancer_launcher image..."
+			sudo docker pull pancancer/pancancer_launcher:latest &> pull_image.log
+			echo "Done pulling pancancer_launcher!"
 
+=======
+>>>>>>> 97cb35b... Update install_bootstrap
 		else
 			echo "Skipping docker installation..."
 		fi
-		echo "Pulling pancancer_launcher image..."
+		echo "Pulling pancancer_launcher L4A image..."
 		sudo docker pull pancancer/pancancer_launcher:"${user_pancancer_version}" &> pull_image.log
 		echo "Done pulling pancancer_launcher!"
 	elif [ "${install_pancancer_launcher^^}" = 'N' ] ; then
@@ -89,7 +96,7 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
 				read -ep $'What is the path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
 				user_pem_path="${user_pem_path/#\~/$HOME}"
 			else
-				read -ep $'What is the path to the pem key file you will use to authenticate in this environment?\n' user_pem_path
+				read -ep "What is the path to the pem key file you will use to authenticate in this environment?\n" user_pem_path
 				user_pem_path="${user_pem_path/#\~/$HOME}"
 			fi
 			if [[ ! -f $user_pem_path && ! -e $user_pem_path ]] ; then
@@ -164,7 +171,7 @@ AWS_CONFIG
 		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
 		# read user_pancancer_version
 		# They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
-		#user_pancancer_version="L4A_1.0.0-rc.0"
+		user_pancancer_version="latest"
 
 		user_fleet_name=''
 		if [ ! -z $FLEET_NAME ] ; then

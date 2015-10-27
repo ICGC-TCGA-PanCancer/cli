@@ -1,8 +1,8 @@
-#AWS Pancancer Workflow Launcher & CLI
+#AWS Pancancer Workflow Launcher & CLI (L4A)
 
 This quick-start guide will help you get started using the Pancancer CLI tool on Amazon's cloud.  **You are responsible for your cloud expenses for this tutorial, be careful to monitor your usage and terminate VMs when you are finished.**
 
-The Pancancer Workflow Launcher and Command Line Tool (CLI) is a system that will allow you to schedule and execute Pancancer workflows (include BWA, Sanger, and DKFZ/EMBL) on a fleet of virtual machines in a cloud-computing environment.  Currently, these directions focus on Amazon Web Services (AWS) but other environments are supported and will be documented in the future (OpenStack and Azure specifically).
+The Pancancer Workflow Launcher and Command Line Tool (CLI) L4A ("Launcher For Amazon") is a system that will allow you to schedule and execute the BWA Pancancer workflow on a fleet of virtual machines in a Amazon's EC2 cloud-computing environment.
 
 ![Pancancer CLI Diagram - Overview](/images/Pancancer_CLI_system_diagram.png?raw=true "Click for larger view")
 

@@ -19,7 +19,7 @@ This system requires the following:
   Please ensure that these files are in ~/.gnos
 * Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
 MSG
-
+user_pancancer_version="L4A_1.0.0-rc.0"
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 install_pancancer_launcher=''
 while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launcher^^}" != 'N' ]] ; do
@@ -45,7 +45,7 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			curl -sSL https://get.docker.com/ | sh &> install_docker.log
 			echo "Done installing docker!"
 			echo "Pulling latest pancancer_launcher image..."
-			sudo docker pull pancancer/pancancer_launcher:latest &> pull_image.log
+			sudo docker pull pancancer/pancancer_launcher:"${user_pancancer_version}" &> pull_image.log
 			echo "Done pulling pancancer_launcher!"
 
 		else
@@ -158,7 +158,7 @@ AWS_CONFIG
 		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
 		# read user_pancancer_version
 		# They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
-		user_pancancer_version="L4A_1.0.0-rc.0"
+		#user_pancancer_version="L4A_1.0.0-rc.0"
 
 		user_fleet_name=''
 		if [ ! -z $FLEET_NAME ] ; then

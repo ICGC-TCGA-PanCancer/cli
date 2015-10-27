@@ -206,7 +206,7 @@ If you this is not enough information to properly debug the failure, you can try
 ###What's Next?
 
 
-Your next step, now that you have successfully run one workflow on one VM, could be to create several INI files and then execute them in a larger fleet. See [here](#Configuration) for instructions on how to reconfigure your launcher to set a larger value for the maximum fleet size.
+Your next step, now that you have successfully run one workflow on one VM, could be to create several INI files and then execute them in a larger fleet. See [here](#configuration) for instructions on how to reconfigure your launcher to set a larger value for the maximum fleet size.
 
 
 ###Other useful tips

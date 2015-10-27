@@ -47,9 +47,16 @@ Configuring security groups for your instance. You can use an existing group, or
 
 When you choose the "MyIP" option, The AWS Console will attempt to determine the IP address that you are using to connect to it. If you are behind a router, it will see the public-facing IP of the router.
 
-Make a note of the *name* of the security group that is chosen at this step, you will need it later.
+**IMPORTANT:** Please make a note of the *name* of the security group that is chosen at this step, you _will_ need it later.
 
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
+
+#### Review and Launch
+When you have completed configuring Security Groups, you should see a "Review and Launch" button. Clicking on that will bring up a Review page where you can review your instance details:
+
+![Review](/images/Review.png?raw=true "Click for a larger view")
+
+Once you have reviewed your choices, you can click the Launch button to move on the the next step: [Choosing or Generating an SSH key pair](#choosing-or-generating-an-ssh-key-pair).
 
 #### Choosing or generating an SSH key pair
 When AWS is ready to launch your VM, it will prompt you to choose an existing SSH key or to create a new one, like this:
@@ -63,7 +70,7 @@ Click [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.ht
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
 ![Connect to Instance](/images/AWS_connect_to_VM2.png?raw=true "Click for larger view")
 
-You will need the key you used in [this step](./#choose or create a key)
+You will need the key you used in [this step](#choosing-or-generating-an-ssh-key-pair)
 
 ### Set up files
 You will now need to set up a few files on your VM.
@@ -72,7 +79,18 @@ You will now need to set up a few files on your VM.
 ```
 chmod 600 ~/.ssh/FillInYourKeyName.pem
 ```
-   You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp.
+   
+A call to scp takes the form:
+```
+$ scp -i <KEY TO AUTHENTICATE WITH> <FILE TO COPY> <USER>@<HOST>:<DESTINATION PATH ON HOST>
+```
+Transferring your pem key file to your new VM using scp on linux can be done like this:
+ 
+```
+$ scp -i <YOUR PEM KEY FILE>.pem <YOUR PEM KEY FILE>.pem ubuntu@<YOUR VM PUBLIC DNS OR IP ADDRESS>:/home/ubuntu/.ssh/<YOUR PEM KEY FILE>.pem
+```
+   See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
 
 ### Run Installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
@@ -81,20 +99,19 @@ $ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases
 ```
 This script will install docker (you can skip this step by answering "N" if you already have docker installed), the pancancer_launcher image, and collect some basic configuration info to get the launcher started. 
 
-This installer script will ask you some questions about how to get started. It will need to know:
- - The absolute path to your AWS pem key (this should be copied into `~/.ssh` before begining the installer, as per instructions above)
+When the launcher asks "Would you like to run the pancancer_launcher now?", anwser "Y" to begin the next step, where you will be asked to provide answers to some questions. It will need to know:
+ - The path to your AWS pem key _file_ (this should be copied into `~/.ssh` on your host VM before begining the installer, as per instructions above), for example: `/home/ubuntu/.ssh/MyKeyFile.pem`.
  - The *name* of your AWS key. This is *usually* the same as the name of the key file you download from AWS. For example, an AWS key with the name "MyKey" is normally downloaded and saved as the file "MyKey.pem".
  - Your AWS Key and AWS Secret Key. If you do not know these, [this document](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) might be able to help you.
  - The name that you would like to give to your fleet. This will make it easier to find your VMs in the AWS EC2 Management Console. If you do not specify a fleet name, a randomly generated name will be used.
  - The _maximum_ number of VMs you want to have in your fleet (you will be able to change this later, if you want).
- - The name of the security group for your fleet. It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. This _must_ be the same as the security group that the launcher is in.
+ - The name of the security group for your fleet, which was set in [this step](#configuring-security-groups). It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. This _must_ be the same as the security group that the launcher is in. If you are not sure about the name of your security group, you can find it in the AWS EC2 console: Find your host VM, and then look for the "Security Group" column. This will show you the name of the security group of your VM.
 
 If for some reason you need to exit this script, you can re-run it simply by executing this command:
 
 ```
 bash install_bootstrap
 ```
-
 
 ##Inside the Pancancer Launcher.
 

@@ -43,13 +43,12 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 			sleep 2
 			sudo apt-get install wget curl --yes && curl -sSL https://get.docker.com/ | sh &> install_docker.log
 			echo "Done installing docker!"
-			echo "Pulling latest pancancer_launcher image..."
-			sudo docker pull pancancer/pancancer_launcher:"${user_pancancer_version}" &> pull_image.log
-			echo "Done pulling pancancer_launcher!"
-
 		else
 			echo "Skipping docker installation..."
 		fi
+		echo "Pulling pancancer_launcher L4A image..."
+		sudo docker pull pancancer/pancancer_launcher:"${user_pancancer_version}" &> pull_image.log
+		echo "Done pulling pancancer_launcher!"
 	elif [ "${install_pancancer_launcher^^}" = 'N' ] ; then
 		echo "You are exiting the installer now, but you can always run it again when you are ready."
 		exit 0

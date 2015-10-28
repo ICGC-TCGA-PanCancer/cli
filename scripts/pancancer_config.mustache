@@ -95,7 +95,7 @@
     "queueName": "pancancer_arch_3",
     "lvm_device_whitelist": "{{lvm_devices}}",
     "single_node_lvm": true,
-    "pancancer_arch3_version": "1.1-beta.rc.0",
+    "pancancer_arch3_version": "1.1-rc.1",
     "seqware_engine":"whitestar-parallel",
     "seqware_use_custom_settings":false,
     "azure": false
@@ -132,7 +132,7 @@
     "provision":
     {
       "max_running_containers":{{max_fleet_size}},
-      "youxia_deployer_parameters":"--max-spot-price 0.001 --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file server-tags.json",
+      "youxia_deployer_parameters":"--max-spot-price 0.001 --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file /home/ubuntu/arch3/server-tags.json",
       "youxia_reaper_parameters":"",
       "reap_failed_workers":""
     }

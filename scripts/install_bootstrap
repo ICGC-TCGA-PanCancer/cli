@@ -19,7 +19,7 @@ This system requires the following:
   Please ensure that these files are in ~/.gnos
 * Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
 MSG
-user_pancancer_version="L4A_1.0.0-rc.0"
+user_pancancer_version="L4A_1.0.0-rc.2"
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 install_pancancer_launcher=''
 while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launcher^^}" != 'N' ]] ; do
@@ -41,14 +41,28 @@ while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launc
 		if [ "$user_install_docker" = 'Y' ] ; then
 			echo "Installing docker..."
 			sleep 2
-			sudo apt-get install wget curl --yes && curl -sSL https://get.docker.com/ | sh &> install_docker.log
+			sudo apt-get install wget curl --yes &> install_wget_curl.log && curl -sSL https://get.docker.com/ | sh &> install_docker.log
 			echo "Done installing docker!"
 		else
 			echo "Skipping docker installation..."
 		fi
-		echo "Pulling pancancer_launcher L4A image..."
-		sudo docker pull pancancer/pancancer_launcher:"${user_pancancer_version}" &> pull_image.log
-		echo "Done pulling pancancer_launcher!"
+		
+		if [ -z "$DOCKER_PATH" ] ; then
+			echo "You need to install docker before pulling docker images. Please ensure that docker is properly installed and then re-run this script with the command \"bash install_bootstrap\""
+			exit 1
+		else
+			echo "Pulling pancancer_launcher L4A image..."
+			set +e
+			sudo docker pull pancancer/pancancer_launcher:"${user_pancancer_version}" &> pull_image.log
+			pull_result=$?
+			set -e
+			if [ $pull_result -ne  0 ] ; then
+				echo "It looks like there might have been an error when pulling the docker image. The pancancer_launcher cannot be run until this is resolved. " 
+				cat pull_image.log
+				exit 1
+			fi
+			echo "Done pulling pancancer_launcher!"
+		fi
 	elif [ "${install_pancancer_launcher^^}" = 'N' ] ; then
 		echo "You are exiting the installer now, but you can always run it again when you are ready."
 		exit 0
@@ -156,7 +170,6 @@ AWS_CONFIG
 		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
 		# read user_pancancer_version
 		# They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
-		#user_pancancer_version="L4A_1.0.0-rc.0"
 
 		user_fleet_name=''
 		if [ ! -z $FLEET_NAME ] ; then

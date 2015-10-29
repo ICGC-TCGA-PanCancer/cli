@@ -1,5 +1,14 @@
 # Changes
 
+## L4A_1.0.0-rc.2
+ - Update documentation
+ - Update mustache template for absolute path for server-tags.json
+ - Small improvements for insall_bootstrap, including better error handling.
+
+## L4A_1.0.0-rc.1
+ - Update documentation
+ - Minor tweaks to bootstrap script
+
 ## L4A_1.0.0-rc.0
  - Restrict CLI to only work with BWA on AWS ("L4A" ==> "Launcher for Amazon"). This involved simplifying or changing a number of commands. Documentation has also been updated.
  - New version of consonance: 1.1-rc.1

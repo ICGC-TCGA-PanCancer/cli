@@ -65,6 +65,8 @@ When AWS is ready to launch your VM, it will prompt you to choose an existing SS
 
 Click [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair) for more information about creating AWS key pairs.
 
+It is recommended to use keyfiles generated with this Amazon utility. If you have existing keyfiles you wish to use, you may do so, but please be aware that if your keyfiles require a user to enter a passphrase in order to use them, it may not work with this system. 
+
 ### SSH to VM
 
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.

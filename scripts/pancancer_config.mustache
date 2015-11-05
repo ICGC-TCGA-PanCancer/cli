@@ -132,7 +132,7 @@
     "provision":
     {
       "max_running_containers":{{max_fleet_size}},
-      "youxia_deployer_parameters":"--max-spot-price 0.001 --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file /home/ubuntu/arch3/server-tags.json",
+      "youxia_deployer_parameters":"--max-spot-price {{spot_price}}{{^spot_price}}0.001{{/spot_price}} --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file /home/ubuntu/arch3/server-tags.json",
       "youxia_reaper_parameters":"",
       "reap_failed_workers":""
     }

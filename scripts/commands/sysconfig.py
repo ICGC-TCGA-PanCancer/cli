@@ -84,8 +84,10 @@ class SysConfig(cliff.command.Command):
             pem_key_path=''
             prev_pem_key_path=''
             key_name=''
+            spot_price = ''
             prev_key_name=''
             prev_security_group = ''
+            prev_spot_price = ''
             security_group = ''
             prev_fleet_size = ''
             fleet_size=''
@@ -127,6 +129,16 @@ class SysConfig(cliff.command.Command):
                 else:
                     security_group = prev_security_group
 
+                if 'spot_price' in config_data:
+                    prev_spot_price = config_data['spot_price']
+                if prev_spot_price.strip() == '':
+                    prev_spot_price = '0.001'
+                # User will only be asked about spot price if they FORCE a sysconfig. Otherwise, Keep It Simple and stick with 0.001 which triggers on-demand instances.
+                if force_config:
+                    spot_price = self._get_config_value(spot_price, prev_spot_price,'What spot price would you like to set')
+                else:
+                    spot_price = prev_spot_price
+
                 if prev_pem_key_path.strip() != '':
                     pem_key_path = prev_pem_key_path
                 if prev_key_name.strip() != '':
@@ -149,7 +161,8 @@ class SysConfig(cliff.command.Command):
             pancancer_config = { 'max_fleet_size':fleet_size, 'path_to_key': pem_key_path,
                                 'name_of_key':key_name, 'aws_secret_key':aws_secret_key,
                                 'security_group': security_group, 'aws_key':aws_key,
-                                'workflow_listing_url': workflow_listing_url}
+                                'workflow_listing_url': workflow_listing_url,
+                                'spot_price': spot_price}
 
             if not os.path.exists(os.path.expanduser('~/.pancancer')):
                 os.makedirs(os.path.expanduser('~/.pancancer'))

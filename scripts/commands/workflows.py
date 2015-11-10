@@ -42,12 +42,12 @@ class Workflows(cliff.command.Command):
             datestr = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             # INI files will have unique names based on datetime and index in loop
             ini_file_name='~/ini-dir/' + workflow_name + '_' + datestr + '_' + str(i) + '.ini'
-            self.log.info('Generating INI file: '+ini_file_name)
             ini_file_path = os.path.expanduser(ini_file_name)
             workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
             url = workflow_details['default-ini']
 
             with urllib.request.urlopen(url) as response, open(ini_file_path, 'wb') as ini_file:
+                self.log.info('Generating INI file: '+ini_file_name)
                 shutil.copyfileobj(response, ini_file)
                 
 

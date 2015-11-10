@@ -29,5 +29,9 @@ class WorkflowLister:
             #Read the pancancer_config.json file if it exists
             with open(pancancer_config_path,'r') as pancancer_config_file:
                 config_data = json.load(pancancer_config_file)
+        
+        if 'workflow_listing_url' not in config_data or config_data['workflow_listing_url'] == '':
+            config_data['workflow_listing_url'] = 'https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/L4A/config/workflowlist.json'
+            
         response = urllib.request.urlopen(config_data['workflow_listing_url'])
         WorkflowLister._workflows = json.loads(response.read().decode('utf-8'))

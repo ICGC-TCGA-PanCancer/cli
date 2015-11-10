@@ -1,7 +1,7 @@
 #! /bin/bash
 set -e
-PANCANCER_LAUNCHER_VERSION=3.1.7
-PANCANCER_CLI_VERSION=L4A
+PANCANCER_LAUNCHER_VERSION=L4A_1.0.0-rc.3
+PANCANCER_CLI_VERSION=L4A_1.0.0-rc.3
 WORKFLOW_LISTING_URL=https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/L4A/config/workflowlist.json
 
 # TODO: make CLI version string here for URL for workflow info
@@ -19,7 +19,7 @@ This system requires the following:
   Please ensure that these files are in ~/.gnos
 * Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
 MSG
-user_pancancer_version="L4A_1.0.0-rc.2"
+user_pancancer_version="L4A_1.0.0-rc.3"
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 install_pancancer_launcher=''
 while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launcher^^}" != 'N' ]] ; do

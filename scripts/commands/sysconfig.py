@@ -104,6 +104,7 @@ class SysConfig(cliff.command.Command):
                 # pull the workflow URL from the config
                 if 'WORKFLOW_LISTING_URL' in H:
                     workflow_listing_url = H['WORKFLOW_LISTING_URL']
+                
                 # Fleet size could be defined in the bootstrap config file which should come from the host machine, or it could be defined in the pancancer config file.
                 # If there's nothing in pancancer config, we'll check in the bootstrap config, and if nothing there, default to 1
                 if 'max_fleet_size' in config_data:
@@ -157,6 +158,7 @@ class SysConfig(cliff.command.Command):
                     bootstrap_config.write('PEM_PATH='+pem_key_path+'\n')
                     bootstrap_config.write('KEY_NAME='+key_name+'\n')
                     bootstrap_config.write('FLEET_NAME='+os.environ['FLEET_NAME']+'\n')
+                    bootstrap_config.write('WORKFLOW_LISTING_URL='+workflow_listing_url+'\n')
 
             # Now, write the simple JSON config that will be used for the rest of pancancer system.
             pancancer_config = { 'max_fleet_size':fleet_size, 'path_to_key': pem_key_path,

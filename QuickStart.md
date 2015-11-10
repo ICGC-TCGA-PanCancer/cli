@@ -162,7 +162,7 @@ A new INI file will be generated in `~/ini-dir`.
 
 ####Running the worker
 
-**NOTE:** The workers launched by the Pancancer Launcher will be _on-demand_ instances, by default. On-demand instances are more reliable and launch faster, but will cost more than spot pricing. If you wish to use spot pricing, read [this section] before proceeding.
+**NOTE:** The workers launched by the Pancancer Launcher will be _on-demand_ instances, by default. On-demand instances are more reliable and launch faster, but will cost more than spot pricing. If you wish to use spot pricing, read [this section](#setting-a-spot-price) before proceeding.
 
 To begin the process of provisioning a worker VM that will run your workflow, run this command:
 

@@ -172,7 +172,7 @@ $ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --no-INI-backup
 
 Doing this will leave all of the old INI files in `~/ini-dir`.
 
-**NOTE:** The workers launched by the Pancancer Launcher will be _on-demand_ instances, by default. On-demand instances are more reliable and launch faster, but will cost more than spot pricing. If you wish to use spot pricing, read [this section] before proceeding.
+**NOTE:** The workers launched by the Pancancer Launcher will be _on-demand_ instances, by default. On-demand instances are more reliable and launch faster, but will cost more than spot pricing. If you wish to use spot pricing, read [this section](#setting-a-spot-price) before proceeding.
 
 ####Generating a work order
 A work order is contains information about what work needs to be done, and what kind of VM needs to be provisioned for it.

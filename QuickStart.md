@@ -310,6 +310,12 @@ The next time you want to run "pancancer sysconfig", you can use this file like 
 pancancer sysconfig --config /home/ubuntu/.pancancer/simple_pancancer_config.json
 ```
 
+If you wish to return to on-demand pricing, re-run the above commandbut set the spot price to 0.001.
+
+**NOTE:** The Pancancer Launcher will give you an on-demand instance if the spot price you request is below the current market price. Check the current market prices in your region before setting a spot price.
+
+**NOTE:** It is important to note that you should run this command _before_ running `pancancer run-workers`.
+
 ####Configuration
 
 Configuration should already be complete once you have entered the Pancancer Launcher, but if you need to change or adjust some configuration options (such as fleet size), you can use this command:

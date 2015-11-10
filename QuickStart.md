@@ -161,6 +161,9 @@ A new INI file will be generated in `~/ini-dir`.
 
 
 ####Running the worker
+
+**NOTE:** The workers launched by the Pancancer Launcher will be _on-demand_ instances, by default. On-demand instances are more reliable and launch faster, but will cost more than spot pricing. If you wish to use spot pricing, read [this section] before proceeding.
+
 To begin the process of provisioning a worker VM that will run your workflow, run this command:
 
 ```
@@ -244,6 +247,24 @@ Your next step, now that you have successfully run one workflow on one VM, could
 
 
 ###Other useful tips
+
+####Setting a spot price.
+Amazon spot pricing allows you to specify a maximum price for your EC2 instances, and this can let you save money on running your instances. You can read more about spot pricing [here](https://aws.amazon.com/ec2/spot/pricing/).
+
+To set a spot instance price, run the `pancancer sysconfig --force` command. You will be prompted to answer a number of questions, the answer to which are probably already correct. When you get to the question that asks "What spot price would you like to set?", type your new spot instance price and hit <kbd>Enter</kbd>.
+
+```
+$ pancancer sysconfig --force
+Setting up pancancer config files.
+What is your AWS Key [Press "ENTER" to use the previous value: <PREVIOUS VALUE>, or type a new value if you want]? 
+What is your AWS Secret Key [Press "ENTER" to use the previous value: <PREVIOUS VALUE>, or type a new value if you want]? 
+How many VMs do you want in your fleet [Press "ENTER" to use the previous value: 1, or type a new value if you want]? 
+What AWS Security Group should the VMs belong to [Press "ENTER" to use the previous value: test_security_group, or type a new value if you want]? 
+What spot price would you like to set [Press "ENTER" to use the previous value: 0.001, or type a new value if you want]? 0.15
+Your new pancancer system config file has been written to /home/ubuntu/.pancancer/simple_pancancer_config.json
+The next time you want to run "pancancer sysconfig", you can use this file like this: 
+pancancer sysconfig --config /home/ubuntu/.pancancer/simple_pancancer_config.json
+```
 
 ####Configuration
 

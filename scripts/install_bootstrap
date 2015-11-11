@@ -163,17 +163,6 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
             fi
         done
 
-#        user_key_name=''
-#        while [[ -z "${user_key_name// /}" ]] ; do
-#            if [ ! -z $KEY_NAME ] ; then
-#                read -ep $'What is the name of this key? Previous value: \n' -i $KEY_NAME user_key_name
-#            else
-#                read -ep $'What is the name of this key?\n' user_key_name
-#            fi
-#            if [[ -z "${user_key_name// /}" ]] ; then
-#                echo 'Key name cannot be blank.'
-#            fi
-#        done
 
 		user_key_name='user_key_name'
 		ask_question "What is the name of this key?" $KEY_NAME "Key name" $user_key_name
@@ -187,46 +176,13 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
                 AWS_SECRET_KEY=$(grep aws_secret_access_key ~/.aws/config | sed 's/\(.*=\)//g')
             fi
     
-#            user_aws_key=''
-#            while [[ -z "${user_aws_key// /}" ]] ; do
-#                if [ ! -z $AWS_KEY ] ; then
-#                    read -ep $'What is your AWS Key? Previous value: \n' -i $AWS_KEY user_aws_key
-#                else
-#                    read -ep $'What is your AWS Key?\n' user_aws_key
-#                fi
-#                if [[ -z "${user_aws_key// /}" ]] ; then
-#                    echo 'AWS Key name cannot be blank.'
-#                fi
-#            done
+
 			user_aws_key='user_aws_key'
 			ask_question "What is your AWS Key?" $AWS_KEY "AWS Key name" $user_aws_key
     
-#            user_aws_secret_key=''
-#            while [[ -z "${user_aws_secret_key// /}" ]] ; do
-#                if [ ! -z $AWS_SECRET_KEY ] ; then
-#                    read -ep $'What is your AWS Secret Key? Previous value: \n' -i $AWS_SECRET_KEY user_aws_secret_key
-#                else
-#                    read -ep $'What is your AWS Secret Key?\n' user_aws_secret_key
-#                fi
-#                if [[ -z "${user_aws_secret_key// /}" ]] ; then
-#                    echo 'AWS Secret Key name cannot be blank.'
-#                fi
-#            done
 			user_aws_secret_key='user_aws_secret_key'
 			ask_question "What is your AWS Secret Key?" $AWS_SECRET_KEY "AWS Secret Key name" $user_aws_secret_key
 
-    
-#            user_sec_grp=''
-#            while [[ -z "${user_sec_grp// /}" ]] ; do
-#                if [ ! -z $SECURITY_GROUP ] ; then
-#                    read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
-#                else
-#                    read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
-#                fi
-#                if [[ -z "${user_sec_grp// /}" ]] ; then
-#                    echo 'Security Group name cannot be blank.'
-#                fi
-#            done
 			user_sec_grp='user_sec_grp'
 			ask_question "What is your Security Group?" $SECURITY_GROUP "Security Group" $user_sec_grp
 
@@ -248,105 +204,24 @@ AWS_CONFIG
         	
         	# TODO: SO MUCH REFACTORING FOR ALL OF THESE QUESTIONS!!! Make a function or something. ... W.I.P.
         	
-#            user_azure_subscription_id=''
-#            while [[ -z "${user_azure_subscription_id// /}" ]] ; do
-#                if [ ! -z $AZURE_SUBSCRIPTION ] ; then
-#                    read -ep $'What is your Azure subscription? Previous value: \n' -i $AZURE_SUBSCRIPTION user_azure_subscription_id
-#                else
-#                    read -ep $'What is your Azure subscription?\n' user_azure_subscription_id
-#                fi
-#                if [[ -z "${user_azure_subscription_id// /}" ]] ; then
-#                    echo 'Azure subscription cannot be blank.'
-#                fi
-#            done
 			user_azure_subscription_id='user_azure_subscription_id'
 			ask_question "What is your Azure subscription?" $AZURE_SUBSCRIPTION "Azure subscription" $user_azure_subscription_id
             
-#            user_azure_storage_account_name=''
-#            while [[ -z "${user_azure_storage_account_name// /}" ]] ; do
-#                if [ ! -z $AZURE_STORAGE_ACCOUNT ] ; then
-#                    read -ep $'What is your Azure storage account name? Previous value: \n' -i $AZURE_STORAGE_ACCOUNT user_azure_storage_account_name
-#                else
-#                    read -ep $'What is your Azure storage account name?\n' user_azure_storage_account_name
-#                fi
-#                if [[ -z "${user_azure_storage_account_name// /}" ]] ; then
-#                    echo 'Azure storage account cannot be blank.'
-#                fi
-#            done
 			user_azure_storage_account_name='user_azure_storage_account_name'
 			ask_question "What is your Azure storage account name?" $AZURE_STORAGE_ACCOUNT "Azure storage account name" $user_azure_storage_account_name
 
-#            user_azure_storage_account_key=''
-#            while [[ -z "${user_azure_storage_account_key// /}" ]] ; do
-#                if [ ! -z $AZURE_STORAGE_ACCOUNT_KEY ] ; then
-#                    read -ep $'What is your Azure storage account key? Previous value: \n' -i $AZURE_STORAGE_ACCOUNT_KEY user_azure_storage_account_key
-#                else
-#                    read -ep $'What is your Azure storage account key?\n' user_azure_storage_account_key
-#                fi
-#                if [[ -z "${user_azure_storage_account_key// /}" ]] ; then
-#                    echo 'Azure storage account key cannot be blank.'
-#                fi
-#            done
 			user_azure_storage_account_key='user_azure_storage_account_key'
 			ask_question "What is your Azure storage account key?" $AZURE_STORAGE_ACCOUNT_KEY "Azure storage account key" $user_azure_storage_account_key
 
-
-#            user_azure_AD_user=''
-#            while [[ -z "${user_azure_AD_user// /}" ]] ; do
-#                if [ ! -z $AZURE_AD_USER ] ; then
-#                    read -ep $'What is your Azure Active Directory user name? Previous value: \n' -i $AZURE_AD_USER user_azure_AD_user
-#                else
-#                    read -ep $'What is your Azure Active directory user name?\n' user_azure_AD_user
-#                fi
-#                if [[ -z "${user_azure_AD_user// /}" ]] ; then
-#                    echo 'Azure Active Directory username cannot be blank.'
-#                fi
-#            done
 			user_azure_AD_user='user_azure_AD_user'
 			ask_question "What is your Azure Active Directory user name?" $AZURE_AD_USER "Azure Active Directory user name" $user_azure_AD_user
 
-
-#            user_azure_AD_passwd=''
-#            while [[ -z "${user_azure_AD_passwd// /}" ]] ; do
-#                if [ ! -z $AZURE_AD_PASSWD ] ; then
-#                    read -ep $'What is your Azure Active Directory password? Previous value: \n' -i $AZURE_AD_PASSWD user_azure_AD_passwd
-#                else
-#                    read -ep $'What is your Azure Active Directory password?\n' user_azure_AD_passwd
-#                fi
-#                if [[ -z "${user_azure_AD_passwd// /}" ]] ; then
-#                    echo 'Azure Active Directory username cannot be blank.'
-#                fi
-#            done
 			user_azure_AD_passwd='user_azure_AD_passwd'
 			ask_question "What is your Azure Active Directory password?" $AZURE_AD_PASSWD "Azure Active Directory user name" $user_azure_AD_passwd
 
-
-#            user_azure_AD_tentant=''
-#            while [[ -z "${user_azure_AD_tentant// /}" ]] ; do
-#                if [ ! -z $AZURE_AD_TENTANT ] ; then
-#                    read -ep $'What is your Azure Active Directory Tentant ID? Previous value: \n' -i $AZURE_AD_TENTANT user_azure_AD_tenant
-#                else
-#                    read -ep $'What is your Azure Active Directory Tentant ID?\n' user_azure_AD_tenant
-#                fi
-#                if [[ -z "${user_azure_AD_tentant// /}" ]] ; then
-#                    echo 'Azure Active Directory Tentant ID cannot be blank.'
-#                fi
-#            done
 			user_azure_AD_tentant='user_azure_AD_tentant'
 			ask_question "What is your Azure Active Directory tenant?" $AZURE_AD_TENANT "Azure Active Directory tenant" $user_azure_AD_tentant
 
-
-#            user_azure_AD_client=''
-#            while [[ -z "${user_azure_AD_client// /}" ]] ; do
-#                if [ ! -z $AZURE_AD_CLIENT ] ; then
-#                    read -ep $'What is your Azure Active Directory Client ID? Previous value: \n' -i $AZURE_AD_CLIENT user_azure_AD_client
-#                else
-#                    read -ep $'What is your Azure Active Directory Client ID?\n' user_azure_AD_client
-#                fi
-#                if [[ -z "${user_azure_AD_client// /}" ]] ; then
-#                    echo 'Azure Active Directory Client ID cannot be blank.'
-#                fi
-#            done
 			user_azure_AD_client='user_azure_AD_client'
 			ask_question "What is your Azure Active Directory client?" $AZURE_AD_CLIENT "Azure Active Directory client" $user_azure_AD_client
 
@@ -356,60 +231,15 @@ AWS_CONFIG
             # OpenStack questions
             ############################
             
-#            user_os_username=''
-#            while [[ -z "${user_os_username// /}" ]] ; do
-#                if [ ! -z $OS_USERNAME ] ; then
-#                    read -ep $'What is your OpenStack username (<tenant>:<username>)? Previous value: \n' -i $OS_USERNAME user_os_username
-#                else
-#                    read -ep $'What is your OpenStack username (<tenant>:<username>)?\n' user_os_username
-#                fi
-#                if [[ -z "${user_os_username// /}" ]] ; then
-#                    echo 'OpenStack username cannot be blank.'
-#                fi
-#            done
 			user_os_username='user_os_username'
 			ask_question "What is your OpenStack username (formatted as <tenant>:<username>)?" $OS_USERNAME "OpenStack username" $user_os_username
 
-
-#            user_os_password=''
-#            while [[ -z "${user_os_password// /}" ]] ; do
-#                if [ ! -z $OS_PASSWORD ] ; then
-#                    read -ep $'What is your OpenStack password? Previous value: \n' -i $OS_PASSWORD user_os_password
-#                else
-#                    read -ep $'What is your OpenStack password?\n' user_os_password
-#                fi
-#                if [[ -z "${user_os_password// /}" ]] ; then
-#                    echo 'OpenStack password cannot be blank.'
-#                fi
-#            done
 			user_os_password='user_os_password'
 			ask_question "What is your OpenStack password?" $OS_PASSWORD "OpenStack password" $user_os_password
 
-#            user_os_endpoint=''
-#            while [[ -z "${user_os_endpoint// /}" ]] ; do
-#                if [ ! -z $OS_ENDPOINT ] ; then
-#                    read -ep $'What is your OpenStack API endpoint? Previous value: \n' -i $OS_ENDPOINT user_os_endpoint
-#                else
-#                    read -ep $'What is your OpenStack API endpoint?\n' user_os_endpoint
-#                fi
-#                if [[ -z "${user_os_endpoint// /}" ]] ; then
-#                    echo 'OpenStack endpoint cannot be blank.'
-#                fi
-#            done
 			user_os_endpoint='user_os_endpoint'
 			ask_question "What is your OpenStack endpoint?" $OS_ENDPOINT "OpenStack endpoint" $user_os_endpoint
 
-#            user_os_region=''
-#            while [[ -z "${user_os_region// /}" ]] ; do
-#                if [ ! -z $OS_REGION ] ; then
-#                    read -ep $'What is your OpenStack region? Previous value: \n' -i $OS_REGION user_os_region
-#                else
-#                    read -ep $'What is your OpenStack region?\n' user_os_region
-#                fi
-#                if [[ -z "${user_os_region// /}" ]] ; then
-#                    echo 'OpenStack region cannot be blank.'
-#                fi
-#            done
 			user_os_region='user_os_region'
 			ask_question "What is your OpenStack region?" $OS_REGION "OpenStack region" $user_os_region
                         
@@ -442,31 +272,9 @@ AWS_CONFIG
             FLEET_NAME_STR=" -f $user_fleet_name "
         fi
 
-#        user_fleet_size=''
-#        while [[ -z "${user_fleet_size// /}" ]] ; do
-#            if [ ! -z $FLEET_SIZE ] ; then
-#                read -ep $'What is the maximum number of worker VMs you want to run in your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
-#            else
-#                read -ep $'What is the maximum number of worker VMs you want to run in your fleet?\n' user_fleet_size
-#            fi
-#            if [[ -z "${user_fleet_size// /}" ]] ; then
-#                echo 'Maximum fleet size cannot be blank.'
-#            fi
-#        done
 		user_fleet_size='user_fleet_size'
 		ask_question "What is the maximum number of worker VMs you want to run in your fleet?" $FLEET_SIZE "Maximum fleet size" $user_fleet_size
 
-#        workflow_listing_url=''
-#        while [[ -z "${workflow_listing_url// /}" ]] ; do
-#            if [ ! -z $WORKFLOW_LISTING_URL ] ; then
-#                read -ep $'What is the URL that lists available workflows? Default value: \n' -i $WORKFLOW_LISTING_URL workflow_listing_url
-#            else
-#                read -ep $'What is the URL that lists available workflows?\n' workflow_listing_url
-#            fi
-#            if [[ -z "${workflow_listing_url// /}" ]] ; then
-#                echo 'Workflow listing URL cannot be blank.'
-#            fi
-#        done
 		workflow_listing_url='workflow_listing_url'
 		ask_question "What is the URL that lists available workflows?" $WORKFLOW_LISTING_URL "Workflow listing URL" $workflow_listing_url
 

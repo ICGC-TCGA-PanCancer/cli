@@ -1,5 +1,10 @@
 # Changes
 
+## L4A_1.0.0-rc.3
+ - Allow user to set spot price via `pancancer sysconfig --force`.
+ - Minor bug fixes.
+ - Documentation updates.
+
 ## L4A_1.0.0-rc.2
  - Update documentation
  - Update mustache template for absolute path for server-tags.json

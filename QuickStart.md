@@ -314,7 +314,7 @@ If you wish to return to on-demand pricing, re-run the above commandbut set the 
 
 **NOTE:** The Pancancer Launcher will give you an on-demand instance if the spot price you request is below the current market price. Check the current market prices in your region before setting a spot price.
 
-**NOTE:** It is important to note that you should run this command _before_ running `pancancer run-workers`.
+**NOTE:** It is important to note that you should do this _before_ running `pancancer generator`.
 
 ####Configuration
 

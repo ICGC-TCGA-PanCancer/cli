@@ -1,4 +1,4 @@
-#AWS Pancancer Workflow Launcher & CLI
+#Pancancer Workflow Launcher & CLI
 
 This quick-start guide will help you get started using the Pancancer CLI tool on Amazon's cloud.  **You are responsible for your cloud expenses for this tutorial, be careful to monitor your usage and terminate VMs when you are finished.**
 
@@ -22,27 +22,43 @@ Before you get started, there are a few items you will need to have available:
 ### Launch a VM
 Launch a new VM in Amazon EC2. You **must** use the AWS region "us-east-1" (AKA North Virginia) for this tutorial to work. If you are unfamiliar with the process of launching VMs in Amazon EC2, you may want to read [this guide](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/LaunchingAndUsingInstances.html). When setting up your instance, be sure to include enough storage space to install docker and download docker images. 40 GB should be enough. The instance type normally used for this is m3.large. The following screen-shots  illustrate how the VM should be configured.
 
+#### Choosing an AMI
 Choosing an Ubuntu 14.04 AMI (here, AMI ami-d05e75b8 was used)
 ![choosing an AMI](/images/1_Choose_AMI.png?raw=true "Click for larger view")
 
+#### Choosing an instance type
 Choosing an m3.large instance type
 ![choosing an instance type](/images/2_Choose_Instance_Type.png?raw=true "Click for larger view")
 
+#### Configuring your instance
 Configure your instance. If you want to use [termination protection](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html#Using_ChangingDisableAPITermination), this is the screen where you can enable it.
 ![Configuring your instance](/images/3_Configure_Instance.png?raw=true "Click for larger view")
 
+#### Adding storage
 Setting up storage. 40 GB should be sufficient.
 ![Add Storage](/images/4_Add_Storage.png?raw=true "Click for larger view")
 
+#### Setting tags
 Setting tags on your instance. Here, you can set the instance name that your VM will use.
 ![Tag instance](/images/5_Tag_Instance.png?raw=true "Click for larger view")
 
+#### Configuring security groups
 Configuring security groups for your instance. You can use an existing group, or let AWS create a new one. *Notice that the rules have been set to allow ssh access from the source "My IP".* It is **very** important to restrict traffic to your VMs to *only* the machines that *need* access. **Avoid** using the "Anywhere" source. If you need to allow access from an IP address that is not "My IP", you can use a Custom IP source.
 
-Make a note of the *name* of the security group that is chosen at this step, you will need it later.
-<!--- TODO: note about not putting spaces in the security group name  - actually, this does not appear to be an issue. -->
+When you choose the "MyIP" option, The AWS Console will attempt to determine the IP address that you are using to connect to it. If you are behind a router, it will see the public-facing IP of the router.
+
+**IMPORTANT:** Please make a note of the *name* of the security group that is chosen at this step, you _will_ need it later.
+
 ![Security Groups](/images/6_Security_Group.png?raw=true "Click for larger view")
 
+#### Review and Launch
+When you have completed configuring Security Groups, you should see a "Review and Launch" button. Clicking on that will bring up a Review page where you can review your instance details:
+
+![Review](/images/Review.png?raw=true "Click for a larger view")
+
+Once you have reviewed your choices, you can click the Launch button to move on the the next step: [Choosing or Generating an SSH key pair](#choosing-or-generating-an-ssh-key-pair).
+
+#### Choosing or generating an SSH key pair
 When AWS is ready to launch your VM, it will prompt you to choose an existing SSH key or to create a new one, like this:
 
 ![Choose or Create a key](/images/AWS_Create_Key.png?raw=true "Click for a larger view")
@@ -54,6 +70,8 @@ Click [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.ht
 Once the VM is running, log in to your new VM over ssh. If you are not sure how to connect to your VM using ssh, right-click on your VM in the AWS EC2 Management Console and click "connect". You will get a detailed information from AWS about how to connect to your VM.
 ![Connect to Instance](/images/AWS_connect_to_VM2.png?raw=true "Click for larger view")
 
+You will need the key you used in [this step](#choosing-or-generating-an-ssh-key-pair)
+
 ### Set up files
 You will now need to set up a few files on your VM.
 
@@ -61,13 +79,27 @@ You will now need to set up a few files on your VM.
 ```
 chmod 600 ~/.ssh/FillInYourKeyName.pem
 ```
-   You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+You can do this by editing the files on your VM in an editor such as vi and copying and pasting from the original files on your workstation, or you can transfer the files from your workstation using a tool such as scp.
+   
+A call to scp takes the form:
+```
+$ scp -i <KEY TO AUTHENTICATE WITH> <FILE TO COPY> <USER>@<HOST>:<DESTINATION PATH ON HOST>
+```
+Transferring your pem key file to your new VM using scp on linux can be done like this:
+ 
+```
+$ scp -i <YOUR PEM KEY FILE>.pem <YOUR PEM KEY FILE>.pem ubuntu@<YOUR VM PUBLIC DNS OR IP ADDRESS>:/home/ubuntu/.ssh/<YOUR PEM KEY FILE>.pem
+```
+   See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
+
+**NOTE:**
   - If you are working with GNOS repositories, which you typically only will be if you are involved in core analysis of PanCancer data through the Technical Working Group, you will need to put your GNOS keys (e.g. `gnos.pem`) on this machine in `~/.gnos/`. Create this directory if it doesn't exist. You can do this by editing the files on your VM and copying and pasting from the original files on your workstation, or you can copy the files from your workstation using a tool such as scp. See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.  **Most users will want to analyze their own data from S3 and write the results back to S3, in this scenario GNOS is not used and you can ignore this step.**
+
 
 ### Run Installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
-$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.0.7/install_bootstrap && bash install_bootstrap
+$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/L4A_1.0.0-rc.3/install_bootstrap && bash install_bootstrap
 ```
 This script will install docker (you can skip this step by answering "N" if you already have docker installed), the pancancer_launcher image, and collect some basic configuration info to get the launcher started. 
 
@@ -76,8 +108,8 @@ This installer script will ask you some questions about how to get started. It w
  - The *name* of your AWS key. This is *usually* the same as the name of the key file you download from AWS. For example, an AWS key with the name "MyKey" is normally downloaded and saved as the file "MyKey.pem".
  - Your AWS Key and AWS Secret Key. If you do not know these, [this document](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html) might be able to help you.
  - The name that you would like to give to your fleet. This will make it easier to find your VMs in the AWS EC2 Management Console. If you do not specify a fleet name, a randomly generated name will be used.
- - The number of VMs you want to have in your fleet (you will be able to change this later, if you want).
- - The name of the security group for your fleet. It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. This _must_ be the same as the security group that the launcher is in.
+ - The _maximum_ number of VMs you want to have in your fleet (you will be able to change this later, if you want).
+ - The name of the security group for your fleet, which was set in [this step](#configuring-security-groups). It needs this so that it can update the permissions of this group so that the VMs in the fleet can communicate properly with each other. This _must_ be the same as the security group that the launcher is in. If you are not sure about the name of your security group, you can find it in the AWS EC2 console: Find your host VM, and then look for the "Security Group" column. This will show you the name of the security group of your VM.
 
 If for some reason you need to exit this script, you can re-run it simply by executing this command:
 
@@ -85,10 +117,7 @@ If for some reason you need to exit this script, you can re-run it simply by exe
 bash install_bootstrap
 ```
 
-
 ##Inside the Pancancer Launcher.
-
-<!-- TODO: start_services_in_container: less noisy startup process , write to a log file, but not on console.  can wait... done? needs test -->
 
 If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, and possibly the version number, will be different):
 
@@ -98,6 +127,7 @@ If you follow the directions above you will find yourself dropped into the docke
 ###Running workflows
 
 The Pancancer Launcher can generate a template INI file for workflows. These INI files are used to set workflow-specific parameters, such as which input files to download or where to upload workflow results. To see which workflows are available, you can use the command `pancancer workflows list`:
+
 ```
 $ pancancer workflows list
 Available workflows are:
@@ -142,6 +172,8 @@ $ pancancer workflows config --workflow HelloWorld_1.0-SNAPSHOT --no-INI-backup
 
 Doing this will leave all of the old INI files in `~/ini-dir`.
 
+**NOTE:** The workers launched by the Pancancer Launcher will be _on-demand_ instances, by default. On-demand instances are more reliable and launch faster, but will cost more than spot pricing. If you wish to use spot pricing, read [this section](#setting-a-spot-price) before proceeding.
+
 ####Generating a work order
 A work order is contains information about what work needs to be done, and what kind of VM needs to be provisioned for it.
 
@@ -175,9 +207,11 @@ As you can see there is one message in the message queue named "pancancer_arch_3
 
 The process that provisiones VMs should detect this request within a couple of minutes and begin provisioning a new VM. Provisioning a new VM may take several minutes (10 minutes is not unreasonable) because we setup various infrastructure on these VMs using Ansible.  The process was designed for the PanCancer workflows which can run for *days* or *weeks* so the startup time of the worker VMs has yet to be optimized.
 
+####Monitoring Progress
+
 There are a few ways that you can monitor progress. You can watch the progress using this command:
 ```
-$ tail -f provisioner.out
+$ tail -f ~/arch3/logs/provisioner.out
 ```
 Type <kbd>Ctrl</kbd>-<kbd>C</kbd> to terminate `tail`.
 
@@ -220,7 +254,6 @@ $ pancancer status job_results --type stderr  --job_id 1
 Job results (stderr) have been written to /home/ubuntu/arch3/job_1.stderr
 ```
 Worker VMs report the stdout and stderr from seqware back to your launcher's database. The command above can extract this data and write it to a text file to make it easier to use, if you are interested in seeing the details of the workflow's execution.
-
 The HelloWorld workflow does not do much - it does not read or write data anywhere. It is useful to test your setup and configuration is correct.
 
 At this point, you have successfully installed the Pancancer Launcher, and used it to schedule and execute a workflow!
@@ -258,6 +291,30 @@ Your next step, now that you have successfully run one workflow on one VM, could
 You can also try running the BWA workflow with your launcher. For more information on this topic, click [here](./run_bwa_tutorial.md).
 
 ###Other useful tips
+
+####Setting a spot price.
+Amazon spot pricing allows you to specify a maximum price for your EC2 instances, and this can let you save money on running your instances. You can read more about spot pricing [here](https://aws.amazon.com/ec2/spot/pricing/).
+
+To set a spot instance price, run the `pancancer sysconfig --force` command. You will be prompted to answer a number of questions, the answer to which are probably already correct. When you get to the question that asks "What spot price would you like to set?", type your new spot instance price and hit <kbd>Enter</kbd>.
+
+```
+$ pancancer sysconfig --force
+Setting up pancancer config files.
+What is your AWS Key [Press "ENTER" to use the previous value: <PREVIOUS VALUE>, or type a new value if you want]? 
+What is your AWS Secret Key [Press "ENTER" to use the previous value: <PREVIOUS VALUE>, or type a new value if you want]? 
+How many VMs do you want in your fleet [Press "ENTER" to use the previous value: 1, or type a new value if you want]? 
+What AWS Security Group should the VMs belong to [Press "ENTER" to use the previous value: test_security_group, or type a new value if you want]? 
+What spot price would you like to set [Press "ENTER" to use the previous value: 0.001, or type a new value if you want]? 0.15
+Your new pancancer system config file has been written to /home/ubuntu/.pancancer/simple_pancancer_config.json
+The next time you want to run "pancancer sysconfig", you can use this file like this: 
+pancancer sysconfig --config /home/ubuntu/.pancancer/simple_pancancer_config.json
+```
+
+If you wish to return to on-demand pricing, re-run the above commandbut set the spot price to 0.001.
+
+**NOTE:** The Pancancer Launcher will give you an on-demand instance if the spot price you request is below the current market price. Check the current market prices in your region before setting a spot price.
+
+**NOTE:** It is important to note that you should do this _before_ running `pancancer generator`.
 
 ####Configuration
 
@@ -345,7 +402,8 @@ Ensure that the security group allows inbound connections on all TCP ports from 
 
 #### I changed my configuration but it doesn't seem to be having any effect.
 
-If the configuration is changed while the provisioner and coordinator are running, they may need to be restarted to use the new configuration. It is best to avoid doing this while a VM is being provisioned. Try stopping these services, updating your configuration, and then starting them again:
+If the configuration is changed while the Provisioner and Coordinator are running, they may need to be restarted to use the new configuration. It is best to avoid doing this while a VM is being provisioned. Try stopping these services, updating your configuration, and then starting them again:
+
 ```
 $ pancancer coordinator stop
 $ pancancer provisioner stop
@@ -382,9 +440,12 @@ $ Reaper --kill-list kill-list.json
 [2015/10/13 18:06:59] | Killing {i-346db1a6=i-346db1a6},
 [2015/10/13 18:06:59] | Marking instances for death i-346db1a6
 ```
+
+<!--
 ##Known Issues
 
 1. the script /home/ubuntu/arch3/cli/scripts/workflowlister.py has a URL for BWA's INI file for a ​_released_​ version of the workflow but this will produce a 404 error if it's not updated to: https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/feature/solomon_BWA_use_S3/workflow/config/workflow_s3.ini
 Once there is a released version of BWA 2.6.7 in github, this shouldn't be an issue.
 2. the INI file needs to be modified. Replace ${version} with 2.6.7. I think this normally happens during the release process...
 3. Make sure you put your AWS config file (containing your AWS Key and AWS Secret Key) into .gnos on the launcher host (is this within the host machine or within the launcher docker container?). This is needed so that BWA can talk with S3 for download and upload. This is not pretty but there's no way around it with the current version of Consonance (only `~/.gnos` gets mounted into the running seqware container and aws cli will let you specify an alternate location for the config file but ​_not_​ the credentials file - fortunately, credentials can also go in the config file so `aws s3 cp...` will still work).  The file the workflow looks for is `/home/ubuntu/.gnos/config`
+-->

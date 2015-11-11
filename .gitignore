@@ -25,3 +25,4 @@ __pycache__
 .metadata
 *.pyc
 .*.md.html
+*.orig

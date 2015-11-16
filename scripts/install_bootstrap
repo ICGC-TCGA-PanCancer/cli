@@ -299,11 +299,11 @@ AWS_CONFIG
         # now wget the start_launcher_container script and call it with the values from above:
         $(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
         chmod u+x start_launcher_container.sh
-        CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e $user_cloud_env $FLEET_NAME_STR"
+        CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e ${user_cloud_env^^} $FLEET_NAME_STR"
 
-        #Now write a config for this file.
+        # Now write a config for this file.
         [[ -d ~/.pancancer ]] || mkdir ~/.pancancer
-
+		# Note: You can't have ANY blank lines in .pancancer/pancancer.config because the python library that will eventually process it does not like blank lines and will fail. 
         cat >~/.pancancer/pancancer.config <<CONFIG
 PEM_PATH="${user_pem_path}"
 KEY_NAME="${user_key_name}"
@@ -311,9 +311,7 @@ FLEET_NAME="${user_fleet_name}"
 FLEET_SIZE="${user_fleet_size}"
 WORKFLOW_LISTING_URL="${workflow_listing_url}"
 CLOUD_ENV="${user_cloud_env}"
-
 SECURITY_GROUP="${user_sec_grp}"
-
 AZURE_SUBSCRIPTION="${user_azure_subscription_id}"
 AZURE_STORAGE_ACCOUNT="${user_azure_storage_account_name}"
 AZURE_STORAGE_ACCOUNT_KEY="${user_azure_storage_account_key}"
@@ -321,13 +319,11 @@ AZURE_AD_USER="${user_azure_AD_user}"
 AZURE_AD_PASSWD="${user_azure_AD_passwd}"
 AZURE_AD_TENANT="${user_azure_AD_tenant}"
 AZURE_AD_CLIENT="${user_azure_AD_client}"
-
 OS_USERNAME="${user_os_username}"
 OS_PASSWORD="${user_os_password}"
 OS_ENDPOINT="${user_os_endpoint}"
 OS_REGION="${user_os_region}"
 OS_ZONE="${user_os_zone}"
-
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config

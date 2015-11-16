@@ -235,13 +235,16 @@ AWS_CONFIG
     while [[ -z "${allow_usage_tracking// /}" && "${allow_usage_tracking^^}" != 'Y' &&  "${allow_usage_tracking^^}" != 'N' ]] ; do
       if [ -z $ASKED_ABOUT_USAGE_TRACKING ] ; then
         read -ep $'Would you like to allow us to record some very basic anonymous usage statistics for the Pancancer Launcher?\nWe are only interested in the number of times a Launcher is run: [Y/N]\n' allow_usage_tracking
+      else
+    	# If we've already asked them, then set this to 'N'
+	    allow_usage_tracking='N'
       fi
     done
     if [ $allow_usage_tracking == 'Y' ] ; then
       # Run this in the background so that if if fails, it fails silently.
       set +e
       user_asked_about_tracking="1"
-      wget -O ./.tmpstats -T 30 http://pancancer.info/launcher_stats_L4A.html &
+      wget -q -O ./.tmpstats -T 30 http://pancancer.info/ &
       set -e
     fi
 

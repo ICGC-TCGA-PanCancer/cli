@@ -30,6 +30,66 @@ class SysConfig(cliff.command.Command):
 
         return user_value
 
+    def _ask_Azure_questions(self):
+        None   
+    
+    def _ask_OpenStack_questions(self):
+        None
+
+
+    def _ask_for_AWS_Keys(self, force_config, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config):
+    # AWS Key and Secret Key should only be asked for if for some reason they are NOT available (they *should* be, but stuff happens...)
+        if force_config or prev_aws_key.strip() == '' or prev_aws_secret_key.strip() == '':
+            aws_key = self._get_config_value(aws_key, prev_aws_key, 'What is your AWS Key')
+            aws_secret_key = self._get_config_value(aws_secret_key, prev_aws_secret_key, 'What is your AWS Secret Key') # If the AWS keys weren't available, ~/.aws/config is either not present or missing values, so re-write it.
+            aws_config = configparser.ConfigParser()
+            aws_config['default'] = {'aws_access_key_id':aws_key, 'aws_secret_access_key':aws_secret_key}
+            with open(aws_config_path, 'w') as aws_configfile:
+                aws_config.write(aws_configfile, space_around_delimiters=False)
+        else:
+            aws_key = prev_aws_key
+            aws_secret_key = prev_aws_secret_key
+        return aws_secret_key, aws_key
+
+
+    def _ask_for_security_group(self, force_config, config_data, prev_security_group, security_group, H):
+        if 'security_group' in config_data:
+            prev_security_group = config_data['security_group']
+        elif 'SECURITY_GROUP' in H:
+            prev_security_group = H['SECURITY_GROUP']
+        if prev_security_group.strip() == '':
+            prev_security_group = 'default'
+        if force_config:
+            security_group = self._get_config_value(security_group, prev_security_group, 'What AWS Security Group should the VMs belong to')
+        else:
+            security_group = prev_security_group
+        return security_group
+
+
+    def _ask_for_spot_price(self, force_config, config_data, spot_price, prev_spot_price):
+        if 'spot_price' in config_data:
+            prev_spot_price = config_data['spot_price']
+        if prev_spot_price.strip() == '':
+            prev_spot_price = '0.001' # User will only be asked about spot price if they FORCE a sysconfig. Otherwise, Keep It Simple and stick with 0.001 which triggers on-demand instances.
+    # TODO: Add condition that input must be a positive float
+        if force_config:
+            spot_price = self._get_config_value(spot_price, prev_spot_price, 'What spot price would you like to set')
+        else:
+            spot_price = prev_spot_price
+        return spot_price
+
+
+    def _ask_AWS_questions(self, force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config, prev_pem_key_path, spot_price, prev_key_name, prev_security_group, prev_spot_price, security_group, H):
+        # AWS-only questions.
+        security_group = self._ask_for_security_group(force_config, config_data, prev_security_group, security_group, H)
+        spot_price = self._ask_for_spot_price(force_config, config_data, spot_price, prev_spot_price)
+        aws_secret_key, aws_key = self._ask_for_AWS_Keys(force_config, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config)
+        if prev_pem_key_path.strip() != '':
+            pem_key_path = prev_pem_key_path
+        if prev_key_name.strip() != '':
+            key_name = prev_key_name
+        return pem_key_path, key_name, aws_secret_key, security_group, aws_key, spot_price
+
     def take_action(self, parsed_args):
         self.log.info('Setting up pancancer config files.')
         config_path=vars(parsed_args)['config_path']
@@ -63,18 +123,8 @@ class SysConfig(cliff.command.Command):
                 prev_aws_key = aws_config['default']['aws_access_key_id']
                 prev_aws_secret_key = aws_config['default']['aws_secret_access_key']
 
-            # AWS Key and Secret Key should only be asked for if for some reason they are NOT available (they *should* be, but stuff happens...)
-            if force_config  or prev_aws_key.strip() == '' or prev_aws_secret_key.strip() == '':
-                aws_key = self._get_config_value(aws_key,prev_aws_key,'What is your AWS Key')
-                aws_secret_key = self._get_config_value(aws_secret_key,prev_aws_secret_key,'What is your AWS Secret Key')
-                # If the AWS keys weren't available, ~/.aws/config is either not present or missing values, so re-write it.
-                aws_config = configparser.ConfigParser()
-                aws_config['default'] = {'aws_access_key_id':aws_key, 'aws_secret_access_key':aws_secret_key}
-                with open(aws_config_path,'w') as aws_configfile:
-                    aws_config.write(aws_configfile,space_around_delimiters=False)
-            else:
-                aws_key = prev_aws_key
-                aws_secret_key = prev_aws_secret_key
+
+            #TODO: Split this up into separate functions for each different cloud environment.
 
             # also: get fleet name, PEM key path, and key name from env. If everything went smoothly, these values should be in
             # /opt/from_host/config/pancancer.config
@@ -126,33 +176,12 @@ class SysConfig(cliff.command.Command):
                 else:
                     fleet_size = prev_fleet_size
 
-                if 'security_group' in config_data:
-                    prev_security_group = config_data['security_group']
-                else:
-                    if 'SECURITY_GROUP' in H:
-                        prev_security_group = H['SECURITY_GROUP']
-                if prev_security_group.strip() == '':
-                    prev_security_group = 'default'
-                if force_config:
-                    security_group = self._get_config_value(security_group, prev_security_group,'What AWS Security Group should the VMs belong to')
-                else:
-                    security_group = prev_security_group
-
-                if 'spot_price' in config_data:
-                    prev_spot_price = config_data['spot_price']
-                if prev_spot_price.strip() == '':
-                    prev_spot_price = '0.001'
-                # User will only be asked about spot price if they FORCE a sysconfig. Otherwise, Keep It Simple and stick with 0.001 which triggers on-demand instances.
-                # TODO: Add condition that input must be a positive float
-                if force_config:
-                    spot_price = self._get_config_value(spot_price, prev_spot_price,'What spot price would you like to set')
-                else:
-                    spot_price = prev_spot_price
-
-                if prev_pem_key_path.strip() != '':
-                    pem_key_path = prev_pem_key_path
-                if prev_key_name.strip() != '':
-                    key_name = prev_key_name
+                # Ask AWS questions
+                pem_key_path, key_name, aws_secret_key, security_group, aws_key, spot_price = self._ask_AWS_questions(force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config, prev_pem_key_path, spot_price, prev_key_name, prev_security_group, prev_spot_price, security_group, H)
+                
+                # TODO: Ask Azure questions
+                
+                # TODO: Ask OpenStack questions
                     
             else:
                 self.log.debug('bootstrap config file cannot be found at: '+bootstrap_config_path+' so a new one will be written.')

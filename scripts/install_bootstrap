@@ -23,120 +23,120 @@ user_pancancer_version="L4A_1.0.0-rc.3"
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 install_pancancer_launcher=''
 while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launcher^^}" != 'N' ]] ; do
-	echo "DO YOU WISH TO CONTINUE [Y/N]:"
-	read install_pancancer_launcher
-	if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
-		user_install_docker=''
-		set +e
-		DOCKER_PATH="$(which docker)"
-		set -e
-		if [ -z "$DOCKER_PATH" ] ; then
-			user_install_docker='Y'
-		else
-			while [[ "${user_install_docker^^}" != 'Y' &&  "${user_install_docker^^}" != 'N' ]] ; do
-				echo "It looks like docker may already be installed. Would you like to run this step anyway, which may attempt to upgrade docker? [Y/N]"
-				read user_install_docker
-			done
-		fi
-		if [ "$user_install_docker" = 'Y' ] ; then
-			echo "Installing docker..."
-			sleep 2
-			
-			set +e
-			sudo apt-get install wget curl --yes &> install_wget_curl.log
-			install_wget_result=$?
-			set -e
-			
-			if [ $install_wget_result -ne  0 ] ; then
-				echo "It looks like there may have been a problem installing or updated wget and curl:" 
-				cat install_wget_curl.log
-				exit 1
-			fi
-			
-			set +e
-			curl -sSL https://get.docker.com/ | sh &> install_docker.log
-			install_docker_result=$?
-			set -e
-			
-			if [ $install_docker_result -ne  0 ] ; then
-				echo "It looks like there may have been a problem installing docker:" 
-				cat install_wget_curl.log
-				exit 1
-			fi
-			
-			echo "Done installing docker!"
-			DOCKER_PATH="$(which docker)"
-		else
-			echo "Skipping docker installation..."
-		fi
-		
-		if [ -z "$DOCKER_PATH" ] ; then
-			echo "You need to install docker before pulling docker images. Please ensure that docker is properly installed and then re-run this script with the command \"bash install_bootstrap\""
-			exit 1
-		else
-			echo "Pulling pancancer_launcher L4A image..."
-			set +e
-			sudo docker pull pancancer/pancancer_launcher:"${user_pancancer_version}" &> pull_image.log
-			pull_result=$?
-			set -e
-			if [ $pull_result -ne  0 ] ; then
-				echo "It looks like there might have been an error when pulling the docker image. The pancancer_launcher cannot be run until this is resolved. Error is:" 
-				cat pull_image.log
-				exit 1
-			fi
-			echo "Done pulling pancancer_launcher!"
-		fi
-	elif [ "${install_pancancer_launcher^^}" = 'N' ] ; then
-		echo "You are exiting the installer now, but you can always run it again when you are ready."
-		exit 0
-	fi
+  echo "DO YOU WISH TO CONTINUE [Y/N]:"
+  read install_pancancer_launcher
+  if [ "${install_pancancer_launcher^^}" = 'Y' ] ; then
+    user_install_docker=''
+    set +e
+    DOCKER_PATH="$(which docker)"
+    set -e
+    if [ -z "$DOCKER_PATH" ] ; then
+      user_install_docker='Y'
+    else
+      while [[ "${user_install_docker^^}" != 'Y' &&  "${user_install_docker^^}" != 'N' ]] ; do
+        echo "It looks like docker may already be installed. Would you like to run this step anyway, which may attempt to upgrade docker? [Y/N]"
+        read user_install_docker
+      done
+    fi
+    if [ "$user_install_docker" = 'Y' ] ; then
+      echo "Installing docker..."
+      sleep 2
+      
+      set +e
+      sudo apt-get install wget curl --yes &> install_wget_curl.log
+      install_wget_result=$?
+      set -e
+      
+      if [ $install_wget_result -ne  0 ] ; then
+        echo "It looks like there may have been a problem installing or updated wget and curl:" 
+        cat install_wget_curl.log
+        exit 1
+      fi
+      
+      set +e
+      curl -sSL https://get.docker.com/ | sh &> install_docker.log
+      install_docker_result=$?
+      set -e
+      
+      if [ $install_docker_result -ne  0 ] ; then
+        echo "It looks like there may have been a problem installing docker:" 
+        cat install_wget_curl.log
+        exit 1
+      fi
+      
+      echo "Done installing docker!"
+      DOCKER_PATH="$(which docker)"
+    else
+      echo "Skipping docker installation..."
+    fi
+    
+    if [ -z "$DOCKER_PATH" ] ; then
+      echo "You need to install docker before pulling docker images. Please ensure that docker is properly installed and then re-run this script with the command \"bash install_bootstrap\""
+      exit 1
+    else
+      echo "Pulling pancancer_launcher L4A image..."
+      set +e
+      sudo docker pull pancancer/pancancer_launcher:"${user_pancancer_version}" &> pull_image.log
+      pull_result=$?
+      set -e
+      if [ $pull_result -ne  0 ] ; then
+        echo "It looks like there might have been an error when pulling the docker image. The pancancer_launcher cannot be run until this is resolved. Error is:" 
+        cat pull_image.log
+        exit 1
+      fi
+      echo "Done pulling pancancer_launcher!"
+    fi
+  elif [ "${install_pancancer_launcher^^}" = 'N' ] ; then
+    echo "You are exiting the installer now, but you can always run it again when you are ready."
+    exit 0
+  fi
 done
 
 run_pancancer_launcher=''
 while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" != 'N' ]] ; do
-	echo "Would you like to run the pancancer_launcher now? [Y/N]"
-	read run_pancancer_launcher
-	# If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
-	if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
+  echo "Would you like to run the pancancer_launcher now? [Y/N]"
+  read run_pancancer_launcher
+  # If the user would like to run pancancer_launcher, then we have to get some config settings from them OR read them from an existing file
+  if [ "${run_pancancer_launcher^^}" = 'Y' ] ; then
 
-		# This question isn't needed for the Aug31 demo
-		# echo "What cloud environment would you like to use (default will be \"AWS\")? [AWS/OPENSTACK]"
-		# read user_cloud_env
+    # This question isn't needed for the Aug31 demo
+    # echo "What cloud environment would you like to use (default will be \"AWS\")? [AWS/OPENSTACK]"
+    # read user_cloud_env
 
-		# if [ -z $user_cloud_env ] ; then
-			user_cloud_env=AWS
-		# fi
+    # if [ -z $user_cloud_env ] ; then
+      user_cloud_env=AWS
+    # fi
 
-		#Read the config file if it exists and then show previous values...
-		if [ -f ~/.pancancer/pancancer.config ] ; then
-			source ~/.pancancer/pancancer.config
-		fi
+    #Read the config file if it exists and then show previous values...
+    if [ -f ~/.pancancer/pancancer.config ] ; then
+      source ~/.pancancer/pancancer.config
+    fi
 
-		user_pem_path=''
-		while [[ ! -f $user_pem_path || ! -e $user_pem_path || -z "${user_pem_path// /}" ]] ; do
-			if [ ! -z $PEM_PATH ] ; then
-				read -ep $'What is the path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
-				user_pem_path="${user_pem_path/#\~/$HOME}"
-			else
-				read -ep $'What is the path to the pem key file you will use to authenticate in this environment?\n' user_pem_path
-				user_pem_path="${user_pem_path/#\~/$HOME}"
-			fi
-			if [[ ! -f $user_pem_path && ! -e $user_pem_path ]] ; then
-				echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
-			fi
-	  done
+    user_pem_path=''
+    while [[ ! -f $user_pem_path || ! -e $user_pem_path || -z "${user_pem_path// /}" ]] ; do
+      if [ ! -z $PEM_PATH ] ; then
+        read -ep $'What is the path to the pem key file you will use to authenticate in this environment? Previous value: \n' -i "$PEM_PATH" user_pem_path
+        user_pem_path="${user_pem_path/#\~/$HOME}"
+      else
+        read -ep $'What is the path to the pem key file you will use to authenticate in this environment?\n' user_pem_path
+        user_pem_path="${user_pem_path/#\~/$HOME}"
+      fi
+      if [[ ! -f $user_pem_path && ! -e $user_pem_path ]] ; then
+        echo "The path you pass for the key file must be valid. Please ensure that \"$user_pem_path\" is a valid path."
+      fi
+    done
 
-		user_key_name=''
-		while [[ -z "${user_key_name// /}" ]] ; do
-			if [ ! -z $KEY_NAME ] ; then
-				read -ep $'What is the name of this key? Previous value: \n' -i $KEY_NAME user_key_name
-			else
-				read -ep $'What is the name of this key?\n' user_key_name
-			fi
-			if [[ -z "${user_key_name// /}" ]] ; then
-				echo 'Key name cannot be blank.'
-			fi
-		done
+    user_key_name=''
+    while [[ -z "${user_key_name// /}" ]] ; do
+      if [ ! -z $KEY_NAME ] ; then
+        read -ep $'What is the name of this key? Previous value: \n' -i $KEY_NAME user_key_name
+      else
+        read -ep $'What is the name of this key?\n' user_key_name
+      fi
+      if [[ -z "${user_key_name// /}" ]] ; then
+        echo 'Key name cannot be blank.'
+      fi
+    done
 
     # load AWS config
     if [ -f ~/.aws/config ] ; then
@@ -145,16 +145,16 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
     fi
 
     user_aws_key=''
-		while [[ -z "${user_aws_key// /}" ]] ; do
-			if [ ! -z $AWS_KEY ] ; then
-				read -ep $'What is your AWS Key? Previous value: \n' -i $AWS_KEY user_aws_key
-			else
-				read -ep $'What is your AWS Key?\n' user_aws_key
-			fi
-			if [[ -z "${user_aws_key// /}" ]] ; then
-				echo 'AWS Key name cannot be blank.'
-			fi
-		done
+    while [[ -z "${user_aws_key// /}" ]] ; do
+      if [ ! -z $AWS_KEY ] ; then
+        read -ep $'What is your AWS Key? Previous value: \n' -i $AWS_KEY user_aws_key
+      else
+        read -ep $'What is your AWS Key?\n' user_aws_key
+      fi
+      if [[ -z "${user_aws_key// /}" ]] ; then
+        echo 'AWS Key name cannot be blank.'
+      fi
+    done
 
     user_aws_secret_key=''
     while [[ -z "${user_aws_secret_key// /}" ]] ; do
@@ -169,16 +169,16 @@ while [[ "${run_pancancer_launcher^^}" != 'Y' &&  "${run_pancancer_launcher^^}" 
     done
 
     user_sec_grp=''
-		while [[ -z "${user_sec_grp// /}" ]] ; do
-			if [ ! -z $SECURITY_GROUP ] ; then
-				read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
-			else
-				read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
-			fi
-			if [[ -z "${user_sec_grp// /}" ]] ; then
-				echo 'Security Group name cannot be blank.'
-			fi
-		done
+    while [[ -z "${user_sec_grp// /}" ]] ; do
+      if [ ! -z $SECURITY_GROUP ] ; then
+        read -ep $'What is the name of the AWS EC2 Security Group you wish to use? Previous value: \n' -i $SECURITY_GROUP user_sec_grp
+      else
+        read -ep $'What is the name of the AWS EC2 Security Group you wish to use?\n' user_sec_grp
+      fi
+      if [[ -z "${user_sec_grp// /}" ]] ; then
+        echo 'Security Group name cannot be blank.'
+      fi
+    done
 
     # Write the AWS config file, so that it will be available when the start_launcher_container script runs.
     [[ -d ~/.aws ]] || mkdir ~/.aws
@@ -190,71 +190,86 @@ region=us-east-1
 output=json
 AWS_CONFIG
 
-		# echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
-		# read user_pancancer_version
-		# They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
+    # echo "What version of the pancancer_launcher do you wish to run (default will be \"latest\")?"
+    # read user_pancancer_version
+    # They already pulled "latest", earlier in this script, so just stick with that. Future versions could ask this question, if necessary...
 
-		user_fleet_name=''
-		if [ ! -z $FLEET_NAME ] ; then
-			read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you. Previous value: \n' -i $FLEET_NAME user_fleet_name
-		else
-			read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you.\n' user_fleet_name
-		fi
+    user_fleet_name=''
+    if [ ! -z $FLEET_NAME ] ; then
+      read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you. Previous value: \n' -i $FLEET_NAME user_fleet_name
+    else
+      read -ep $'What would you like to name your fleet? If you do not specify a name, a name will be generated randomly for you.\n' user_fleet_name
+    fi
 
-		FLEET_NAME_STR=''
+    FLEET_NAME_STR=''
 
-		if [ ! -z $user_fleet_name ] ; then
-			FLEET_NAME_STR=" -f $user_fleet_name "
-		fi
+    if [ ! -z $user_fleet_name ] ; then
+      FLEET_NAME_STR=" -f $user_fleet_name "
+    fi
 
     user_fleet_size=''
-		while [[ -z "${user_fleet_size// /}" ]] ; do
-			if [ ! -z $FLEET_SIZE ] ; then
-				read -ep $'What is the maximum number of worker VMs you want to run in your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
-			else
-				read -ep $'What is the maximum number of worker VMs you want to run in your fleet?\n' user_fleet_size
-			fi
-			if [[ -z "${user_fleet_size// /}" ]] ; then
-				echo 'Key name cannot be blank.'
-			fi
-		done
+    while [[ -z "${user_fleet_size// /}" ]] ; do
+      if [ ! -z $FLEET_SIZE ] ; then
+        read -ep $'What is the maximum number of worker VMs you want to run in your fleet? Previous value: \n' -i $FLEET_SIZE user_fleet_size
+      else
+        read -ep $'What is the maximum number of worker VMs you want to run in your fleet?\n' user_fleet_size
+      fi
+      if [[ -z "${user_fleet_size// /}" ]] ; then
+        echo 'Key name cannot be blank.'
+      fi
+    done
 
     workflow_listing_url=''
-		while [[ -z "${workflow_listing_url// /}" ]] ; do
-			if [ ! -z $WORKFLOW_LISTING_URL ] ; then
-				read -ep $'What is the URL that lists available workflows? Default value: \n' -i $WORKFLOW_LISTING_URL workflow_listing_url
-			else
-				read -ep $'What is the URL that lists available workflows?\n' workflow_listing_url
-			fi
-			if [[ -z "${workflow_listing_url// /}" ]] ; then
-				echo 'Key name cannot be blank.'
-			fi
-		done
+    while [[ -z "${workflow_listing_url// /}" ]] ; do
+      if [ ! -z $WORKFLOW_LISTING_URL ] ; then
+        read -ep $'What is the URL that lists available workflows? Default value: \n' -i $WORKFLOW_LISTING_URL workflow_listing_url
+      else
+        read -ep $'What is the URL that lists available workflows?\n' workflow_listing_url
+      fi
+      if [[ -z "${workflow_listing_url// /}" ]] ; then
+        echo 'Key name cannot be blank.'
+      fi
+    done
+    
+    allow_usage_tracking=''
+    while [[ -z "${allow_usage_tracking// /}" && "${allow_usage_tracking^^}" != 'Y' &&  "${allow_usage_tracking^^}" != 'N' ]] ; do
+      if [ -z $ASKED_ABOUT_USAGE_TRACKING ] ; then
+        read -ep $'Would you like to allow us to record some very basic anonymous usage statistics for the Pancancer Launcher?\nWe are only interested in the number of times a Launcher is run: [Y/N]\n' allow_usage_tracking
+      fi
+    done
+    if [ $allow_usage_tracking == 'Y' ] ; then
+      # Run this in the background so that if if fails, it fails silently.
+      set +e
+      user_asked_about_tracking="1"
+      wget -T -q 30 http://pancancer.info/launcher_stats_L4A.html &
+      set -e
+    fi
 
-		# now wget the start_launcher_container script and call it with the values from above:
-		$(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
+    # now wget the start_launcher_container script and call it with the values from above:
+    $(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
     chmod u+x start_launcher_container.sh
-		CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e $user_cloud_env $FLEET_NAME_STR"
+    CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e $user_cloud_env $FLEET_NAME_STR"
 
-		#Now write a config for this file.
-		[[ -d ~/.pancancer ]] || mkdir ~/.pancancer
+    #Now write a config for this file.
+    [[ -d ~/.pancancer ]] || mkdir ~/.pancancer
 
-		cat >~/.pancancer/pancancer.config <<CONFIG
+    cat >~/.pancancer/pancancer.config <<CONFIG
 PEM_PATH=${user_pem_path}
 KEY_NAME=${user_key_name}
 FLEET_NAME=${user_fleet_name}
 FLEET_SIZE=${user_fleet_size}
 SECURITY_GROUP=${user_sec_grp}
 WORKFLOW_LISTING_URL=${workflow_listing_url}
+ASKED_ABOUT_USAGE_TRACKING=${user_asked_about_tracking}
 CONFIG
     [[ -d "/home/$USER/pancancer_launcher_config" ]] || mkdir "/home/$USER/pancancer_launcher_config"
     cp ~/.pancancer/pancancer.config /home/$USER/pancancer_launcher_config/pancancer.config
-		echo $CMD_STR > start_launcher_container.cmd
-		$(echo -e $CMD_STR)
-	elif [ "${run_pancancer_launcher^^}" = 'N' ] ; then
-		echo "You can run this script at another time to run the pancancer launcher"
-		exit 0
-	fi
+    echo $CMD_STR > start_launcher_container.cmd
+    $(echo -e $CMD_STR)
+  elif [ "${run_pancancer_launcher^^}" = 'N' ] ; then
+    echo "You can run this script at another time to run the pancancer launcher"
+    exit 0
+  fi
 done
 echo "Exiting now."
 set +e

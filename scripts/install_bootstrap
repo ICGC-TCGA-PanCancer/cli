@@ -241,7 +241,7 @@ AWS_CONFIG
       # Run this in the background so that if if fails, it fails silently.
       set +e
       user_asked_about_tracking="1"
-      wget -T -q 30 http://pancancer.info/launcher_stats_L4A.html &
+      wget -O ./.tmpstats -T 30 http://pancancer.info/launcher_stats_L4A.html &
       set -e
     fi
 

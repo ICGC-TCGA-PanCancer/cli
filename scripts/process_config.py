@@ -122,4 +122,3 @@ def main(config_path):
     shutil.copy2(config_path + '/masterConfig.ini','/home/ubuntu/arch3/config/masterConfig.ini')
     shutil.copy2(config_path + '/params.json','/home/ubuntu/params.json')
 
-main(os.path.abspath(sys.argv[1]))

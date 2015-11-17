@@ -234,7 +234,7 @@ AWS_CONFIG
     allow_usage_tracking=''
     while [[ -z "${allow_usage_tracking// /}" && "${allow_usage_tracking^^}" != 'Y' &&  "${allow_usage_tracking^^}" != 'N' ]] ; do
       if [ -z $ASKED_ABOUT_USAGE_TRACKING ] ; then
-        read -ep $'Would you like to allow us to record some very basic anonymous usage statistics for the Pancancer Launcher?\nWe are only interested in the number of times a Launcher is run: [Y/N]\n' allow_usage_tracking
+        read -ep $'Can we collect basic usage statistics for the PanCancer Launcher (we only record the number of times a Launcher is run): [Y/N]\n' -i "Y" allow_usage_tracking
       else
     	# If we've already asked them, then set this to 'N'
 	    allow_usage_tracking='N'
@@ -243,11 +243,10 @@ AWS_CONFIG
     if [ $allow_usage_tracking == 'Y' ] ; then
       # Run this in the background so that if if fails, it fails silently.
       set +e
-      user_asked_about_tracking="1"
       wget -q -O ./.tmpstats -T 30 http://pancancer.info/launcher_stats_L4A.html &
       set -e
     fi
-
+    user_asked_about_tracking="Y"
     # now wget the start_launcher_container script and call it with the values from above:
     $(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
     chmod u+x start_launcher_container.sh

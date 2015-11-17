@@ -44,6 +44,9 @@ class SysConfig(cliff.command.Command):
         return az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_ad_tenant_id, az_ad_client_id
     
     def _ask_question_or_set_to_prev(self,force_config, bootstrap_key, bootstrap_config, json_key, json_config, question, alt_condition=None, allow_blank=False):
+        """Looks in bootstrap_config[bootstrap_key] and then in json_config[json_key] and if no value is found, the user is asked a question and the answer is returned.
+        If force_config is specified, the user will always be asked the question. alt_condition is a lambda that can be used to validate the answer.
+        allow_blank allows the user to not answer the question and a blank answer will be accepted (this is False by default)."""
         user_answer=''
         prev_value=''
         if json_key in json_config:
@@ -268,17 +271,22 @@ class SysConfig(cliff.command.Command):
             # Write the simple JSON config that will be used for the rest of pancancer system.
             # This JSON file will be used as the input to the template file "panancer_config.mustache".
             pancancer_config = { 'max_fleet_size':fleet_size, 'path_to_key': pem_key_path,
-                                'name_of_key':key_name, 'aws_secret_key':aws_secret_key,
-                                'security_group': security_group, 'aws_key':aws_key,
+                                'name_of_key':key_name, 'security_group': security_group}
+            if cloud_env == 'AWS':
+                pancancer_config.update( { 'aws_secret_key':aws_secret_key,
+                                'aws_key':aws_key,
                                 'workflow_listing_url': workflow_listing_url,
-                                'spot_price': spot_price,
-                                'az_subscription_id': az_subscription_id, 'az_storage_account': az_storage_account,
+                                'spot_price': spot_price} )
+            elif cloud_env == 'Azure':
+                pancancer_config.update( { 'az_subscription_id': az_subscription_id, 'az_storage_account': az_storage_account,
                                 'az_storage_account_key': az_storage_account_key, 'az_ad_user': az_ad_user,
                                 'az_ad_password': az_ad_password, 'az_ad_tenant_id': az_tenant_id,
-                                'az_ad_client_id': az_client_id,
-                                'os_username': os_username, 'os_password': os_password,
+                                'az_ad_client_id': az_client_id } )
+            elif cloud_env == 'OpenStack':
+                pancancer_config.update( {'os_username': os_username, 'os_password': os_password,
                                 'os_endpoint': os_endpoint, 'os_region': os_region,
-                                'os_zone': os_zone }
+                                'os_zone': os_zone } )
+
 
             if not os.path.exists(os.path.expanduser('~/.pancancer')):
                 os.makedirs(os.path.expanduser('~/.pancancer'))
@@ -289,11 +297,12 @@ class SysConfig(cliff.command.Command):
                 self.log.info('The next time you want to run \"pancancer sysconfig\", you can use this file like this: ')
                 self.log.info('pancancer sysconfig --config '+pancancer_config_path)
 
-            # Copy the AWS config file to ~/.gnos, because some workflows may need it to access S3 and it's just easier to do this automatically
-            # then to tell the user to do it. We don't copy to ~/.aws because currently, the ~/.gnos directory and its contents get copied to the 
-            # workers and ~/.gnos on the worker will get mounted into the running seqware container. In the future, it may be possible to copy ~/.aws
-            # to the workers and have the seqware container look at that as well as ~/.gnos ...
-            shutil.copy2(aws_config_path,os.path.expanduser('~/.gnos/config'))
+            if cloud_env =='AWS':
+                # Copy the AWS config file to ~/.gnos, because some workflows may need it to access S3 and it's just easier to do this automatically
+                # then to tell the user to do it. We don't copy to ~/.aws because currently, the ~/.gnos directory and its contents get copied to the 
+                # workers and ~/.gnos on the worker will get mounted into the running seqware container. In the future, it may be possible to copy ~/.aws
+                # to the workers and have the seqware container look at that as well as ~/.gnos ...
+                shutil.copy2(aws_config_path,os.path.expanduser('~/.gnos/config'))
 
             # Now that a config is written, USE IT!!
             process_config.main(pancancer_config_path)

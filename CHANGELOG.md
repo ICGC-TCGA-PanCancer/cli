@@ -1,5 +1,9 @@
 # Changes
 
+## L4A_1.0.0
+ - Add simple question to install_bootstrap asking if user is OK with tracking/logging usage.
+ - New AMI ID for BWA.
+
 ## L4A_1.0.0-rc.3
  - Allow user to set spot price via `pancancer sysconfig --force`.
  - Minor bug fixes.

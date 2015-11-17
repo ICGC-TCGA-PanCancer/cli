@@ -93,9 +93,9 @@ $ scp -i <YOUR PEM KEY FILE>.pem <YOUR PEM KEY FILE>.pem ubuntu@<YOUR VM PUBLIC 
    See "Transferring Files to Linux Instances from Linux Using SCP" on [this page](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) for more details about copying files to your VM.
 
 ### Run Installer
-Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
+Download & execute the bootstrap script like this:
 ```
-$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/L4A_1.0.0-rc.3/install_bootstrap && bash install_bootstrap
+$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/L4A_1.0.0/install_bootstrap && bash install_bootstrap
 ```
 This script will install docker (you can skip this step by answering "N" if you already have docker installed), the pancancer_launcher image, and collect some basic configuration info to get the launcher started. 
 

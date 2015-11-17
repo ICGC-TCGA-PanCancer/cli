@@ -1,4 +1,5 @@
 import os
+import decimal
 import logging
 import cliff.command
 import configparser
@@ -17,31 +18,60 @@ class SysConfig(cliff.command.Command):
         # Need to have a "force" option
         return parser
 
-    def _get_config_value(self,user_value,prev_user_value,message, alt_condition=None):
+    def _get_config_value(self,prev_user_value,message, alt_condition=None, allow_blank=False):
         "This function will prompt the use with a question and will keep prompting them until a valid value is given."
+        user_value=''
         while (alt_condition == None and user_value.strip() == '') or (alt_condition != None and alt_condition(user_value)):
             prev_value_prompt = ''
             if prev_user_value != '':
                 prev_value_prompt = '[Press \"ENTER\" to use the previous value: '+str(prev_user_value)+', or type a new value if you want]'
             user_value = input(message + ' ' + prev_value_prompt+'? ')
             user_value = str(user_value).strip() or str(prev_user_value).strip()
-            if user_value=='':
+            if user_value=='' and not allow_blank:
                 self.log.info('This value cannot be blank.')
 
         return user_value
 
-    def _ask_Azure_questions(self):
-        None   
-    
-    def _ask_OpenStack_questions(self):
-        None
+    def _ask_Azure_questions(self,force_config, config_data, H):
 
+        az_subscription_id = self._ask_question_or_set_to_prev(force_config,  'AZURE_SUBSCRIPTION', H, 'az_subscription_id', config_data, 'What is your Azure subscription ID')
+        az_storage_account = self._ask_question_or_set_to_prev(force_config,  'AZURE_STORAGE_ACCOUNT', H, 'az_storage_account', config_data, 'What is your Azure storage account ID')
+        az_storage_account_key = self._ask_question_or_set_to_prev(force_config,  'AZURE_STORAGE_ACCOUNT_KEY', H, 'az_storage_account_key', config_data, 'What is your Azure storage account key')
+        az_ad_user = self._ask_question_or_set_to_prev(force_config,  'AZURE_AD_USER', H, 'az_ad_user', config_data, 'What is your Azure Active Directory username')
+        az_ad_password = self._ask_question_or_set_to_prev(force_config,  'AZURE_AD_PASSWD', H, 'az_ad_password', config_data, 'What is your Azure Active Directory password')
+        az_ad_tenant_id = self._ask_question_or_set_to_prev(force_config,  'AZURE_AD_TENANT', H, 'az_ad_tenant_id', config_data, 'What is your Azure Active Directory tenant ID')
+        az_ad_client_id = self._ask_question_or_set_to_prev(force_config,  'AZURE_AD_CLIENT', H, 'az_ad_client_id', config_data, 'What is your Azure Active Directory client ID')
+        return az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_ad_tenant_id, az_ad_client_id
+    
+    def _ask_question_or_set_to_prev(self,force_config, bootstrap_key, bootstrap_config, json_key, json_config, question, alt_condition=None, allow_blank=False):
+        user_answer=''
+        prev_value=''
+        if json_key in json_config:
+            prev_value = json_config[json_key]
+        elif bootstrap_key in bootstrap_config:
+            prev_value = bootstrap_config[bootstrap_key]
+        
+        if force_config:
+            user_answer = self._get_config_value(prev_value, question, alt_condition, allow_blank)
+        else:
+            user_answer = prev_value
+        
+        return user_answer
+
+    
+    def _ask_OpenStack_questions(self,force_config, config_data, H):
+        os_username = self._ask_question_or_set_to_prev(force_config,'OS_USERNAME', H, 'os_username', config_data, 'What is your OpenStack username (formatted as: username:tenant)')
+        os_password = self._ask_question_or_set_to_prev(force_config,'OS_PASSWORD', H, 'os_password', config_data, 'What is your OpenStack password')
+        os_endpoint = self._ask_question_or_set_to_prev(force_config,'OS_ENDPOINT', H, 'os_endpoint', config_data, 'What is your OpenStack endpoint')
+        os_region = self._ask_question_or_set_to_prev(force_config,'OS_REGION', H, 'os_region', config_data, 'What is your OpenStack region')
+        os_zone = self._ask_question_or_set_to_prev(force_config,'OS_ZONE', H, 'os_zone', config_data, 'What is your OpenStack zone',allow_blank=True)
+        return os_username, os_password, os_endpoint, os_region, os_zone
 
     def _ask_for_AWS_Keys(self, force_config, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config):
         # AWS Key and Secret Key should only be asked for if for some reason they are NOT available (they *should* be, but stuff happens...)
         if force_config or prev_aws_key.strip() == '' or prev_aws_secret_key.strip() == '':
-            aws_key = self._get_config_value(aws_key, prev_aws_key, 'What is your AWS Key')
-            aws_secret_key = self._get_config_value(aws_secret_key, prev_aws_secret_key, 'What is your AWS Secret Key') # If the AWS keys weren't available, ~/.aws/config is either not present or missing values, so re-write it.
+            aws_key = self._get_config_value( prev_aws_key, 'What is your AWS Key')
+            aws_secret_key = self._get_config_value( prev_aws_secret_key, 'What is your AWS Secret Key') # If the AWS keys weren't available, ~/.aws/config is either not present or missing values, so re-write it.
             aws_config = configparser.ConfigParser()
             aws_config['default'] = {'aws_access_key_id':aws_key, 'aws_secret_access_key':aws_secret_key}
             with open(aws_config_path, 'w') as aws_configfile:
@@ -62,11 +92,22 @@ class SysConfig(cliff.command.Command):
         if prev_security_group.strip() == '':
             prev_security_group = 'default'
         if force_config:
-            security_group = self._get_config_value(security_group, prev_security_group, 'What AWS Security Group should the VMs belong to')
+            security_group = self._get_config_value( prev_security_group, 'What AWS Security Group should the VMs belong to')
         else:
             security_group = prev_security_group
         return security_group
 
+
+    def _check_for_positive_decimal(self,x):
+        "This checks that the input is a positive decimal number"
+        try:
+            d = decimal.Decimal(x)
+            if d>0:
+                return True
+            else:
+                return False
+        except:
+            return False
 
     def _ask_for_spot_price(self, force_config, config_data):
         spot_price=''
@@ -75,9 +116,8 @@ class SysConfig(cliff.command.Command):
             prev_spot_price = config_data['spot_price']
         if prev_spot_price.strip() == '':
             prev_spot_price = '0.001' # User will only be asked about spot price if they FORCE a sysconfig. Otherwise, Keep It Simple and stick with 0.001 which triggers on-demand instances.
-        # TODO: Add condition that input must be a positive float
         if force_config:
-            spot_price = self._get_config_value(spot_price, prev_spot_price, 'What spot price would you like to set')
+            spot_price = self._get_config_value( prev_spot_price, 'What spot price would you like to set', alt_condition=lambda x: self._check_for_positive_decimal(x))
         else:
             spot_price = prev_spot_price
         return spot_price
@@ -124,8 +164,6 @@ class SysConfig(cliff.command.Command):
                 prev_aws_secret_key = aws_config['default']['aws_secret_access_key']
 
 
-            #TODO: Split this up into separate functions for each different cloud environment.
-
             # also: get fleet name, PEM key path, and key name from env. If everything went smoothly, these values should be in
             # /opt/from_host/config/pancancer.config
             # Actually, fleet name should be coming from process_config.py, not here, since it's passed into the container as an environment variable.
@@ -141,8 +179,10 @@ class SysConfig(cliff.command.Command):
             fleet_size=''
             workflow_listing_url=''
             cloud_env=''
+            bootstrap_config_exists = False
             if os.path.isfile(bootstrap_config_path):
                 self.log.debug('bootstrap config file exists at: '+bootstrap_config_path)
+                bootstrap_config_exists = True
                 # load simple config file (it should have been generated by install_bootrap) and get values.
                 H = dict(line.strip().split('=') for line in open(bootstrap_config_path))
                 
@@ -151,10 +191,12 @@ class SysConfig(cliff.command.Command):
                     if k.startswith('"') and k.endswith('"'):
                         H[k] = H[k][1:-1]
                 
-                if 'CLOUD_ENV' in H:
-                    cloud_env = H['CLOUD_ENV']
-                else:
-                    self._get_config_value(cloud_env, '', 'What Cloud Environment (allowable values are "AWS","Azure","OpenStack" are you working in', alt_condition = lambda x: x.strip() =='AWS' or x.strip() =='Azure' or x.strip() =='OpenStack')
+                
+                cloud_env = self._ask_question_or_set_to_prev(force_config, 'CLOUD_ENV', H, 'cloud_env', config_data, 'What Cloud Environment (allowable values are "AWS","Azure","OpenStack" are you working in', alt_condition = lambda x: x.strip() =='AWS' or x.strip() =='Azure' or x.strip() =='OpenStack')
+#                 if 'CLOUD_ENV' in H:
+#                     cloud_env = H['CLOUD_ENV']
+#                 else:
+#                     self._get_config_value('', 'What Cloud Environment (allowable values are "AWS","Azure","OpenStack" are you working in', alt_condition = lambda x: x.strip() =='AWS' or x.strip() =='Azure' or x.strip() =='OpenStack')
                 
                 if 'PEM_PATH' in H:
                     prev_pem_key_path = H['PEM_PATH']
@@ -176,7 +218,7 @@ class SysConfig(cliff.command.Command):
                 if str(prev_fleet_size).strip() == '':
                     prev_fleet_size = 1
                 if force_config:
-                    fleet_size = self._get_config_value(fleet_size, prev_fleet_size, 'How many VMs do you want in your fleet', alt_condition = lambda x: x.strip()=='' or x.isdigit() == False or int(x)<=0 )
+                    fleet_size = self._get_config_value( prev_fleet_size, 'How many VMs do you want in your fleet', alt_condition = lambda x: x.strip()=='' or x.isdigit() == False or int(x)<=0 )
                 else:
                     fleet_size = prev_fleet_size
 
@@ -184,29 +226,44 @@ class SysConfig(cliff.command.Command):
                     pem_key_path = prev_pem_key_path
                 if prev_key_name.strip() != '':
                     key_name = prev_key_name
-
-                if cloud_env == 'AWS':
-                    # Ask AWS questions
-                    aws_secret_key, aws_key, security_group, spot_price = self._ask_AWS_questions(force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config, prev_pem_key_path,  prev_key_name, H)
-                elif cloud_env == 'Azure':
-                    # TODO: Ask Azure questions
-                    az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_tenant_id, az_client_id = self._ask_Azure_questions()
-                elif cloud_env == 'OpenStack':
-                    # TODO: Ask OpenStack questions
-                    os_username, os_password, os_endpoint, os_region, os_zone = self._ask_OpenStack_questions()
             else:
                 self.log.debug('bootstrap config file cannot be found at: '+bootstrap_config_path+' so a new one will be written.')
 
+            if cloud_env == 'AWS':
+                # Ask AWS questions
+                aws_secret_key, aws_key, security_group, spot_price = self._ask_AWS_questions(force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config, prev_pem_key_path,  prev_key_name, H)
+            elif cloud_env == 'Azure':
+                # Ask Azure questions
+                az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_tenant_id, az_client_id = self._ask_Azure_questions(force_config, config_data, H)
+            elif cloud_env == 'OpenStack':
+                # Ask OpenStack questions
+                os_username, os_password, os_endpoint, os_region, os_zone = self._ask_OpenStack_questions(force_config, config_data, H)
+
+
             # Only ask the use about these if one or the other does not exist (indicates there might be a config value/file problem somewhere)
-            if force_config or prev_pem_key_path.strip()=='' or prev_key_name.strip()=='' :
-                pem_key_path = self._get_config_value(pem_key_path, prev_pem_key_path, 'What is the path to the AWS pem key file that your new VMs to use')
-                key_name = self._get_config_value(key_name, prev_key_name, 'What is the Name of this key in AWS')
+            if force_config or prev_pem_key_path.strip()=='' or prev_key_name.strip()=='' or not bootstrap_config_exists:
+                pem_key_path = self._get_config_value( prev_pem_key_path, 'What is the path to the pem key file that your new VMs to use')
+                key_name = self._get_config_value( prev_key_name, 'What is the Name of this key')
                 # Now (re)write the bootstrap config file if the user forced sysconfig, OR if the key name or path were missing (because those should never be missing).
                 with open(bootstrap_config_path,'w') as bootstrap_config:
                     bootstrap_config.write('PEM_PATH='+pem_key_path+'\n')
                     bootstrap_config.write('KEY_NAME='+key_name+'\n')
                     bootstrap_config.write('FLEET_NAME='+os.environ['FLEET_NAME']+'\n')
                     bootstrap_config.write('WORKFLOW_LISTING_URL='+workflow_listing_url+'\n')
+                    bootstrap_config.write('SECURITY_GROUP='+security_group+'\n')
+                    bootstrap_config.write('AZURE_SUBSCRIPTION='+az_subscription_id+'\n')
+                    bootstrap_config.write('AZURE_STORAGE_ACCOUNT='+az_storage_account+'\n')
+                    bootstrap_config.write('AZURE_STORAGE_ACCOUNT_KEY='+az_storage_account_key+'\n')
+                    bootstrap_config.write('AZURE_AD_USER='+az_ad_user+'\n')
+                    bootstrap_config.write('AZURE_AD_PASSWD='+az_ad_password+'\n')
+                    bootstrap_config.write('AZURE_AD_TENANT='+az_tenant_id+'\n')
+                    bootstrap_config.write('AZURE_AD_CLIENT='+az_client_id+'\n')
+                    bootstrap_config.write('OS_USERNAME='+os_username+'\n')
+                    bootstrap_config.write('OS_PASSWORD='+os_password+'\n')
+                    bootstrap_config.write('OS_ENDPOINT='+os_endpoint+'\n')
+                    bootstrap_config.write('OS_REGION='+os_region+'\n')
+                    bootstrap_config.write('OS_ZONE='+os_zone+'\n')
+
 
             # Write the simple JSON config that will be used for the rest of pancancer system.
             # This JSON file will be used as the input to the template file "panancer_config.mustache".
@@ -217,8 +274,8 @@ class SysConfig(cliff.command.Command):
                                 'spot_price': spot_price,
                                 'az_subscription_id': az_subscription_id, 'az_storage_account': az_storage_account,
                                 'az_storage_account_key': az_storage_account_key, 'az_ad_user': az_ad_user,
-                                'az_ad_password': az_ad_password, 'az_tenant_id': az_tenant_id,
-                                'az_client_id': az_client_id,
+                                'az_ad_password': az_ad_password, 'az_ad_tenant_id': az_tenant_id,
+                                'az_ad_client_id': az_client_id,
                                 'os_username': os_username, 'os_password': os_password,
                                 'os_endpoint': os_endpoint, 'os_region': os_region,
                                 'os_zone': os_zone }

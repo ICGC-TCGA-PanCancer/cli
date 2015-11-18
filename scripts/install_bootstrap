@@ -15,9 +15,8 @@ workflows installed on them for processing one or more genomes specified by the 
 This system requires the following:
 * Docker support in your Linux distribution (Ubuntu 14.04 is officially supported by the Pancancer Launcher)
 * AWS credentials
-* A GNOS key (or keys) which are used to both download Docker images for our workflows, dependencies, as well as data from from GNOS servers used in the project.
-  Please ensure that these files are in ~/.gnos
-* Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
+  * You will need to be able to launch EC2 virtual machines.
+  * You will need to be able to create and populate S3 buckets.
 MSG
 user_pancancer_version="L4A_1.0.0"
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.

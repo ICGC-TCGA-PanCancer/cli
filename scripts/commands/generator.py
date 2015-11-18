@@ -48,9 +48,9 @@ class Generator(cliff.command.Command):
                 master_config.read(master_config_path)
      
                 # if --force then do NOT check previous hash
-                master_config['generator']['check_previous_job_hash']=str(not force_generate)
+                master_config['generator']['check_previous_job_hash']=str(not force_generate).lower()
                 # keep_failed==true -> reap_failed_workers=false
-                master_config['provision']['reap_failed_workers']=str(not keep_failed)
+                master_config['provision']['reap_failed_workers']=str(not keep_failed).lower()
     
                 with open(master_config_path,'w') as master_config_file:
                     master_config.write(master_config_file,space_around_delimiters=True)

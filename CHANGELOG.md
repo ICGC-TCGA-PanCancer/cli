@@ -1,5 +1,10 @@
 # Changes
 
+## L4A_1.0.1
+ - Changed AMI ID
+ - Changed welcome text
+ - Fixed possible bug with usage of `--keep-failed`
+
 ## L4A_1.0.0
  - Add simple question to install_bootstrap asking if user is OK with tracking/logging usage.
  - New AMI ID for BWA.

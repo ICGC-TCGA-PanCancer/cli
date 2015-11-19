@@ -1,7 +1,7 @@
 #! /bin/bash
 set -e
-PANCANCER_LAUNCHER_VERSION=L4A_1.0.0
-PANCANCER_CLI_VERSION=L4A_1.0.0
+PANCANCER_LAUNCHER_VERSION=L4A_1.0.1
+PANCANCER_CLI_VERSION=L4A_1.0.1
 WORKFLOW_LISTING_URL=https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/L4A/config/workflowlist.json
 
 # TODO: make CLI version string here for URL for workflow info
@@ -18,7 +18,7 @@ This system requires the following:
   * You will need to be able to launch EC2 virtual machines.
   * You will need to be able to create and populate S3 buckets.
 MSG
-user_pancancer_version="L4A_1.0.0"
+user_pancancer_version="L4A_1.0.1"
 #FYI: The weird "^^" is to make the user input into uppercase so that if they enter "y" the installer will still run.
 install_pancancer_launcher=''
 while [[ "${install_pancancer_launcher^^}" != 'Y' &&  "${install_pancancer_launcher^^}" != 'N' ]] ; do

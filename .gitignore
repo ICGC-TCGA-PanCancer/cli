@@ -19,6 +19,8 @@ nytprof.out
 *.bs
 /_eumm/
 __pycache__
+*.orig
+*.log
 # Eclipse stuff
 .project
 .pydevproject

@@ -29,7 +29,8 @@ class SysConfig(cliff.command.Command):
             user_value = str(user_value).strip() or str(prev_user_value).strip()
             if user_value=='' and not allow_blank:
                 self.log.info('This value cannot be blank.')
-
+            elif user_value=='' and allow_blank:
+                return user_value
         return user_value
 
     def _ask_Azure_questions(self,force_config, config_data, H):
@@ -191,11 +192,10 @@ class SysConfig(cliff.command.Command):
                 
                 #Now, need to strip the leading and trailing double-quotes
                 for k in H:
-                    if k.startswith('"') and k.endswith('"'):
-                        H[k] = H[k][1:-1]
+                    H[k] = H[k].lstrip('"').rstrip('"')
                 
                 
-                cloud_env = self._ask_question_or_set_to_prev(force_config, 'CLOUD_ENV', H, 'cloud_env', config_data, 'What Cloud Environment (allowable values are "AWS","Azure","OpenStack" are you working in', alt_condition = lambda x: x.strip() =='AWS' or x.strip() =='Azure' or x.strip() =='OpenStack')
+                cloud_env = self._ask_question_or_set_to_prev(force_config, 'CLOUD_ENV', H, 'cloud_env', config_data, 'What Cloud Environment (must be one of: AWS, Azure, OpenStack) are you working in', alt_condition = lambda x: x.strip() =='AWS' or x.strip() =='Azure' or x.strip() =='OpenStack')
 #                 if 'CLOUD_ENV' in H:
 #                     cloud_env = H['CLOUD_ENV']
 #                 else:
@@ -254,24 +254,27 @@ class SysConfig(cliff.command.Command):
                     bootstrap_config.write('FLEET_NAME='+os.environ['FLEET_NAME']+'\n')
                     bootstrap_config.write('WORKFLOW_LISTING_URL='+workflow_listing_url+'\n')
                     bootstrap_config.write('SECURITY_GROUP='+security_group+'\n')
-                    bootstrap_config.write('AZURE_SUBSCRIPTION='+az_subscription_id+'\n')
-                    bootstrap_config.write('AZURE_STORAGE_ACCOUNT='+az_storage_account+'\n')
-                    bootstrap_config.write('AZURE_STORAGE_ACCOUNT_KEY='+az_storage_account_key+'\n')
-                    bootstrap_config.write('AZURE_AD_USER='+az_ad_user+'\n')
-                    bootstrap_config.write('AZURE_AD_PASSWD='+az_ad_password+'\n')
-                    bootstrap_config.write('AZURE_AD_TENANT='+az_tenant_id+'\n')
-                    bootstrap_config.write('AZURE_AD_CLIENT='+az_client_id+'\n')
-                    bootstrap_config.write('OS_USERNAME='+os_username+'\n')
-                    bootstrap_config.write('OS_PASSWORD='+os_password+'\n')
-                    bootstrap_config.write('OS_ENDPOINT='+os_endpoint+'\n')
-                    bootstrap_config.write('OS_REGION='+os_region+'\n')
-                    bootstrap_config.write('OS_ZONE='+os_zone+'\n')
+                    if cloud_env == 'Azure':
+                        bootstrap_config.write('AZURE_SUBSCRIPTION='+az_subscription_id+'\n')
+                        bootstrap_config.write('AZURE_STORAGE_ACCOUNT='+az_storage_account+'\n')
+                        bootstrap_config.write('AZURE_STORAGE_ACCOUNT_KEY='+az_storage_account_key+'\n')
+                        bootstrap_config.write('AZURE_AD_USER='+az_ad_user+'\n')
+                        bootstrap_config.write('AZURE_AD_PASSWD='+az_ad_password+'\n')
+                        bootstrap_config.write('AZURE_AD_TENANT='+az_tenant_id+'\n')
+                        bootstrap_config.write('AZURE_AD_CLIENT='+az_client_id+'\n')
+                    elif cloud_env == 'OpenStack':
+                        bootstrap_config.write('OS_USERNAME='+os_username+'\n')
+                        bootstrap_config.write('OS_PASSWORD='+os_password+'\n')
+                        bootstrap_config.write('OS_ENDPOINT='+os_endpoint+'\n')
+                        bootstrap_config.write('OS_REGION='+os_region+'\n')
+                        bootstrap_config.write('OS_ZONE='+os_zone+'\n')
+
 
 
             # Write the simple JSON config that will be used for the rest of pancancer system.
             # This JSON file will be used as the input to the template file "panancer_config.mustache".
             pancancer_config = { 'max_fleet_size':fleet_size, 'path_to_key': pem_key_path,
-                                'name_of_key':key_name, 'security_group': security_group}
+                                'name_of_key':key_name, 'security_group': security_group, 'cloud_env':cloud_env}
             if cloud_env == 'AWS':
                 pancancer_config.update( { 'aws_secret_key':aws_secret_key,
                                 'aws_key':aws_key,

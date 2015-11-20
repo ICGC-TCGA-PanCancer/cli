@@ -71,11 +71,11 @@ def main(config_path):
         simple_config['queue_host'] = os.environ['SENSU_SERVER_IP_ADDRESS']
         simple_config['fleet_name'] = os.environ['FLEET_NAME']
         simple_config['cloud_env'] = os.environ['HOST_ENV']
-        if simple_config['cloud_env'] == 'Azure':
+        if simple_config['cloud_env'].upper() == 'AZURE':
             simple_config['use_openstack'] = "false"
             simple_config['use_azure'] = "true"
             simple_config['youxia_env_opt'] = '--azure'
-        elif simple_config['cloud_env'] == 'OpenStack':
+        elif simple_config['cloud_env'].upper() == 'OPENSTACK':
             simple_config['use_openstack'] = "true"
             simple_config['use_azure'] = "false"
             simple_config['youxia_env_opt'] = '--openstack'

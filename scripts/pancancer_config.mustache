@@ -35,12 +35,6 @@
     },
     "deployer_openstack":
     {
-      "openstack_username":"{{os_username}}",
-      "openstack_password":"{{os_password}}",
-      "openstack_endpoint":"{{os_endpoint}}",
-      "openstack_key_name":"{{name_of_key}}",
-      "openstack_ssh_key":"{{path_to_key}}",
-      "openstack_region":"{{os_region}}",
       "flavor":"{{instance_type}}",
       "min_cores":4,
       "min_ram":16384,
@@ -110,7 +104,7 @@
     "provision":
     {
       "max_running_containers":{{max_fleet_size}},
-      "youxia_deployer_parameters":"--max-spot-price {{spot_price}}{{^spot_price}}0.001{{/spot_price}} --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file server-tags.json",
+      "youxia_deployer_parameters":"--max-spot-price {{spot_price}}{{^spot_price}}0.001{{/spot_price}} --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file server-tags.json {{youxia_env_opt}}",
       "youxia_reaper_parameters":"{{youxia_env_opt}}",
       "reap_failed_workers":""
     }

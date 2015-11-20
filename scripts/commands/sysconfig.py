@@ -274,11 +274,11 @@ class SysConfig(cliff.command.Command):
             # Write the simple JSON config that will be used for the rest of pancancer system.
             # This JSON file will be used as the input to the template file "panancer_config.mustache".
             pancancer_config = { 'max_fleet_size':fleet_size, 'path_to_key': pem_key_path,
-                                'name_of_key':key_name, 'security_group': security_group, 'cloud_env':cloud_env}
+                                'name_of_key':key_name, 'security_group': security_group, 'cloud_env':cloud_env,
+                                'workflow_listing_url':workflow_listing_url}
             if cloud_env == 'AWS':
                 pancancer_config.update( { 'aws_secret_key':aws_secret_key,
                                 'aws_key':aws_key,
-                                'workflow_listing_url': workflow_listing_url,
                                 'spot_price': spot_price} )
             elif cloud_env == 'Azure':
                 pancancer_config.update( { 'az_subscription_id': az_subscription_id, 'az_storage_account': az_storage_account,

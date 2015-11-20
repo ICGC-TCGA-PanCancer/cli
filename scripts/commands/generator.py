@@ -28,6 +28,7 @@ class Generator(cliff.command.Command):
         keep_failed=vars(parsed_args)['keep_failed']
         self.log.debug('workflow_name: %s',workflow_name)
         self.log.debug('all workflows: '+workflowlister.WorkflowLister.get_workflow_names())
+        cloud_env = os.environ['HOST_ENV'].upper()
         
         if workflow_name in workflowlister.WorkflowLister.get_workflow_keys():
 
@@ -57,6 +58,15 @@ class Generator(cliff.command.Command):
     
                 workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
                 
+                if cloud_env == 'AWS' :
+                    cloud_specific_details = workflow_details['cloud-specific-details']['aws']
+                elif cloud_env == 'OPENSTACK' : 
+                    cloud_specific_details = workflow_details['cloud-specific-details']['openstack']
+                elif cloud_env == 'AZURE' : 
+                    cloud_specific_details = workflow_details['cloud-specific-details']['azure']
+                else:
+                    self.log.error("Unrecognized cloud environment: "+cloud_env)
+
                 workflow_version = ''            
                 if 'http_workflow' in workflow_details:
                     workflow_version = workflow_details['http_workflow']['version']
@@ -83,12 +93,14 @@ class Generator(cliff.command.Command):
                         paramsData['s3_containers'] = workflow_details['s3_containers']
                     if 'http_containers' in workflow_details:
                         paramsData['http_containers'] = workflow_details['http_containers']
+                    
+                    paramsData['lvm_device_whitelist']=cloud_specific_details['lvm_device_whitelist']
     
                     # if --force then do NOT check previous hash
                     #paramsData['generator']['check_previous_job_hash']=str(not force_generate)
                     # keep_failed==true -> reap_failed_workers=false
                     #paramsData['provision']['reap_failed_workers']=str(not keep_failed)
-                    paramsData['lvm_device_whitelist'] = workflow_details['lvm_devices']
+                    #
                     paramsData['workflow_name'] = workflow_name
     
                 # Now write the params.json file.
@@ -98,8 +110,9 @@ class Generator(cliff.command.Command):
                 # Update the youxia config file with the correct AMI and instance-type
                 config = configparser.ConfigParser()
                 config.read('/home/ubuntu/.youxia/config')
-                config['deployer']['instance_type']=workflow_details['instance-type']
-                config['deployer']['ami_image']=workflow_details['ami_id']
+                config['deployer']['instance_type']=cloud_specific_details['instance-type']
+                config['deployer']['ami_image']=cloud_specific_details['image']
+                
                 with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
                     config.write(youxia_configfile,space_around_delimiters=True)
     

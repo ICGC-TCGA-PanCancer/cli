@@ -219,6 +219,8 @@ AWS_CONFIG
 			user_azure_AD_client='user_azure_AD_client'
 			ask_question "What is your Azure Active Directory client?" "$AZURE_AD_CLIENT" "Azure Active Directory client" $user_azure_AD_client
 
+            # TODO: Get public and private Azure IP addresses, or ask the user to provide them since it seems rather difficult to get them from the Azure API directly.
+
         elif [ $user_cloud_env == 'OpenStack' ] ; then
             ############################
             # OpenStack questions
@@ -234,7 +236,10 @@ AWS_CONFIG
 
 			user_os_region='user_os_region'
 			ask_question "What is your OpenStack region?" "$OS_REGION" "OpenStack region" $user_os_region
-                        
+
+            user_sec_grp='user_sec_grp'
+            ask_question "What is your Security Group?" "$SECURITY_GROUP" "Security Group" $user_sec_grp
+
             user_os_zone=''
             if [ ! -z $OS_ZONE ] ; then
                 read -ep $'What is your OpenStack zone? Previous value: \n' -i $OS_REGION user_os_zone

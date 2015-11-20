@@ -2,7 +2,7 @@
 set -e
 PANCANCER_LAUNCHER_VERSION=3.1.7
 PANCANCER_CLI_VERSION=0.0.7
-WORKFLOW_LISTING_URL=https://github.com/ICGC-TCGA-PanCancer/cli/blob/${PANCANCER_CLI_VERSION}/config/workflowlist.json
+WORKFLOW_LISTING_URL=https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/${PANCANCER_CLI_VERSION}/config/workflowlist.json
 
 cat <<MSG
 PANCANCER COMMAND LINE INTERFACE - INSTALLATION

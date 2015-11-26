@@ -240,8 +240,8 @@ AWS_CONFIG
             user_sec_grp='user_sec_grp'
             ask_question "What is your Security Group?" "$SECURITY_GROUP" "Security Group" $user_sec_grp
 
-            user_sec_grp='user_os_network_id'
-            ask_question "What is your OpenStack network ID?" "$OS_NETWORK_ID" "Security Group" $user_os_network_id
+            user_os_network_id='user_os_network_id'
+            ask_question "What is your OpenStack network ID?" "$OS_NETWORK_ID" "Network ID" $user_os_network_id
 
             user_os_zone=''
             if [ ! -z $OS_ZONE ] ; then

@@ -95,6 +95,11 @@ class Generator(cliff.command.Command):
                         paramsData['http_containers'] = workflow_details['http_containers']
                     
                     paramsData['lvm_device_whitelist']=cloud_specific_details['lvm_devices']
+                    
+                    if paramsData['lvm_device_whitelist'] == "" or paramsData['lvm_device_whitelist'].strip() == "":
+                        paramsData['use_lvm'] = "false"
+                    else:
+                        paramsData['use_lvm'] = "true"
     
                     # if --force then do NOT check previous hash
                     #paramsData['generator']['check_previous_job_hash']=str(not force_generate)

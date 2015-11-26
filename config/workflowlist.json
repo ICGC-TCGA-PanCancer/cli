@@ -23,7 +23,7 @@
           	},
           	"openstack":
           	{
-          		"image":"dd1b3c39-9ad4-4a0c-bfdd-d55f204b857e",
+          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
 				"instance-type":"m1.xlarge",
 				"lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"	
           	},

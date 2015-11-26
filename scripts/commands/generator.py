@@ -94,7 +94,7 @@ class Generator(cliff.command.Command):
                     if 'http_containers' in workflow_details:
                         paramsData['http_containers'] = workflow_details['http_containers']
                     
-                    paramsData['lvm_device_whitelist']=cloud_specific_details['lvm_device_whitelist']
+                    paramsData['lvm_device_whitelist']=cloud_specific_details['lvm_devices']
     
                     # if --force then do NOT check previous hash
                     #paramsData['generator']['check_previous_job_hash']=str(not force_generate)
@@ -110,9 +110,16 @@ class Generator(cliff.command.Command):
                 # Update the youxia config file with the correct AMI and instance-type
                 config = configparser.ConfigParser()
                 config.read('/home/ubuntu/.youxia/config')
-                config['deployer']['instance_type']=cloud_specific_details['instance-type']
-                config['deployer']['ami_image']=cloud_specific_details['image']
-                
+                if cloud_env == 'AWS':
+                    config['deployer']['instance_type']=cloud_specific_details['instance-type']
+                    config['deployer']['ami_image']=cloud_specific_details['image']
+                elif cloud_env == 'OPENSTACK':
+                    config['deployer_openstack']['flavor']=cloud_specific_details['instance-type']
+                    config['deployer_openstack']['image_id']=cloud_specific_details['image']
+                elif cloud_env == 'AZURE':
+                    config['deployer_azure']['flavor']=cloud_specific_details['instance-type']
+                    config['deployer_azure']['image_id']=cloud_specific_details['image']
+                    
                 with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
                     config.write(youxia_configfile,space_around_delimiters=True)
     

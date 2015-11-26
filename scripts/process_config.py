@@ -10,37 +10,33 @@ def makeConfigString(k,v):
 def processYouxiaSettings(d):
     outstr=''
     outstr+='[youxia]\n'
-    aws_str=''
     openstack_str=''
     aws_deployer_str=''
+    azure_deployer_str=''
     for k,v in d.items():
+        # If we encounter something that is not a dictionary (i.e. a scalar of some kind, probably string or numeric), just add it to the file.
         if not (isinstance(v,dict)):
             outstr+=makeConfigString(k,v)
+        # If we do find a dictionary, prepend it with the correct section heading.
         else:
-            # if k=='aws':
-            #     # Process AWS-specific variables in the AWS heading
-            #     # awsStr+='\n[aws]\n'
-            #     aws_settings=d['aws']
-            #     for k1,v1 in aws_settings.items():
-            #         aws_str+=makeConfigString(k1,str(v1))
             if k=='deployer_openstack':
                 openstack_str+='\n[deployer_openstack]\n'
                 openstack_settings=d['deployer_openstack']
                 for k1,v1 in openstack_settings.items():
                     openstack_str+=makeConfigString(k1,str(v1))
             elif k=='deployer_azure':
-                openstack_str+='\n[deployer_azure]\n'
-                openstack_settings=d['deployer_azure']
-                for k1,v1 in openstack_settings.items():
-                    openstack_str+=makeConfigString(k1,str(v1))
+                azure_deployer_str+='\n[deployer_azure]\n'
+                azure_settings=d['deployer_azure']
+                for k1,v1 in azure_settings.items():
+                    azure_deployer_str+=makeConfigString(k1,str(v1))
             elif k=='deployer':
                 aws_deployer_str+='\n[deployer]\n'
                 aws_deployer_settings=d['deployer']
                 for k1,v1 in aws_deployer_settings.items():
                     aws_deployer_str+=makeConfigString(k1,str(v1))
 
-    outstr+=aws_str
     outstr+=aws_deployer_str
+    outstr+=azure_deployer_str
     outstr+=openstack_str
     return outstr
 

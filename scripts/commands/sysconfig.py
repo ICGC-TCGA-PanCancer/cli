@@ -69,8 +69,9 @@ class SysConfig(cliff.command.Command):
         os_endpoint = self._ask_question_or_set_to_prev(force_config,'OS_ENDPOINT', H, 'os_endpoint', config_data, 'What is your OpenStack endpoint')
         os_region = self._ask_question_or_set_to_prev(force_config,'OS_REGION', H, 'os_region', config_data, 'What is your OpenStack region')
         os_zone = self._ask_question_or_set_to_prev(force_config,'OS_ZONE', H, 'os_zone', config_data, 'What is your OpenStack zone',allow_blank=True)
+        os_network_id = self._ask_question_or_set_to_prev(force_config,'OS_NETWORK_ID', H, 'os_network_id', config_data, 'What is your OpenStack network ID',allow_blank=True)
         security_group = self._ask_for_security_group(force_config, config_data, H)
-        return os_username, os_password, security_group, os_endpoint, os_region, os_zone
+        return os_username, os_password, security_group, os_endpoint, os_region, os_zone, os_network_id
 
     def _ask_for_AWS_Keys(self, force_config, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config):
         # AWS Key and Secret Key should only be asked for if for some reason they are NOT available (they *should* be, but stuff happens...)
@@ -241,7 +242,7 @@ class SysConfig(cliff.command.Command):
                 az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_tenant_id, az_client_id = self._ask_Azure_questions(force_config, config_data, H)
             elif cloud_env == 'OpenStack':
                 # Ask OpenStack questions
-                os_username, os_password, security_group, os_endpoint, os_region, os_zone = self._ask_OpenStack_questions(force_config, config_data, H)
+                os_username, os_password, security_group, os_endpoint, os_region, os_zone, os_network_id = self._ask_OpenStack_questions(force_config, config_data, H)
 
 
             # Only ask the use about these if one or the other does not exist (indicates there might be a config value/file problem somewhere)
@@ -289,7 +290,7 @@ class SysConfig(cliff.command.Command):
             elif cloud_env == 'OpenStack':
                 pancancer_config.update( {'os_username': os_username, 'os_password': os_password,
                                 'os_endpoint': os_endpoint, 'os_region': os_region,
-                                'os_zone': os_zone } )
+                                'os_zone': os_zone, 'os_network_id': os_network_id } )
 
 
             if not os.path.exists(os.path.expanduser('~/.pancancer')):

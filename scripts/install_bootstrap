@@ -240,6 +240,9 @@ AWS_CONFIG
             user_sec_grp='user_sec_grp'
             ask_question "What is your Security Group?" "$SECURITY_GROUP" "Security Group" $user_sec_grp
 
+            user_sec_grp='user_os_network_id'
+            ask_question "What is your OpenStack network ID?" "$OS_NETWORK_ID" "Security Group" $user_os_network_id
+
             user_os_zone=''
             if [ ! -z $OS_ZONE ] ; then
                 read -ep $'What is your OpenStack zone? Previous value: \n' -i $OS_REGION user_os_zone
@@ -327,6 +330,7 @@ AZURE_AD_CLIENT="${user_azure_AD_client}"
 OS_USERNAME="${user_os_username}"
 OS_PASSWORD="${user_os_password}"
 OS_ENDPOINT="${user_os_endpoint}"
+OS_NETWORK_ID="${user_os_network_id}"
 OS_REGION="${user_os_region}"
 OS_ZONE="${user_os_zone}"
 CONFIG

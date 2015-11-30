@@ -61,7 +61,17 @@ class Generator(cliff.command.Command):
                 if cloud_env == 'AWS' :
                     cloud_specific_details = workflow_details['cloud-specific-details']['aws']
                 elif cloud_env == 'OPENSTACK' : 
-                    cloud_specific_details = workflow_details['cloud-specific-details']['openstack']
+                    # Need to figure out which OpenStack environment they are working in. But... should that question be here, or in sysconfig?
+                    # Also: How to track this information so we only need to ask them once.
+                    if len(workflow_details['cloud-specific-details']['openstack'].keys())>1:
+                        print('Please enter one of the following OpenStack configurations that are available for this workflow:')
+                        for k in workflow_details['cloud-specific-details']['openstack']:
+                            print(k)
+                        user_value = input()
+                        cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][user_value]
+                    else:
+                        cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][0]
+                    
                 elif cloud_env == 'AZURE' : 
                     cloud_specific_details = workflow_details['cloud-specific-details']['azure']
                 else:

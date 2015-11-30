@@ -17,15 +17,17 @@ class Generator(cliff.command.Command):
         parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.',required=True)
         parser.add_argument('--force',dest='force_generate',help='Force the generation of the jobs, even if the system detects that the job has already been generated once before.', required=False, action='store_true')
         parser.add_argument('--keep_failed',dest='keep_failed',help='Keep failed workers in the fleet. Useful for debugging workflows.', required=False, action='store_true')
+        parser.add_argument('--os_env_name',dest='os_env_name',help='The name of the OpenStack environment you\'re working in. Only useful if you are working in OpenStack. If you omit this, you will be prompted for this information when necessary.', required=False)
         #parser.add_argument('--no_config_update',dest='no_config_update',help='Do not update any configuration files.', required=False, action='store_true')
         #parser.add_argument('--uses_gnos', dest='use_gnos',help='Indicates that your worfklow will be using GNOS repositories. --use_gnos and --use_s3 are not mutually exclusive - you could configure your workflow\'s INI file to use both GNOS and AWS S3 repositories.',required=False, default=True, choices=[True,False])
         #parser.add_argument('--uses_s3', dest='use_s3',help='Indicates that your worfklow will be using S3 repositories.  --use_gnos and --use_s3 are not mutually exclusive - you could configure your workflow\'s INI file to use both GNOS and AWS S3 repositories.',required=False, default=False, choices=[True,False])
         return parser
 
     def take_action(self, parsed_args):
-        workflow_name=vars(parsed_args)['workflow_name']
-        force_generate=vars(parsed_args)['force_generate']
-        keep_failed=vars(parsed_args)['keep_failed']
+        workflow_name = vars(parsed_args)['workflow_name']
+        force_generate = vars(parsed_args)['force_generate']
+        keep_failed = vars(parsed_args)['keep_failed']
+        os_env_name = vars(parsed_args)['os_env_name']
         self.log.debug('workflow_name: %s',workflow_name)
         self.log.debug('all workflows: '+workflowlister.WorkflowLister.get_workflow_names())
         cloud_env = os.environ['HOST_ENV'].upper()
@@ -61,16 +63,25 @@ class Generator(cliff.command.Command):
                 if cloud_env == 'AWS' :
                     cloud_specific_details = workflow_details['cloud-specific-details']['aws']
                 elif cloud_env == 'OPENSTACK' : 
-                    # Need to figure out which OpenStack environment they are working in. But... should that question be here, or in sysconfig?
-                    # Also: How to track this information so we only need to ask them once.
-                    if len(workflow_details['cloud-specific-details']['openstack'].keys())>1:
-                        print('Please enter one of the following OpenStack configurations that are available for this workflow:')
-                        for k in workflow_details['cloud-specific-details']['openstack']:
-                            print(k)
-                        user_value = input()
-                        cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][user_value]
-                    else:
+                    # If there is only one OpenStack choice, we'll just go with that.
+                    if len(workflow_details['cloud-specific-details']['openstack'].keys())<=1:
                         cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][0]
+                    else:
+                        # Check to see if the user did not provide an OpenStack environment name, or if it's not in the list of *actual* names
+                        if os_env_name is None or os_env_name not in workflow_details['cloud-specific-details']['openstack'].keys():
+                            print('Please enter one of the following OpenStack configurations that are available for this workflow:')
+                            for k in workflow_details['cloud-specific-details']['openstack']:
+                                print(k)
+                            user_value = input()
+                            while user_value.strip() != '' or user_value not in workflow_details['cloud-specific-details']['openstack'].keys():
+                                print('Sorry, but \''+user_value+'\' was not a valid value. Please try again, valid values are: ')
+                                for k in workflow_details['cloud-specific-details']['openstack']:
+                                    print(k)
+                                user_value = input()
+                            cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][user_value]
+                        else:
+                            # If the user provided an OpenStack environment name and it's legit, just use it.
+                            cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][os_env_name]
                     
                 elif cloud_env == 'AZURE' : 
                     cloud_specific_details = workflow_details['cloud-specific-details']['azure']

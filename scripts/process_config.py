@@ -75,6 +75,9 @@ def main(config_path):
             simple_config['use_openstack'] = "true"
             simple_config['use_azure'] = "false"
             simple_config['youxia_env_opt'] = '--openstack'
+        elif simple_config['cloud_env'].upper() == 'AWS':
+            simple_config['use_azure'] = "false"
+            simple_config['use_openstack'] = "false"
 
     config_path = os.path.dirname(__file__)
     with open(config_path +'/pancancer_config.mustache') as mustache_template_file:

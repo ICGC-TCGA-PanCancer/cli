@@ -68,16 +68,16 @@ class Generator(cliff.command.Command):
                         cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][0]
                     else:
                         # Check to see if the user did not provide an OpenStack environment name, or if it's not in the list of *actual* names
-                        if os_env_name is None or os_env_name not in workflow_details['cloud-specific-details']['openstack'].keys():
+                        if os_env_name is None or os_env_name not in workflow_details['cloud-specific-details']['openstack']:
                             print('Please enter one of the following OpenStack configurations that are available for this workflow:')
                             for k in workflow_details['cloud-specific-details']['openstack']:
                                 print(k)
-                            user_value = input()
-                            while user_value.strip() != '' or user_value not in workflow_details['cloud-specific-details']['openstack'].keys():
+                            user_value = input().strip()
+                            while user_value.strip() == '' or user_value not in workflow_details['cloud-specific-details']['openstack']:
                                 print('Sorry, but \''+user_value+'\' was not a valid value. Please try again, valid values are: ')
                                 for k in workflow_details['cloud-specific-details']['openstack']:
                                     print(k)
-                                user_value = input()
+                                user_value = input().strip()
                             cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][user_value]
                         else:
                             # If the user provided an OpenStack environment name and it's legit, just use it.

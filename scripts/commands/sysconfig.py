@@ -236,7 +236,7 @@ class SysConfig(cliff.command.Command):
 
             if cloud_env == 'AWS':
                 # Ask AWS questions
-                aws_secret_key, aws_key, security_group, spot_price = self._ask_AWS_questions(force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config, prev_pem_key_path,  prev_key_name, H)
+                aws_secret_key, aws_key, security_group, spot_price = self._ask_AWS_questions(force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config,  H)
             elif cloud_env == 'Azure':
                 # Ask Azure questions
                 az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_tenant_id, az_client_id = self._ask_Azure_questions(force_config, config_data, H)

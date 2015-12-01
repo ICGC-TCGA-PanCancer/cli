@@ -231,19 +231,21 @@ class SysConfig(cliff.command.Command):
                     pem_key_path = prev_pem_key_path
                 if prev_key_name.strip() != '':
                     key_name = prev_key_name
+            
+                if cloud_env.upper() == 'AWS':
+                    # Ask AWS questions
+                    aws_secret_key, aws_key, security_group, spot_price = self._ask_AWS_questions(force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config,  H)
+                elif cloud_env.upper() == 'AZURE':
+                    # Ask Azure questions
+                    az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_tenant_id, az_client_id = self._ask_Azure_questions(force_config, config_data, H)
+                elif cloud_env.upper() == 'OPENSTACK':
+                    # Ask OpenStack questions
+                    os_username, os_password, security_group, os_endpoint, os_region, os_zone, os_network_id = self._ask_OpenStack_questions(force_config, config_data, H)
+                else:
+                    print('Unknown cloud environment: \''+cloud_env+'\'')
+            
             else:
                 self.log.debug('bootstrap config file cannot be found at: '+bootstrap_config_path+' so a new one will be written.')
-
-            if cloud_env == 'AWS':
-                # Ask AWS questions
-                aws_secret_key, aws_key, security_group, spot_price = self._ask_AWS_questions(force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config,  H)
-            elif cloud_env == 'Azure':
-                # Ask Azure questions
-                az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_tenant_id, az_client_id = self._ask_Azure_questions(force_config, config_data, H)
-            elif cloud_env == 'OpenStack':
-                # Ask OpenStack questions
-                os_username, os_password, security_group, os_endpoint, os_region, os_zone, os_network_id = self._ask_OpenStack_questions(force_config, config_data, H)
-
 
             # Only ask the use about these if one or the other does not exist (indicates there might be a config value/file problem somewhere)
             if force_config or prev_pem_key_path.strip()=='' or prev_key_name.strip()=='' or not bootstrap_config_exists:
@@ -256,7 +258,7 @@ class SysConfig(cliff.command.Command):
                     bootstrap_config.write('FLEET_NAME='+os.environ['FLEET_NAME']+'\n')
                     bootstrap_config.write('WORKFLOW_LISTING_URL='+workflow_listing_url+'\n')
                     bootstrap_config.write('SECURITY_GROUP='+security_group+'\n')
-                    if cloud_env == 'Azure':
+                    if cloud_env.upper() == 'AZURE':
                         bootstrap_config.write('AZURE_SUBSCRIPTION='+az_subscription_id+'\n')
                         bootstrap_config.write('AZURE_STORAGE_ACCOUNT='+az_storage_account+'\n')
                         bootstrap_config.write('AZURE_STORAGE_ACCOUNT_KEY='+az_storage_account_key+'\n')
@@ -264,7 +266,7 @@ class SysConfig(cliff.command.Command):
                         bootstrap_config.write('AZURE_AD_PASSWD='+az_ad_password+'\n')
                         bootstrap_config.write('AZURE_AD_TENANT='+az_tenant_id+'\n')
                         bootstrap_config.write('AZURE_AD_CLIENT='+az_client_id+'\n')
-                    elif cloud_env == 'OpenStack':
+                    elif cloud_env.upper() == 'OPENSTACK':
                         bootstrap_config.write('OS_USERNAME='+os_username+'\n')
                         bootstrap_config.write('OS_PASSWORD='+os_password+'\n')
                         bootstrap_config.write('OS_ENDPOINT='+os_endpoint+'\n')

@@ -5,9 +5,6 @@ import configparser
 import workflowlister
 import json
 import os
-# from commands.daemons import Provisioner
-# from commands.sysconfig import SysConfig
-
 
 class Generator(cliff.command.Command):
     "This Generator will generate new job orders based on the contents of ~/ini-dir. Be aware that it will also rewrite your params.json file and your ~.youxia/config file."
@@ -74,7 +71,7 @@ class Generator(cliff.command.Command):
                                 print(k)
                             user_value = input().strip()
                             while user_value.strip() == '' or user_value not in workflow_details['cloud-specific-details']['openstack']:
-                                print('Sorry, but \''+user_value+'\' was not a valid value. Please try again, valid values are: ')
+                                print('Sorry, but \''+user_value+'\' was not a valid value. Please try again; valid values are: ')
                                 for k in workflow_details['cloud-specific-details']['openstack']:
                                     print(k)
                                 user_value = input().strip()

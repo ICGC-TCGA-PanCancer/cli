@@ -26,7 +26,7 @@ class SysConfig(cliff.command.Command):
         if force_once:
             keep_asking = True
         else:
-            keep_asking = (alt_condition == None and user_value.strip() == '') or (alt_condition != None and alt_condition(user_value) )
+            keep_asking = (alt_condition == None and user_value.strip() == '' and not allow_blank) or (alt_condition != None and not alt_condition(user_value) )
         
         while keep_asking:
         #while (alt_condition == None and user_value.strip() == '') or (alt_condition != None and alt_condition(user_value) and not force_once):
@@ -39,7 +39,7 @@ class SysConfig(cliff.command.Command):
                 self.log.info('This value cannot be blank.')
             elif user_value=='' and allow_blank:
                 return user_value
-            keep_asking = ((alt_condition == None and user_value.strip() == '') or (alt_condition != None and alt_condition(user_value)))
+            keep_asking = ((alt_condition == None and user_value.strip() == '' and not allow_blank) or (alt_condition != None and not alt_condition(user_value)))
 
         return user_value
 
@@ -66,7 +66,7 @@ class SysConfig(cliff.command.Command):
             prev_value = bootstrap_config[bootstrap_key]
         
         if force_config:
-            user_answer = self._get_config_value(prev_value, question, alt_condition, allow_blank)
+            user_answer = self._get_config_value(prev_value, question, alt_condition, allow_blank, force_config)
         else:
             user_answer = prev_value
         
@@ -206,11 +206,7 @@ class SysConfig(cliff.command.Command):
                 for k in H:
                     H[k] = H[k].lstrip('"').rstrip('"')
                 
-                cloud_env = self._ask_question_or_set_to_prev(force_config, 'CLOUD_ENV', H, 'cloud_env', config_data, 'What Cloud Environment (must be one of: AWS, Azure, OpenStack) are you working in', alt_condition = lambda x: not(x.strip() =='AWS' or x.strip() =='Azure' or x.strip() =='OpenStack'))
-#                 if 'CLOUD_ENV' in H:
-#                     cloud_env = H['CLOUD_ENV']
-#                 else:
-#                     self._get_config_value('', 'What Cloud Environment (allowable values are "AWS","Azure","OpenStack" are you working in', alt_condition = lambda x: x.strip() =='AWS' or x.strip() =='Azure' or x.strip() =='OpenStack')
+                cloud_env = self._ask_question_or_set_to_prev(force_config, 'CLOUD_ENV', H, 'cloud_env', config_data, 'What Cloud Environment (must be one of: AWS, Azure, OpenStack) are you working in', alt_condition = lambda x: x.strip() =='AWS' or x.strip() =='Azure' or x.strip() =='OpenStack')
                 
                 if 'PEM_PATH' in H:
                     prev_pem_key_path = H['PEM_PATH']
@@ -220,23 +216,8 @@ class SysConfig(cliff.command.Command):
                 # pull the workflow URL from the config
                 if 'WORKFLOW_LISTING_URL' in H:
                     workflow_listing_url = H['WORKFLOW_LISTING_URL']
-                
-                # Fleet size could be defined in the bootstrap config file which should come from the host machine, or it could be defined in the pancancer config file.
-                # If there's nothing in pancancer config, we'll check in the bootstrap config, and if nothing there, default to 1
-#                 if 'max_fleet_size' in config_data:
-#                     prev_fleet_size = config_data['max_fleet_size']
-#                 else:
-#                     if 'FLEET_SIZE' in H:
-#                         prev_fleet_size = H['FLEET_SIZE']
-#                         prev_fleet_size = prev_fleet_size.replace('"','')
-#                 if str(prev_fleet_size).strip() == '':
-#                     prev_fleet_size = 1
-                
+
                 fleet_size = self._ask_question_or_set_to_prev(force_config, 'FLEET_SIZE', H, 'max_fleet_size', config_data, 'How many VMs do you want in your fleet', alt_condition = lambda x: x.strip()!='' and x.isdigit() and int(x)>0)
-#                 if force_config:
-#                     fleet_size = self._get_config_value( prev_fleet_size, 'How many VMs do you want in your fleet', alt_condition = lambda x: x.strip()!='' and x.isdigit() or int(x)>0 )
-#                 else:
-#                     fleet_size = prev_fleet_size
 
                 if prev_pem_key_path.strip() != '':
                     pem_key_path = prev_pem_key_path

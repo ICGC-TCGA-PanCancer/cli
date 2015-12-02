@@ -5,9 +5,6 @@ import configparser
 import workflowlister
 import json
 import os
-# from commands.daemons import Provisioner
-# from commands.sysconfig import SysConfig
-
 
 class Generator(cliff.command.Command):
     "This Generator will generate new job orders based on the contents of ~/ini-dir. Be aware that it will also rewrite your params.json file and your ~.youxia/config file."
@@ -17,17 +14,20 @@ class Generator(cliff.command.Command):
         parser.add_argument('--workflow',dest='workflow_name',help='The name of the workflow for which you would like to generate jobs.',required=True)
         parser.add_argument('--force',dest='force_generate',help='Force the generation of the jobs, even if the system detects that the job has already been generated once before.', required=False, action='store_true')
         parser.add_argument('--keep_failed',dest='keep_failed',help='Keep failed workers in the fleet. Useful for debugging workflows.', required=False, action='store_true')
+        parser.add_argument('--os_env_name',dest='os_env_name',help='The name of the OpenStack environment you\'re working in. Only useful if you are working in OpenStack. If you omit this, you will be prompted for this information when necessary.', required=False)
         #parser.add_argument('--no_config_update',dest='no_config_update',help='Do not update any configuration files.', required=False, action='store_true')
         #parser.add_argument('--uses_gnos', dest='use_gnos',help='Indicates that your worfklow will be using GNOS repositories. --use_gnos and --use_s3 are not mutually exclusive - you could configure your workflow\'s INI file to use both GNOS and AWS S3 repositories.',required=False, default=True, choices=[True,False])
         #parser.add_argument('--uses_s3', dest='use_s3',help='Indicates that your worfklow will be using S3 repositories.  --use_gnos and --use_s3 are not mutually exclusive - you could configure your workflow\'s INI file to use both GNOS and AWS S3 repositories.',required=False, default=False, choices=[True,False])
         return parser
 
     def take_action(self, parsed_args):
-        workflow_name=vars(parsed_args)['workflow_name']
-        force_generate=vars(parsed_args)['force_generate']
-        keep_failed=vars(parsed_args)['keep_failed']
+        workflow_name = vars(parsed_args)['workflow_name']
+        force_generate = vars(parsed_args)['force_generate']
+        keep_failed = vars(parsed_args)['keep_failed']
+        os_env_name = vars(parsed_args)['os_env_name']
         self.log.debug('workflow_name: %s',workflow_name)
         self.log.debug('all workflows: '+workflowlister.WorkflowLister.get_workflow_names())
+        cloud_env = os.environ['HOST_ENV'].upper()
         
         if workflow_name in workflowlister.WorkflowLister.get_workflow_keys():
 
@@ -57,6 +57,34 @@ class Generator(cliff.command.Command):
     
                 workflow_details = workflowlister.WorkflowLister.get_workflow_details(workflow_name)
                 
+                if cloud_env == 'AWS' :
+                    cloud_specific_details = workflow_details['cloud-specific-details']['aws']
+                elif cloud_env == 'OPENSTACK' : 
+                    # If there is only one OpenStack choice, we'll just go with that.
+                    if len(workflow_details['cloud-specific-details']['openstack'].keys())<=1:
+                        cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][0]
+                    else:
+                        # Check to see if the user did not provide an OpenStack environment name, or if it's not in the list of *actual* names
+                        if os_env_name is None or os_env_name not in workflow_details['cloud-specific-details']['openstack']:
+                            print('Please enter one of the following OpenStack configurations that are available for this workflow:')
+                            for k in workflow_details['cloud-specific-details']['openstack']:
+                                print(k)
+                            user_value = input().strip()
+                            while user_value.strip() == '' or user_value not in workflow_details['cloud-specific-details']['openstack']:
+                                print('Sorry, but \''+user_value+'\' was not a valid value. Please try again; valid values are: ')
+                                for k in workflow_details['cloud-specific-details']['openstack']:
+                                    print(k)
+                                user_value = input().strip()
+                            cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][user_value]
+                        else:
+                            # If the user provided an OpenStack environment name and it's legit, just use it.
+                            cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][os_env_name]
+                    
+                elif cloud_env == 'AZURE' : 
+                    cloud_specific_details = workflow_details['cloud-specific-details']['azure']
+                else:
+                    self.log.error("Unrecognized cloud environment: "+cloud_env)
+
                 workflow_version = ''            
                 if 'http_workflow' in workflow_details:
                     workflow_version = workflow_details['http_workflow']['version']
@@ -83,12 +111,19 @@ class Generator(cliff.command.Command):
                         paramsData['s3_containers'] = workflow_details['s3_containers']
                     if 'http_containers' in workflow_details:
                         paramsData['http_containers'] = workflow_details['http_containers']
+                    
+                    paramsData['lvm_device_whitelist']=cloud_specific_details['lvm_devices']
+                    
+                    if paramsData['lvm_device_whitelist'] == "" or paramsData['lvm_device_whitelist'].strip() == "":
+                        paramsData['single_node_lvm'] = "false"
+                    else:
+                        paramsData['single_node_lvm'] = "true"
     
                     # if --force then do NOT check previous hash
                     #paramsData['generator']['check_previous_job_hash']=str(not force_generate)
                     # keep_failed==true -> reap_failed_workers=false
                     #paramsData['provision']['reap_failed_workers']=str(not keep_failed)
-                    paramsData['lvm_device_whitelist'] = workflow_details['lvm_devices']
+                    #
                     paramsData['workflow_name'] = workflow_name
     
                 # Now write the params.json file.
@@ -98,8 +133,16 @@ class Generator(cliff.command.Command):
                 # Update the youxia config file with the correct AMI and instance-type
                 config = configparser.ConfigParser()
                 config.read('/home/ubuntu/.youxia/config')
-                config['deployer']['instance_type']=workflow_details['instance-type']
-                config['deployer']['ami_image']=workflow_details['ami_id']
+                if cloud_env == 'AWS':
+                    config['deployer']['instance_type']=cloud_specific_details['instance-type']
+                    config['deployer']['ami_image']=cloud_specific_details['image']
+                elif cloud_env == 'OPENSTACK':
+                    config['deployer_openstack']['flavor']=cloud_specific_details['instance-type']
+                    config['deployer_openstack']['image_id']=cloud_specific_details['image']
+                elif cloud_env == 'AZURE':
+                    config['deployer_azure']['flavor']=cloud_specific_details['instance-type']
+                    config['deployer_azure']['image_name']=cloud_specific_details['image']
+                    
                 with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
                     config.write(youxia_configfile,space_around_delimiters=True)
     

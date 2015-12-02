@@ -6,11 +6,27 @@
     "sensu_ip_address":"localhost",
     "sensu_port":"4567",
     "managed_tag":"{{fleet_name}}",
-    {{! Yes, I know, these are AWS-specific settings but that's how it is in the original youxia config. }}
     "aws_ssh_key":"{{path_to_key}}",
     "aws_key_name":"{{name_of_key}}",
     "region":"{{aws_region}}{{^aws_region}}us-east-1{{/aws_region}}",
     "zone":"{{aws_zones}}{{^aws_zones}}us-east-1a,us-east-1b,us-east-1c,us-east-1d,us-east-1e{{/aws_zones}}",
+	"openstack_username":"{{os_username}}",
+	"openstack_password":"{{os_password}}",
+	"openstack_endpoint":"{{os_endpoint}}",
+	"openstack_key_name":"{{name_of_key}}",
+	"openstack_ssh_key":"{{path_to_key}}",
+	"openstack_region":"{{os_region}}",
+	"openstack_zone":"{{os_zone}}",
+	"azure_ssh_key":"{{path_to_key}}",
+	"azure_subscription_id":"{{az_subscription_id}}",
+	"azure_keystore_location":"{{az_keystore_location}}{{^az_keystore_location}}/home/ubuntu/.keystore/launcher.jks{{/az_keystore_location}}",
+	"azure_keystore_password":"{{az_keystore_password}}{{^az_keystore_password}}launcherKeystore{{/az_keystore_password}}",
+	"azure_active_directory_username":"{{az_ad_user}}",
+	"azure_active_directory_password":"{{az_ad_password}}",
+	"azure_active_directory_tenant_id":"{{az_ad_tenant_id}}",
+	"azure_active_directory_client_id":"{{az_ad_client_id}}",
+	"azure_storage_account_name":"{{az_storage_account}}",
+	"azure_storage_account_key":"{{az_storage_account_key}}",
     "deployer":
     {
       "ami_image":"{{image_id}}",
@@ -19,14 +35,8 @@
       "product":"Linux/UNIX",
       "disable_sensu_server":true
     },
-    "openstack":
+    "deployer_openstack":
     {
-      "openstack_username":"{{os_username}}",
-      "openstack_password":"{{os_password}}",
-      "openstack_endpoint":"{{os_endpoint}}",
-      "openstack_key_name":"{{name_of_key}}",
-      "openstack_ssh_key":"{{path_to_key}}",
-      "openstack_region":"{{os_region}}",
       "flavor":"{{instance_type}}",
       "min_cores":4,
       "min_ram":16384,
@@ -34,8 +44,15 @@
       "security_group":"{{security_group}}",
       "network_id":"{{os_network_id}}",
       "arbitrary_wait":200000
+    },
+	"deployer_azure":
+    {
+      "flavor":"{{instance_type}}",
+      "image_name":"{{image_id}}",
+      "location":"{{az_location}}{{^az_location}}East US 2{{/az_location}}",
+      "virtual_network":"{{az_virtual_network}}",
+      "arbitrary_wait":200000
     }
-    {{! TODO: Add an openstack-deployer section }}
   },
   "params":
   {
@@ -45,60 +62,17 @@
     "aws_secret_key": "{{aws_secret_key}}",
     "seqware_version": "1.1.1",
     "workflow_name": "HelloWorld",
-    {{! Workflows will be injected into params.json by the "pancancer generator" command, because that's the first point where we know what the user wants.
-    "http_workflows": {
-      "DEWrapper": {
-        "name": "Workflow_Bundle_DEWrapperWorkflow_1.0.2_SeqWare_1.1.0",
-        "url": "http://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_DEWrapperWorkflow_1.0.2_SeqWare_1.1.0.zip"
-      },
-      "HelloWorld": {
-        "name": "Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.0",
-        "url":"http://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.0.zip"
-      }
-    },
-    "s3_workflows": {
-      "S3Workflow": {
-        "name":"Workflow_Bundle_OnlyAvailableFromS3_1.0_SeqWare_1.1.0",
-        "url":"s3://some.private.bucket/Workflow_Bundle_OnlyAvailableFromS3_1.0_SeqWare_1.1.0.zip"
-      }
-    },
-    "containers": {
-      "seqware_whitestar": {
-        "name": "seqware_whitestar",
-        "image_name": "seqware/seqware_whitestar:{ seqware_version }"
-      },
-      "pcawg-delly-workflow": {
-        "name":"pcawg-delly-workflow",
-        "image_name": "pancancer/pcawg-delly-workflow:1.0"
-      },
-      "pancancer_upload_download": {
-        "name": "pancancer_upload_download",
-        "image_name": "pancancer/pancancer_upload_download:1.1"
-      }
-    },
-    "s3_containers": {
-      "some_s3_container": {
-        "name": "some_s3_container_1.2.3",
-        "url": "s3://private.container.bucket/some_s3_container_1.2.3.tar"
-      }
-    },
-    "http_containers": {
-      "some_other_container": {
-        "name":"some_other_container",
-        "url":"http://www.some-other-organization.com/some_other_container.tar"
-      }
-    },
-    }}
     "install_workflow": "true",
     "test_workflow": false,
     "queueHost": "{{queue_host}}",
     "queueName": "pancancer_arch_3",
     "lvm_device_whitelist": "{{lvm_devices}}",
     "single_node_lvm": true,
-    "pancancer_arch3_version": "1.1-rc.1",
+    "pancancer_arch3_version": "1.1-rc.3",
     "seqware_engine":"whitestar-parallel",
     "seqware_use_custom_settings":false,
-    "azure": false
+    "azure":{{use_azure}},
+    "openstack":{{use_openstack}}
   },
   "consonance":
   {
@@ -132,8 +106,8 @@
     "provision":
     {
       "max_running_containers":{{max_fleet_size}},
-      "youxia_deployer_parameters":"--max-spot-price {{spot_price}}{{^spot_price}}0.001{{/spot_price}} --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file /home/ubuntu/arch3/server-tags.json",
-      "youxia_reaper_parameters":"",
+      "youxia_deployer_parameters":"--max-spot-price {{spot_price}}{{^spot_price}}0.001{{/spot_price}} --batch-size 3 --ansible-playbook /home/ubuntu/architecture-setup/container-host-bag/install.yml -e /home/ubuntu/params.json --server-tag-file server-tags.json {{youxia_env_opt}}",
+      "youxia_reaper_parameters":"{{youxia_env_opt}}",
       "reap_failed_workers":""
     }
   }

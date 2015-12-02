@@ -219,6 +219,12 @@ AWS_CONFIG
 			user_azure_AD_client='user_azure_AD_client'
 			ask_question "What is your Azure Active Directory client?" "$AZURE_AD_CLIENT" "Azure Active Directory client" $user_azure_AD_client
 
+			user_azure_virtual_network='user_azure_virtual_network'
+			ask_question "What is the name of the Virtual Network for this fleet?" "$AZURE_VIRTUAL_NETWORK" "Azure Virtual Network Name" $user_azure_virtual_network
+			
+			user_azure_location='user_azure_location'
+			ask_question "What Location do you want to use for this fleet?" "$AZURE_LOCATION" "Location" $user_azure_location
+
             # TODO: Get public and private Azure IP addresses, or ask the user to provide them since it seems rather difficult to get them from the Azure API directly.
 
         elif [ $user_cloud_env == 'OpenStack' ] ; then
@@ -332,6 +338,8 @@ AZURE_AD_USER="${user_azure_AD_user}"
 AZURE_AD_PASSWD="${user_azure_AD_passwd}"
 AZURE_AD_TENANT="${user_azure_AD_tenant}"
 AZURE_AD_CLIENT="${user_azure_AD_client}"
+AZURE_VIRTUAL_NETWORK="${user_azure_virtual_network}"
+AZURE_LOCATION="${user_azure_location}"
 OS_USERNAME="${user_os_username}"
 OS_PASSWORD="${user_os_password}"
 OS_ENDPOINT="${user_os_endpoint}"

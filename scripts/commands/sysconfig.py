@@ -52,7 +52,9 @@ class SysConfig(cliff.command.Command):
         az_ad_password = self._ask_question_or_set_to_prev(force_config,  'AZURE_AD_PASSWD', H, 'az_ad_password', config_data, 'What is your Azure Active Directory password')
         az_ad_tenant_id = self._ask_question_or_set_to_prev(force_config,  'AZURE_AD_TENANT', H, 'az_ad_tenant_id', config_data, 'What is your Azure Active Directory tenant ID')
         az_ad_client_id = self._ask_question_or_set_to_prev(force_config,  'AZURE_AD_CLIENT', H, 'az_ad_client_id', config_data, 'What is your Azure Active Directory client ID')
-        return az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_ad_tenant_id, az_ad_client_id
+        az_virtual_network = self._ask_question_or_set_to_prev(force_config,  'AZURE_VIRTUAL_NETWORK', H, 'az_virtual_network', config_data, 'What is the name of the Virtual Network you would like to use')
+        az_location = self._ask_question_or_set_to_prev(force_config,  'AZURE_LOCATION', H, 'az_location', config_data, 'What Location would you like to use')
+        return az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_ad_tenant_id, az_ad_client_id, az_virtual_network, az_location
     
     def _ask_question_or_set_to_prev(self,force_config, bootstrap_key, bootstrap_config, json_key, json_config, question, alt_condition=None, allow_blank=False):
         """Looks in bootstrap_config[bootstrap_key] and then in json_config[json_key] and if no value is found, the user is asked a question and the answer is returned.
@@ -229,7 +231,7 @@ class SysConfig(cliff.command.Command):
                     aws_secret_key, aws_key, security_group, spot_price = self._ask_AWS_questions(force_config, config_data, aws_config_path, aws_key, aws_secret_key, prev_aws_key, prev_aws_secret_key, aws_config,  H)
                 elif cloud_env.upper() == 'AZURE':
                     # Ask Azure questions
-                    az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_tenant_id, az_client_id = self._ask_Azure_questions(force_config, config_data, H)
+                    az_subscription_id, az_storage_account, az_storage_account_key, az_ad_user, az_ad_password, az_tenant_id, az_client_id, az_virtual_network, az_location = self._ask_Azure_questions(force_config, config_data, H)
                 elif cloud_env.upper() == 'OPENSTACK':
                     # Ask OpenStack questions
                     os_username, os_password, security_group, os_endpoint, os_region, os_zone, os_network_id = self._ask_OpenStack_questions(force_config, config_data, H)
@@ -280,7 +282,8 @@ class SysConfig(cliff.command.Command):
                 pancancer_config.update( { 'az_subscription_id': az_subscription_id, 'az_storage_account': az_storage_account,
                                 'az_storage_account_key': az_storage_account_key, 'az_ad_user': az_ad_user,
                                 'az_ad_password': az_ad_password, 'az_ad_tenant_id': az_tenant_id,
-                                'az_ad_client_id': az_client_id } )
+                                'az_ad_client_id': az_client_id, 'az_virtual_network': az_virtual_network, 
+                                'az_location': az_location,  } )
             elif cloud_env == 'OpenStack':
                 pancancer_config.update( {'os_username': os_username, 'os_password': os_password,
                                 'os_endpoint': os_endpoint, 'os_region': os_region,

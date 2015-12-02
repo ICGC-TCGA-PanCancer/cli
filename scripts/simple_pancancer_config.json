@@ -18,5 +18,6 @@
   "os_password":"os-password",
   "os_endpoint":"http://0.0.0.0:5000/v2.0",
   "os_region":"Region",
-  "os_zone":"zoooone"
+  "os_zone":"zoooone",
+  "os_network_id":"networkid"
 }

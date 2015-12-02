@@ -18,29 +18,29 @@
           	"aws":
           	{
           		"image":"ami-ef22748a",
-				"instance-type":"m1.xlarge",
-				"lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"	
+			"instance-type":"m1.xlarge",
+			"lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"	
           	},
           	"openstack":
           	{
           		"sweng":
           		{
 	          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
-					"instance-type":"m1.xlarge",
-					"lvm_devices":""
-				},
-				"pancancer":
-				{
+				"instance-type":"m1.xlarge",
+				"lvm_devices":""
+			},
+			"pancancer":
+			{
 	          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
-					"instance-type":"m1.xlarge",
-					"lvm_devices":""
-				}	
+				"instance-type":"m1.xlarge",
+				"lvm_devices":""
+			}	
           	},
           	"azure":
           	{
-          		"image":"HelloWorld Base Image",
-				"instance-type":"Standard_G5",
-				"lvm_devices":"/dev/sdb"	
+        		"image":"base-worker-no-workflows",
+			"instance-type":"Standard_G5",
+			"lvm_devices":"/dev/sdb"	
           	}
           },
           "default-ini":"http://something.ini"

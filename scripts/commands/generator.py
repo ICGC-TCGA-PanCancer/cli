@@ -141,7 +141,7 @@ class Generator(cliff.command.Command):
                     config['deployer_openstack']['image_id']=cloud_specific_details['image']
                 elif cloud_env == 'AZURE':
                     config['deployer_azure']['flavor']=cloud_specific_details['instance-type']
-                    config['deployer_azure']['image_id']=cloud_specific_details['image']
+                    config['deployer_azure']['image_name']=cloud_specific_details['image']
                     
                 with open('/home/ubuntu/.youxia/config','w') as youxia_configfile:
                     config.write(youxia_configfile,space_around_delimiters=True)

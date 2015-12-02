@@ -299,7 +299,7 @@ AWS_CONFIG
             # replace space with underscore so we can pass to the next script without having to surround in quotes because that
             # causes problems for other systems.
             user_fleet_name=${user_fleet_name// /_}
-            FLEET_NAME_STR=" -f \"$user_fleet_name\" "
+            FLEET_NAME_STR=" -f $user_fleet_name "
         fi
 
 		user_fleet_size='user_fleet_size'

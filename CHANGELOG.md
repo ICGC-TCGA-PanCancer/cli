@@ -1,5 +1,19 @@
 # Changes
 
+## 0.1.0
+ - Major changes:
+  - Support for non-Amazon clouds environments:
+   - Azure
+    - New script to create management certificates
+    - New Azure-specific questions in bootstrap script and in sysconfig  
+   - OpenStack.
+    - New OpenStack-specific questions in bootstrap script and in sysconfig
+    - new sysconfig option "--os_env_name" to specify which OpenStack environment settings to use for a workflow. 
+ - Some documentation updates
+ - Spot-pricing for Amazon
+ - Many other smaller bug fixes.
+ 
+
 ## 0.0.7
  - Minor documentation updates
  - Added new "--keep_failed" option for generator to prevent failed workers from being reaped (useful for debugging)

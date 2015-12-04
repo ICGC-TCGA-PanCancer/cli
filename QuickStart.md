@@ -99,7 +99,7 @@ $ scp -i <YOUR PEM KEY FILE>.pem <YOUR PEM KEY FILE>.pem ubuntu@<YOUR VM PUBLIC 
 ### Run Installer
 Download & execute the [bootstrap script](scripts/install_bootstrap) like this:
 ```
-$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/L4A_1.0.0-rc.3/install_bootstrap && bash install_bootstrap
+$ wget -qO install_bootstrap https://github.com/ICGC-TCGA-PanCancer/cli/releases/download/0.1.0/install_bootstrap && bash install_bootstrap
 ```
 This script will install docker (you can skip this step by answering "N" if you already have docker installed), the pancancer_launcher image, and collect some basic configuration info to get the launcher started. 
 
@@ -121,7 +121,7 @@ bash install_bootstrap
 
 If you follow the directions above you will find yourself dropped into the docker container that has all our launcher tools. The prompt will look something like this (the hostname, "f27e86874dfb" in this case, and possibly the version number, will be different):
 
-    [LAUNCHER 3.1.6] ubuntu@f27e86874dfb:~/arch3$
+    [LAUNCHER 3.2.0] ubuntu@f27e86874dfb:~/arch3$
 
 
 ###Running workflows

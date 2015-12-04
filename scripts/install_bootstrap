@@ -316,7 +316,19 @@ AWS_CONFIG
 		ask_question "What is the URL that lists available workflows?" $WORKFLOW_LISTING_URL "Workflow listing URL" $workflow_listing_url
 
         # now wget the start_launcher_container script and call it with the values from above:
-        $(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
+        #$(wget -q -O start_launcher_container.sh https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh)
+		starter_script_url="https://github.com/ICGC-TCGA-PanCancer/pancancer_launcher/releases/download/$PANCANCER_LAUNCHER_VERSION/start_launcher_container.sh"
+
+        set +e
+        wget -O start_launcher_container.sh $starter_script_url 2>get_start_launcher_container.err
+        get_starter_script_result=$?
+        set -e
+        if [ $get_starter_script_result -ne 0 ] ; then
+            echo "There seems to have been a problem downloading the startup script from:   $starter_script_url"
+            echo "Error is:"
+            cat ./get_start_launcher_container.err
+        fi
+				
         chmod u+x start_launcher_container.sh
         CMD_STR="bash start_launcher_container.sh -p $user_pem_path -i $user_pancancer_version -e ${user_cloud_env^^} $FLEET_NAME_STR"
 

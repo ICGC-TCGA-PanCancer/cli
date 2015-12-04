@@ -5,5 +5,19 @@
   "name_of_key":"MyKey",
   "security_group":"default",
   "aws_key":"AWS_KEY",
-  "aws_secret_key":"AWS_SECRET_KEY"
+  "aws_secret_key":"AWS_SECRET_KEY",
+  "azure_subscription_id":"subscription12345676",
+  "azure_keystore_location":"~/keystore_location",
+  "azure_keystore_password":"KEYSTORE_PASSWORD",
+  "azure_AD_username":"useR",
+  "azure_AD_password":"passwordD",
+  "azure_AD_tenant_id":"tenant_ID",
+  "azure_AD_client_id":"cleint_ID",
+  "azure_virtual_network":"Some Virtual Network",
+  "os_username":"os_tentant:user",
+  "os_password":"os-password",
+  "os_endpoint":"http://0.0.0.0:5000/v2.0",
+  "os_region":"Region",
+  "os_zone":"zoooone",
+  "os_network_id":"networkid"
 }

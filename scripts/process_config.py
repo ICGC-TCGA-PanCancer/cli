@@ -1,6 +1,7 @@
 import json
 import pystache
 import os
+import sys
 import shutil
 
 def makeConfigString(k,v):
@@ -9,42 +10,40 @@ def makeConfigString(k,v):
 def processYouxiaSettings(d):
     outstr=''
     outstr+='[youxia]\n'
-    aws_str=''
     openstack_str=''
     aws_deployer_str=''
+    azure_deployer_str=''
     for k,v in d.items():
+        # If we encounter something that is not a dictionary (i.e. a scalar of some kind, probably string or numeric), just add it to the file.
         if not (isinstance(v,dict)):
             outstr+=makeConfigString(k,v)
+        # If we do find a dictionary, prepend it with the correct section heading.
         else:
-            # if k=='aws':
-            #     # Process AWS-specific variables in the AWS heading
-            #     # awsStr+='\n[aws]\n'
-            #     aws_settings=d['aws']
-            #     for k1,v1 in aws_settings.items():
-            #         aws_str+=makeConfigString(k1,str(v1))
-            if k=='openstack':
-                # Process AWS-specific variables in the AWS heading
-                openstack_str+='\n[openstack]\n'
-                openstack_settings=d['openstack']
+            if k=='deployer_openstack':
+                openstack_str+='\n[deployer_openstack]\n'
+                openstack_settings=d['deployer_openstack']
                 for k1,v1 in openstack_settings.items():
-                    #print(k1+'='+str(v1))
                     openstack_str+=makeConfigString(k1,str(v1))
+            elif k=='deployer_azure':
+                azure_deployer_str+='\n[deployer_azure]\n'
+                azure_settings=d['deployer_azure']
+                for k1,v1 in azure_settings.items():
+                    azure_deployer_str+=makeConfigString(k1,str(v1))
             elif k=='deployer':
-                # Process AWS-specific variables in the AWS heading
                 aws_deployer_str+='\n[deployer]\n'
                 aws_deployer_settings=d['deployer']
                 for k1,v1 in aws_deployer_settings.items():
-                    #print(k1+'='+str(v1))
                     aws_deployer_str+=makeConfigString(k1,str(v1))
 
-    outstr+=aws_str
     outstr+=aws_deployer_str
+    outstr+=azure_deployer_str
     outstr+=openstack_str
     return outstr
 
 def processParams(d):
     return str(json.dumps(d,sort_keys=True, indent=4) )
 
+# TODO: Add code to ensure that "--openstack" or "--azure" are properly added to deployer/reaper commands
 def processConsonanceSettings(d):
     outstr=''
     for k,v in d.items():
@@ -67,6 +66,18 @@ def main(config_path):
         simple_config['sensu_server_ip_address'] = os.environ['SENSU_SERVER_IP_ADDRESS']
         simple_config['queue_host'] = os.environ['SENSU_SERVER_IP_ADDRESS']
         simple_config['fleet_name'] = os.environ['FLEET_NAME']
+        simple_config['cloud_env'] = os.environ['HOST_ENV']
+        if simple_config['cloud_env'].upper() == 'AZURE':
+            simple_config['use_openstack'] = "false"
+            simple_config['use_azure'] = "true"
+            simple_config['youxia_env_opt'] = '--azure'
+        elif simple_config['cloud_env'].upper() == 'OPENSTACK':
+            simple_config['use_openstack'] = "true"
+            simple_config['use_azure'] = "false"
+            simple_config['youxia_env_opt'] = '--openstack'
+        elif simple_config['cloud_env'].upper() == 'AWS':
+            simple_config['use_azure'] = "false"
+            simple_config['use_openstack'] = "false"
 
     config_path = os.path.dirname(__file__)
     with open(config_path +'/pancancer_config.mustache') as mustache_template_file:
@@ -109,3 +120,4 @@ def main(config_path):
     shutil.copy2(config_path + '/youxia_config','/home/ubuntu/.youxia/config')
     shutil.copy2(config_path + '/masterConfig.ini','/home/ubuntu/arch3/config/masterConfig.ini')
     shutil.copy2(config_path + '/params.json','/home/ubuntu/params.json')
+

@@ -1,5 +1,9 @@
 # Changes
 
+## 0.1.1
+ - Added the begining of an OpenStack-specific config document.
+ - Fixed incorrect consonance version number in mustache file.
+
 ## 0.1.0
  - Major changes:
   - Support for non-Amazon clouds environments:

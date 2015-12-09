@@ -1,7 +1,7 @@
 #! /bin/bash
 set -e
-PANCANCER_LAUNCHER_VERSION=3.2.0
-PANCANCER_CLI_VERSION=0.1.0
+PANCANCER_LAUNCHER_VERSION=3.2.1
+PANCANCER_CLI_VERSION=0.1.1
 WORKFLOW_LISTING_URL=https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/cli/${PANCANCER_CLI_VERSION}/config/workflowlist.json
 
 cat <<MSG
@@ -12,11 +12,11 @@ the PanCancer donors.  This launcher host can then launch one or more worker VMs
 workflows installed on them for processing one or more genomes specified by the user.
 
 This system requires the following:
-* Docker support in your Linux distribution (Ubuntu 14.04 is officially supported by the Pancancer Launcher)
-* AWS credentials
+* Docker support in your Linux distribution (Ub1untu 14.04 is officially supported by the Pancancer Launcher).
+* AWS credentials, if you are using Amazon EC2.
 * A GNOS key (or keys) which are used to both download Docker images for our workflows, dependencies, as well as data from from GNOS servers used in the project.
   Please ensure that these files are in ~/.gnos
-* Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3
+* Alternatively (or in addition to) the GNOS keys, a token for downloading workflows, dependencies, as well as donor data files from S3.
 MSG
 
 # Ask the user a question and save the answer.

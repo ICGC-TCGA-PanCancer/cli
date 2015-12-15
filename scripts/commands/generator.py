@@ -62,7 +62,7 @@ class Generator(cliff.command.Command):
                 elif cloud_env == 'OPENSTACK' : 
                     # If there is only one OpenStack choice, we'll just go with that.
                     if len(workflow_details['cloud-specific-details']['openstack'].keys())<=1:
-                        cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][0]
+                        cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][ list(workflow_details['cloud-specific-details']['openstack'].keys())[0] ]
                     else:
                         # Check to see if the user did not provide an OpenStack environment name, or if it's not in the list of *actual* names
                         if os_env_name is None or os_env_name not in workflow_details['cloud-specific-details']['openstack']:

@@ -75,8 +75,8 @@
 			}
              	},
              	"azure":{
-             		"image":"ami-f583d190",
-             		"instance-type":"r3.8xlarge",
+        		"image":"sanger-base-image-2",
+			"instance-type":"Standard_G5",
              		"lvm_devices":"/dev/sdb"
              	}
              },

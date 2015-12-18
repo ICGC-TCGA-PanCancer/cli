@@ -157,7 +157,7 @@
 
 		"cloud-specific-details": {
 	          	"aws": {
-		          "image":"ami-4387d526",
+		          "image":"ami-f583d190",
 		          "instance-type":"r3.8xlarge",
 		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
 	          	},

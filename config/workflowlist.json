@@ -175,7 +175,7 @@
 				}
 	          	}
           	},
-          "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0_GNOS.ini",
+          "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0_GNOS.ini"
              
          },
         "Broad_1.0.0":

@@ -154,10 +154,29 @@
                      "url":"s3://oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar"
                  }
              },
-             "ami_id":"ami-d05e75b8",
-             "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0_GNOS.ini",
-             "instance-type":"r3.8xlarge",
-             "lvm_devices":"/dev/xvdb,/dev/xvdc"
+
+		"cloud-specific-details": {
+	          	"aws": {
+		          "image":"ami-4387d526",
+		          "instance-type":"r3.8xlarge",
+		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
+	          	},
+	          	"azure": {
+	          	  "image":"base-image",
+	          	  "instance-type":"Standard_G5",
+	          	  "lvm_devices":"/dev/sdb"
+	          	},
+	          	"openstack": {
+	          		"sweng":
+	          		{
+		          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
+					"instance-type":"m1.4xlarge",
+					"lvm_devices":""
+				}
+	          	}
+          	},
+          "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0_GNOS.ini",
+             
          },
         "Broad_1.0.0":
             {

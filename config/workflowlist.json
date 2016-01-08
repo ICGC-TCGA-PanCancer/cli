@@ -34,7 +34,13 @@
 	          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
 				"instance-type":"m1.xlarge",
 				"lvm_devices":""
-			}	
+			},
+			"collaboratory":
+			{
+	          		"image":"cc9c3069-3482-40b7-a0f9-80138a74a894",
+				"instance-type":"c1.medium",
+				"lvm_devices":""
+			}
           	},
           	"azure":
           	{

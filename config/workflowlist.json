@@ -255,6 +255,11 @@
              			"image_name":"pancancer/pancancer_upload_download:1.7"
              		}
              	},
+             	"http_workflow":
+          	{
+              		"url":"https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_HelloWorld_1.0-SNAPSHOT_SeqWare_1.1.1.zip",
+              		"version":"1.0-SNAPSHOT"
+          	},
 		"default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/OxoGWrapperWorkflow/develop/workflow/config/OxoGWrapperWorkflow.ini"
 	}
 }

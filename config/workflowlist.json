@@ -216,7 +216,7 @@
                 "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/BroadWrapperWorkflow/develop/workflow/config/BroadWrapperWorkflow.ini",
                 "instance-type":"m1.xlarge",
                 "lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"
-            }
+            },
 	"OxoG_1.0":
 	{
 		"full_name":"Workflow_Bundle_OxoGWrapper_1.0_SeqWare_1.1.2",

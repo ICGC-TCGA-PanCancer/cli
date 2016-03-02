@@ -227,7 +227,7 @@
 		          "image":"ami-b180b1db",
 		          "instance-type":"m2.4xlarge",
 		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
-	          	}
+	          	},
 			"openstack":
 			{
 				"collaboratory":

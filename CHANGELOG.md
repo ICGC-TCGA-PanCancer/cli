@@ -1,5 +1,10 @@
 # Changes
 
+## 0.1.2
+ - New version of architecture-setup: [3.1.13](https://github.com/ICGC-TCGA-PanCancer/architecture-setup/releases/tag/3.1.13)
+ - Updated config file: now includes OxoG for Collaboratory, as well as updates to other workflows' configurations.
+ - Changed path to server-tags to be absolute path, in mustache file.
+
 ## 0.1.1
  - Added the begining of an OpenStack-specific config document.
  - Fixed incorrect consonance version number in mustache file.

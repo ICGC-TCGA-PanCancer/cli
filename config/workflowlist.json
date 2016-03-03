@@ -34,7 +34,13 @@
 	          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
 				"instance-type":"m1.xlarge",
 				"lvm_devices":""
-			}	
+			},
+			"collaboratory":
+			{
+	          		"image":"cc9c3069-3482-40b7-a0f9-80138a74a894",
+				"instance-type":"c1.medium",
+				"lvm_devices":""
+			}
           	},
           	"azure":
           	{
@@ -67,13 +73,16 @@
              		"lvm_devices":"/dev/xvdb,/dev/xvdc"
              	},
              	"openstack":{
-             		"image":"ami-f583d190",
-             		"instance-type":"r3.8xlarge",
-             		"lvm_devices":"/dev/xvdb,/dev/xvdc"
+			"sweng":
+			{
+				"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
+				"instance-type":"m1.2xlarge",
+				"lvm_devices":""
+			}
              	},
              	"azure":{
-             		"image":"ami-f583d190",
-             		"instance-type":"r3.8xlarge",
+        		"image":"sanger-base-image-2",
+			"instance-type":"Standard_G5",
              		"lvm_devices":"/dev/sdb"
              	}
              },
@@ -94,7 +103,7 @@
                   "image_name": "pancancer/seqware_whitestar_pancancer:1.1.2"
               }
           },
-          "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/feature/solomon_BWA_use_S3/workflow/config/workflow_s3.ini",
+          "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/Seqware-BWA-Workflow/2.6.6/workflow/config/workflow_s3.ini",
           "cloud-specific-details": {
           	"aws": {
 	          "image":"ami-4387d526",
@@ -107,9 +116,12 @@
           	  "lvm_devices":"/dev/sdb"
           	},
           	"openstack": {
-          		"image":"somethingelse",
-          		"instance-type":"m1.xlarge",
-          		"lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"
+          		"sweng":
+          		{
+	          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
+				"instance-type":"m1.xlarge",
+				"lvm_devices":""
+			}
           	}
           }
       },
@@ -148,10 +160,29 @@
                      "url":"s3://oicr.docker.private.images/dkfz_dockered_workflows_1.3.tar"
                  }
              },
-             "ami_id":"ami-d05e75b8",
-             "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0_GNOS.ini",
-             "instance-type":"r3.8xlarge",
-             "lvm_devices":"/dev/xvdb,/dev/xvdc"
+
+		"cloud-specific-details": {
+	          	"aws": {
+		          "image":"ami-f583d190",
+		          "instance-type":"r3.8xlarge",
+		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
+	          	},
+	          	"azure": {
+	          	  "image":"base-image",
+	          	  "instance-type":"Standard_G5",
+	          	  "lvm_devices":"/dev/sdb"
+	          	},
+	          	"openstack": {
+	          		"sweng":
+	          		{
+		          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
+					"instance-type":"m1.4xlarge",
+					"lvm_devices":""
+				}
+	          	}
+          	},
+          "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/DEWrapperWorkflow/develop/workflow/config/DEWrapperWorkflow_1.6.0_GNOS.ini"
+             
          },
         "Broad_1.0.0":
             {
@@ -185,5 +216,61 @@
                 "default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/BroadWrapperWorkflow/develop/workflow/config/BroadWrapperWorkflow.ini",
                 "instance-type":"m1.xlarge",
                 "lvm_devices":"/dev/xvdb,/dev/xvdc,/dev/xvdd,/dev/xvde"
-            }
-  }
+            },
+	"OxoG_1.0":
+	{
+		"full_name":"Workflow_Bundle_OxoGWrapper_1.0_SeqWare_1.1.2",
+		"cloud-specific-details":
+		{
+			"aws":
+			{
+		          "image":"ami-b180b1db",
+		          "instance-type":"m2.4xlarge",
+		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
+	          	},
+			"openstack":
+			{
+				"collaboratory":
+				{
+					"image":"a3749ea3-46c3-4d20-9b32-70ed6d584e9c",
+					"instance-type":"c1.large",
+					"lvm_devices":""
+				}
+	          	}
+		},
+		"containers":
+             	{
+             		"compbio_ngseasy_base":
+             		{
+             			"name":"compbio_ngseasy_base",
+             			"image_name":"compbio/ngseasy-base:a1.0-002"
+             		},
+             		"icgc_storage_client":
+             		{
+             			"name":"icgc_storage_client",
+             			"image_name":"icgc/icgc-storage-client"
+             		},
+             		"seqware_whitestar_pancancer":
+             		{
+             			"name":"seqware_whitestar_pancancer",
+             			"image_name":"pancancer/seqware_whitestar_pancancer:1.1.2-actual-java8"
+             		},
+             		"annotator":
+             		{
+             			"name":"annotator",
+             			"image_name":"ljdursi/pcawg-annotate"
+             		},
+             		"pancancer_upload_download":
+             		{
+             			"name":"pancancer_upload_download",
+             			"image_name":"pancancer/pancancer_upload_download:1.7"
+             		}
+             	},
+             	"http_workflow":
+          	{
+              		"url":"https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_OxoGWrapper_1.0.0_SeqWare_1.1.2.zip",
+              		"version":"1.0.0"
+          	},
+		"default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/OxoGWrapperWorkflow/develop/workflow/config/OxoGWrapperWorkflow.ini"
+	}
+}

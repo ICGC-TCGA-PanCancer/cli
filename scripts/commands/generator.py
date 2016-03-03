@@ -5,6 +5,7 @@ import configparser
 import workflowlister
 import json
 import os
+import sys
 
 class Generator(cliff.command.Command):
     "This Generator will generate new job orders based on the contents of ~/ini-dir. Be aware that it will also rewrite your params.json file and your ~.youxia/config file."
@@ -61,8 +62,13 @@ class Generator(cliff.command.Command):
                     cloud_specific_details = workflow_details['cloud-specific-details']['aws']
                 elif cloud_env == 'OPENSTACK' : 
                     # If there is only one OpenStack choice, we'll just go with that.
-                    if len(workflow_details['cloud-specific-details']['openstack'].keys())<=1:
-                        cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][ list(workflow_details['cloud-specific-details']['openstack'].keys())[0] ]
+                    self.log.debug('OpenStack options: '+str(workflow_details['cloud-specific-details']['openstack']))
+                    if len(workflow_details['cloud-specific-details']['openstack'].keys())==0:
+                        print('No OpenStack environments are available. Exiting.')
+                        sys.exit(1)                  
+                    elif len(workflow_details['cloud-specific-details']['openstack'].keys())==1:
+                        k = list(workflow_details['cloud-specific-details']['openstack'].keys())[0]
+                        cloud_specific_details = workflow_details['cloud-specific-details']['openstack'][k]
                     else:
                         # Check to see if the user did not provide an OpenStack environment name, or if it's not in the list of *actual* names
                         if os_env_name is None or os_env_name not in workflow_details['cloud-specific-details']['openstack']:

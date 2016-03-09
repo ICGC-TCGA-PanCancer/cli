@@ -224,7 +224,7 @@
 		{
 			"aws":
 			{
-		          "image":"ami-b180b1db",
+		          "image":"ami-d85e75b0",
 		          "instance-type":"m2.4xlarge",
 		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
 	          	},
@@ -280,7 +280,7 @@
 		{
 			"aws":
 			{
-		          "image":"ami-b180b1db",
+		          "image":"ami-d85e75b0",
 		          "instance-type":"m2.4xlarge",
 		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
 	          	},
@@ -336,7 +336,7 @@
 		{
 			"aws":
 			{
-		          "image":"ami-b180b1db",
+		          "image":"ami-d85e75b0",
 		          "instance-type":"m2.4xlarge",
 		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
 	          	},

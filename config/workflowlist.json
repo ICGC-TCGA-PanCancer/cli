@@ -776,5 +776,61 @@
               		"version":"1.1.4"
           	},
 		"default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/OxoGWrapperWorkflow/develop/workflow/config/OxoGWrapperWorkflow.ini"
+	},
+	"OxoG_1.1.5":
+	{
+		"full_name":"Workflow_Bundle_OxoGWrapper_1.1.5_SeqWare_1.1.2",
+		"cloud-specific-details":
+		{
+			"aws":
+			{
+		          "image":"ami-808c86ea",
+		          "instance-type":"m2.4xlarge",
+		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
+	          	},
+			"openstack":
+			{
+				"collaboratory":
+				{
+					"image":"4e59bc18-0881-4745-b16c-f974b8aa0f29",
+					"instance-type":"c1.large",
+					"lvm_devices":""
+				}
+	          	}
+		},
+		"containers":
+             	{
+             		"compbio_ngseasy_base":
+             		{
+             			"name":"compbio_ngseasy_base",
+             			"image_name":"compbio/ngseasy-base:a1.0-002"
+             		},
+             		"icgc_storage_client":
+             		{
+             			"name":"icgc_storage_client",
+             			"image_name":"icgc/icgc-storage-client:1.0.13"
+             		},
+             		"seqware_whitestar_pancancer":
+             		{
+             			"name":"seqware_whitestar_pancancer",
+             			"image_name":"pancancer/seqware_whitestar_pancancer:1.1.2-actual-java8"
+             		},
+             		"annotator":
+             		{
+             			"name":"annotator",
+             			"image_name":"ljdursi/pcawg-annotate"
+             		},
+             		"pancancer_upload_download":
+             		{
+             			"name":"pancancer_upload_download",
+             			"image_name":"pancancer/pancancer_upload_download:1.7"
+             		}
+             	},
+             	"http_workflow":
+          	{
+              		"url":"https://s3.amazonaws.com/oicr.workflow.bundles/released-bundles/Workflow_Bundle_OxoGWrapper_1.1.5_SeqWare_1.1.2.zip",
+              		"version":"1.1.5"
+          	},
+		"default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/OxoGWrapperWorkflow/develop/workflow/config/OxoGWrapperWorkflow.ini"
 	}
 }

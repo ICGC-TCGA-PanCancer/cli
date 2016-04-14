@@ -849,7 +849,7 @@
 				"collaboratory":
 				{
 					"image":"1cd38bae-bba0-4f6a-bbd4-b69ee2f0c32b",
-					"instance-type":"c1.xlarge",
+					"instance-type":"OxoG_Multutumour",
 					"lvm_devices":""
 				}
 	          	}

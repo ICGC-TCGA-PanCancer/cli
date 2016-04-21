@@ -888,8 +888,7 @@
               		"version":"2.0.0"
           	},
 		"default-ini":"https://raw.githubusercontent.com/ICGC-TCGA-PanCancer/OxoGWrapperWorkflow/develop/workflow/config/OxoGWrapperWorkflow.ini"
-	}
-	,
+	},
 	"OxoG_2.0.1":
 	{
 		"full_name":"Workflow_Bundle_OxoGWrapper_2.0.1_SeqWare_1.1.2",

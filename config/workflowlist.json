@@ -1008,7 +1008,7 @@
 		{
 			"aws":
 			{
-		          "image":"ami-808c86ea",
+		          "image":"ami-05876068",
 		          "instance-type":"m2.4xlarge",
 		          "lvm_devices":"/dev/xvdb,/dev/xvdc"
 	          	},

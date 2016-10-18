@@ -116,11 +116,14 @@
           	  "lvm_devices":"/dev/sdb"
           	},
           	"openstack": {
-          		"sweng":
-          		{
-	          		"image":"d696eb26-a0b0-4533-a28f-60e92f9ed125",
-				"instance-type":"m1.xlarge",
-				"lvm_devices":""
+			"openstack":
+			{
+				"collaboratory":
+				{
+					"image":"ed891fa9-7ab9-4b25-bd0c-e39b30879255",
+					"instance-type":"OxoG_Multutumour",
+					"lvm_devices":""
+				}
 			}
           	}
           }

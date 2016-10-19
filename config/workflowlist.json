@@ -116,14 +116,11 @@
           	  "lvm_devices":"/dev/sdb"
           	},
           	"openstack": {
-			"openstack":
+			"collaboratory":
 			{
-				"collaboratory":
-				{
-					"image":"ed891fa9-7ab9-4b25-bd0c-e39b30879255",
-					"instance-type":"OxoG_Multutumour",
-					"lvm_devices":""
-				}
+				"image":"ed891fa9-7ab9-4b25-bd0c-e39b30879255",
+				"instance-type":"OxoG_Multutumour",
+				"lvm_devices":""
 			}
           	}
           }

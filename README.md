@@ -1,6 +1,6 @@
 # Overview
 
-The Pancancer CLI is a tool that allows you to provision and manage a fleet of virutal machines in a cloud environment (such as Amazon EC2), and execute Pancancer workflows on them.
+The Pancancer CLI is a tool that allows you to provision and manage a fleet of virtual machines in a cloud environment (such as Amazon EC2), and execute Pancancer workflows on them.
 
 <!-- TODO: A little more detail here, and a "how it works" section -->
 <!-- This section needs more work.
